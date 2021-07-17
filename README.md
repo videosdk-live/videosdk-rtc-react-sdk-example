@@ -4,7 +4,7 @@
 
 1. Navigate to `/src/App.js`
 
-2. Change config inside `MeetingProvider`
+2. clone this repository => https://github.com/videosdk-live/videosdk-rtc-nodejs-sdk-example and run node server
 
 3. run `npm run start`
 
