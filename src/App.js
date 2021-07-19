@@ -5,29 +5,7 @@ import {
   useMeeting,
   useParticipant,
 } from "@videosdk.live/react-sdk";
-
-const getToken = async () => {
-  const res = await fetch(`http://localhost:9000/get-token`, { method: "GET" });
-
-  const { token } = await res.json();
-  return token;
-};
-
-const createMeeting = async () => {
-  const res = await fetch("http://localhost:9000/create-meeting", {
-    method: "POST",
-  });
-  console.log(res);
-};
-
-const validateMeeting = async (token) => {
-  const res = await fetch(`http://localhost:9000/validate-meeting/${token}`, {
-    method: "GET",
-  });
-
-  const { meetingId } = await res.json();
-  return meetingId;
-};
+import { getToken, validateMeeting } from "./api";
 
 const primary = "#3E84F6";
 
@@ -608,13 +586,15 @@ const App = () => {
   const [token, setToken] = useState(null);
   const [meetingId, setMeetingId] = useState(null);
 
-  useEffect(async () => {
+  const getMeetingAndToken = async () => {
     const token = await getToken();
     const meetingId = await validateMeeting(token);
 
     setToken(token);
     setMeetingId(meetingId);
-  }, []);
+  };
+
+  useEffect(getMeetingAndToken, []);
 
   return token && meetingId ? (
     <MeetingProvider
