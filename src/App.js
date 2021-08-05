@@ -35,14 +35,48 @@ const Title = ({ title, dark }) => {
 };
 
 const ExternalVideo = () => {
-  const { externalVideo } = useMeeting();
-  const externalPlayer = useRef();
+  const [{ link, playing }, setVideoInfo] = useState({
+    link: null,
+    playing: false,
+  });
 
-  useEffect(() => {
-    if (externalPlayer.current) {
-      externalPlayer.current.currentTime = externalVideo.currentTime;
+  const onVideoStateChanged = (data) => {
+    const { currentTime, link, status } = data;
+
+    switch (status) {
+      case "stopped":
+        console.log("stopped in switch");
+        externalPlayer.current.src = null;
+        setVideoInfo({ link: null, playing: false });
+        break;
+      case "resumed":
+        if (typeof currentTime === "number") {
+          externalPlayer.current.currentTime = currentTime;
+        }
+        externalPlayer.current.play();
+        setVideoInfo((s) => ({ ...s, playing: true }));
+        break;
+      case "paused":
+        externalPlayer.current.pause();
+        setVideoInfo((s) => ({ ...s, playing: false }));
+        break;
+      case "started":
+        setVideoInfo({ link, playing: true });
+        break;
+      default:
+        break;
     }
-  }, [externalVideo]);
+  };
+
+  const onVideoSeeked = (data) => {
+    const { currentTime } = data;
+    if (typeof currentTime === "number") {
+      externalPlayer.current.currentTime = currentTime;
+    }
+  };
+
+  useMeeting({ onVideoStateChanged, onVideoSeeked });
+  const externalPlayer = useRef();
 
   return (
     <div
@@ -60,7 +94,7 @@ const ExternalVideo = () => {
         style={{ borderRadius, height, width, backgroundColor: "black" }}
         autoPlay
         ref={externalPlayer}
-        src={externalVideo.link}
+        src={link}
       />
     </div>
   );
@@ -428,11 +462,12 @@ function MeetingView() {
   const onLiveStreamStopped = (data) => {
     console.log("onLiveStreamStopped example", data);
   };
-  const onVideoStarted = (data) => {
-    console.log("onVideoStarted example", data);
+
+  const onVideoStateChanged = (data) => {
+    console.log("onVideoStateChanged", data);
   };
-  const onVideoStopped = (data) => {
-    console.log("onVideoStopped example", data);
+  const onVideoSeeked = (data) => {
+    console.log("onVideoSeeked", data);
   };
 
   const {
@@ -464,9 +499,12 @@ function MeetingView() {
     toggleScreenShare,
     startVideo,
     stopVideo,
+    resumeVideo,
+    pauseVideo,
+    seekVideo,
+
     startLivestream,
     stopLivestream,
-    externalVideo,
     isLiveStreaming,
   } = useMeeting({
     onParticipantJoined,
@@ -483,13 +521,13 @@ function MeetingView() {
     onMeetingLeft,
     onLiveStreamstarted,
     onLiveStreamStopped,
-    onVideoStarted,
-    onVideoStopped,
+    onVideoStateChanged,
+    onVideoSeeked,
   });
 
-  console.log(externalVideo, "externalVideo");
-
   const handlestartVideo = () => {
+    console.log("handlestartVideo");
+
     startVideo({
       link: "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4",
     });
@@ -497,6 +535,16 @@ function MeetingView() {
 
   const handlestopVideo = () => {
     stopVideo();
+  };
+
+  const handleresumeVideo = () => {
+    resumeVideo();
+  };
+  const handlepauseVideo = () => {
+    pauseVideo({ currentTime: 2 });
+  };
+  const handlesseekVideo = () => {
+    seekVideo({ currentTime: 5 });
   };
   const handleStartLiveStream = () => {
     startLivestream([
@@ -549,6 +597,16 @@ function MeetingView() {
         <button className={"button blue"} onClick={handlestopVideo}>
           stopVideo
         </button>
+        <button className={"button blue"} onClick={handleresumeVideo}>
+          resumeVideo
+        </button>
+        <button className={"button blue"} onClick={handlepauseVideo}>
+          pauseVideo
+        </button>
+        <button className={"button blue"} onClick={handlesseekVideo}>
+          seekVideo
+        </button>
+
         <button className={"button blue"} onClick={handleStartLiveStream}>
           Start Live Stream
         </button>
