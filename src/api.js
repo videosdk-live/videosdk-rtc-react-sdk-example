@@ -9,18 +9,22 @@ export const getToken = async () => {
   return token;
 };
 
-export const createMeeting = async () => {
+export const createMeeting = async ({ token }) => {
   const res = await fetch(`${API_BASE_URL}create-meeting`, {
     method: "POST",
-  });
-  console.log(res);
-};
-
-export const validateMeeting = async (token) => {
-  const res = await fetch(`${API_BASE_URL}validate-meeting/${token}`, {
-    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
   });
 
   const { meetingId } = await res.json();
+
   return meetingId;
+};
+
+export const validateMeeting = async ({ meetingId, token }) => {
+  await fetch(`${API_BASE_URL}validate-meeting/${meetingId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+  });
 };

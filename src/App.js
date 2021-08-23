@@ -5,7 +5,7 @@ import {
   useMeeting,
   useParticipant,
 } from "@videosdk.live/react-sdk";
-import { getToken, validateMeeting } from "./api";
+import { getToken, validateMeeting, createMeeting } from "./api";
 
 const primary = "#3E84F6";
 
@@ -646,7 +646,7 @@ const App = () => {
 
   const getMeetingAndToken = async () => {
     const token = await getToken();
-    const meetingId = await validateMeeting(token);
+    const meetingId = await createMeeting({ token });
 
     setToken(token);
     setMeetingId(meetingId);
