@@ -36,7 +36,8 @@ You must have the following installed:
 ## Getting started
 
 1. Run the authentication server
-   Follow [videosdk-rtc-nodejs-sdk-example](https://github.com/videosdk-live/videosdk-rtc-nodejs-sdk-example) to run authentication server.
+
+   Follow instructions from [videosdk-rtc-nodejs-sdk-example](https://github.com/videosdk-live/videosdk-rtc-nodejs-sdk-example) to run the authentication server.
 
 2. Clone the repo
 
