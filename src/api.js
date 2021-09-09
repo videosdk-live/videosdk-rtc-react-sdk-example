@@ -1,7 +1,7 @@
-const API_BASE_URL = "http://localhost:9000/";
+const API_BASE_URL = process.env.REACT_APP_SERVER_URL;
 
 export const getToken = async () => {
-  const res = await fetch(`${API_BASE_URL}get-token`, {
+  const res = await fetch(`${API_BASE_URL}/get-token`, {
     method: "GET",
   });
 
@@ -10,7 +10,7 @@ export const getToken = async () => {
 };
 
 export const createMeeting = async ({ token }) => {
-  const res = await fetch(`${API_BASE_URL}create-meeting`, {
+  const res = await fetch(`${API_BASE_URL}/create-meeting`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token }),
@@ -22,7 +22,7 @@ export const createMeeting = async ({ token }) => {
 };
 
 export const validateMeeting = async ({ meetingId, token }) => {
-  await fetch(`${API_BASE_URL}validate-meeting/${meetingId}`, {
+  await fetch(`${API_BASE_URL}/validate-meeting/${meetingId}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ token }),
