@@ -189,6 +189,7 @@ const ParticipantView = ({ participantId }) => {
 
   const {
     displayName,
+    participant,
     webcamStream,
     micStream,
     screenShareStream,
@@ -198,6 +199,15 @@ const ParticipantView = ({ participantId }) => {
     isLocal,
     isActiveSpeaker,
     isMainParticipant,
+    pinState,
+
+    setQuality,
+    enableMic,
+    disableMic,
+    enableWebcam,
+    disableWebcam,
+    pin,
+    unpin,
   } = useParticipant(participantId, {
     onStreamEnabled,
     onStreamDisabled,
@@ -456,8 +466,8 @@ function MeetingView() {
   function onMeetingLeft() {
     console.log("onMeetingLeft");
   }
-  const onLiveStreamstarted = (data) => {
-    console.log("onLiveStreamstarted example", data);
+  const onLiveStreamStarted = (data) => {
+    console.log("onLiveStreamStarted example", data);
   };
   const onLiveStreamStopped = (data) => {
     console.log("onLiveStreamStopped example", data);
@@ -470,42 +480,66 @@ function MeetingView() {
     console.log("onVideoSeeked", data);
   };
 
+  const onWebcamRequested = (data) => {
+    console.log("onWebcamRequested", data);
+  };
+  const onMicRequested = (data) => {
+    console.log("onMicRequested", data);
+  };
+  const onPinStateChanged = (data) => {
+    console.log("onPinStateChanged", data);
+  };
+
   const {
-    // meetingId,
+    meetingId,
     meeting,
-    // localParticipant,
-    // mainParticipant,
-    // activeSpeakerId,
+    localParticipant,
+    mainParticipant,
+    activeSpeakerId,
     participants,
-    isRecording,
-    // presenterId,
-    // localMicOn,
-    // localWebcamOn,
-    // localScreenShareOn,
+    presenterId,
+    localMicOn,
+    localWebcamOn,
+    localScreenShareOn,
     messages,
+    isRecording,
+    isLiveStreaming,
+    pinnedParticipants,
     //
     join,
     leave,
-
+    end,
+    //
     startRecording,
     stopRecording,
-    // //
+    //
     sendChatMessage,
-    // respondEntry,
-
+    respondEntry,
+    //
+    muteMic,
+    unmuteMic,
     toggleMic,
+    //
+    disableWebcam,
+    enableWebcam,
     toggleWebcam,
-
+    //
+    disableScreenShare,
+    enableScreenShare,
     toggleScreenShare,
+    //
+    getMics,
+    getWebcams,
+    changeWebcam,
+    changeMic,
+
     startVideo,
     stopVideo,
     resumeVideo,
     pauseVideo,
     seekVideo,
-
     startLivestream,
     stopLivestream,
-    isLiveStreaming,
   } = useMeeting({
     onParticipantJoined,
     onParticipantLeft,
@@ -519,10 +553,13 @@ function MeetingView() {
     onChatMessage,
     onMeetingJoined,
     onMeetingLeft,
-    onLiveStreamstarted,
+    onLiveStreamStarted,
     onLiveStreamStopped,
     onVideoStateChanged,
     onVideoSeeked,
+    onWebcamRequested,
+    onMicRequested,
+    onPinStateChanged,
   });
 
   const handlestartVideo = () => {

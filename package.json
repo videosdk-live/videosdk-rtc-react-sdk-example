@@ -2,11 +2,12 @@
   "name": "react-sdk-example",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://lab.zujonow.com/react-rtc-demo/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "@videosdk.live/react-sdk": "^0.0.23",
+    "@videosdk.live/react-sdk": "^0.1.9",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
