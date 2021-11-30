@@ -2,7 +2,7 @@
 
 ## What is it?
 
-This code sample demonstrates a one-to-one and group video call application built with [Video SDK RTC React SDK](https://docs.videosdk.live/docs/realtime-communication/sdk-reference/react-sdk/setup), [Video SDK RTC JS SDK](https://docs.videosdk.live/docs/realtime-communication/sdk-reference/javascript-sdk/setup)
+This code sample demonstrates a one-to-one and group video call application built with [Video SDK RTC React SDK](https://docs.videosdk.live/docs/guide/video-and-audio-calling-api-sdk/react-js-sdk), [Video SDK RTC JS SDK](https://docs.videosdk.live/docs/realtime-communication/sdk-reference/javascript-sdk/setup)
 
 - Built for serverless video calling experience.
 - Scale it upto 5,000 participants with low code.
@@ -40,13 +40,13 @@ You must have the following installed:
 2. Clone the repo
 
    ```sh
-   $ git clone https://github.com/videosdk-live/videosdk-rtc-react-sdk-example.git
+   git clone https://github.com/videosdk-live/videosdk-rtc-react-sdk-example.git
    ```
 
 3. Copy the `.env.example` file to `.env` file.
 
    ```sh
-   $ cp .env.example .env
+   cp .env.example .env
    ```
 
 4. Update the api server url in the `.env` file that points to the authentication server.
@@ -58,16 +58,16 @@ You must have the following installed:
 5. Install NPM packages
 
    ```sh
-   $ npm install
+   npm install
    ```
 
 6. Run the app
 
    ```sh
-   $ npm run start
+   npm run start
    ```
 
-For more information, visit [official documentation](https://docs.videosdk.live/docs/realtime-communication/sdk-reference/react-sdk/setup)
+For more information, visit [official documentation](https://docs.videosdk.live/docs/guide/video-and-audio-calling-api-sdk/getting-started)
 
 Related
 
