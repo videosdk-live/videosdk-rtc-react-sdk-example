@@ -678,23 +678,14 @@ function MeetingView() {
 }
 
 const App = () => {
-  const [token, setToken] = useState(null);
-  const [meetingId, setMeetingId] = useState(null);
+  const [token, setToken] = useState(
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlrZXkiOiI2MjlhODNiYS02MTAxLTQ5ZTItODMxZS1lZjMzZGQ3OTczNGYiLCJwZXJtaXNzaW9ucyI6WyJhbGxvd19qb2luIiwiYWxsb3dfbW9kIl0sImlhdCI6MTY0MDE1MjIwNCwiZXhwIjoxNjQwMTUyODA0fQ.0jtFGVGSlTdkAH3Ib0I513h9VryFJLZiUzY-A0rIbTs"
+  );
 
-  const getMeetingAndToken = async () => {
-    const token = await getToken();
-    const meetingId = await createMeeting({ token });
-
-    setToken(token);
-    setMeetingId(meetingId);
-  };
-
-  useEffect(getMeetingAndToken, []);
-
-  return token && meetingId ? (
+  return token ? (
     <MeetingProvider
       config={{
-        meetingId,
+        meetingId: "dhlx-vktf-773b",
         micEnabled: true,
         webcamEnabled: false,
         name: "Participant Name",
