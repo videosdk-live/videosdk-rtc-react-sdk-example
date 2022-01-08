@@ -4,8 +4,11 @@ import {
   MeetingConsumer,
   useMeeting,
   useParticipant,
+  useConnection,
 } from "@videosdk.live/react-sdk";
 import { getToken, validateMeeting, createMeeting } from "./api";
+import { confirmAlert } from "react-confirm-alert"; // Import
+import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 
 const primary = "#3E84F6";
 
@@ -78,7 +81,7 @@ const ExternalVideo = () => {
   useMeeting({ onVideoStateChanged, onVideoSeeked });
   const externalPlayer = useRef();
 
-  return (
+  return !link ? null : (
     <div
       style={{
         borderRadius,
@@ -199,8 +202,8 @@ const ParticipantView = ({ participantId }) => {
     isLocal,
     isActiveSpeaker,
     isMainParticipant,
+    switchTo,
     pinState,
-
     setQuality,
     enableMic,
     disableMic,
@@ -282,7 +285,7 @@ const ParticipantView = ({ participantId }) => {
         position: "relative",
       }}
     >
-      <audio ref={micRef} autoPlay />
+      <audio ref={micRef} autoPlay muted={isLocal} />
 
       <div
         style={{
@@ -330,8 +333,48 @@ const ParticipantView = ({ participantId }) => {
               WEB CAM
             </p>
           </div>
+
+          <div
+            style={{
+              position: "absolute",
+              top: 10,
+              left: 10,
+            }}
+          >
+            <button
+              className="button blue"
+              style={
+                {
+                  // height: 50,
+                  // width: 200,
+                }
+              }
+              onClick={async () => {
+                const meetingId = prompt(
+                  `Please enter meeting id where you want to switch ${displayName}`
+                );
+                const token = await getToken();
+                if (meetingId && token) {
+                  try {
+                    await switchTo({
+                      meetingId,
+                      payload: "Im Switching",
+                      token: token,
+                    });
+                  } catch (e) {
+                    console.log("swithc To Error", e);
+                  }
+                } else {
+                  alert("Empty meetingId!");
+                }
+              }}
+            >
+              Switch Participant
+            </button>
+          </div>
         </div>
       </div>
+
       <div
         style={{
           marginTop: borderRadius,
@@ -429,7 +472,134 @@ const ParticipantsView = () => {
   );
 };
 
-function MeetingView() {
+const ConnectionView = ({ connectionId }) => {
+  const { connection } = useConnection(connectionId, {
+    onMeeting: {
+      onChatMessage: ({ message, participantId }) => {
+        alert(
+          `A Person ${participantId} from ${connectionId} Wants to say : ${message}`
+        );
+      },
+    },
+  });
+
+  const connectionParticipants = [...connection.meeting.participants.values()];
+
+  const ConnectionParticipant = ({ participant }) => {
+    return (
+      <div style={{ padding: 4, border: "1px solid blue" }}>
+        <p>{participant.displayName}</p>
+        <button
+          onClick={async () => {
+            const meetingId = prompt(
+              `In Which meetingId you want to switch ${participant.displayName} ?`
+            );
+            const payload = prompt("enter payload you want to pass");
+
+            const token = await getToken();
+            if ((meetingId, token, payload)) {
+              participant
+                .switchTo({ meetingId, token, payload })
+                .catch(console.log);
+            } else {
+              alert("Empty meetingId or payload ");
+            }
+          }}
+          className={"button "}
+        >
+          Switch
+        </button>
+      </div>
+    );
+  };
+
+  return (
+    <div
+      style={{
+        width,
+        backgroundColor: primary,
+        borderRadius: borderRadius,
+        overflow: "hidden",
+        margin: borderRadius,
+        padding: borderRadius,
+        display: "flex",
+        flex: 1,
+        flexDirection: "column",
+        position: "relative",
+      }}
+    >
+      <button
+        onClick={() => {
+          connection.close();
+        }}
+        className={"button"}
+      >
+        Close Connection
+      </button>
+
+      <button
+        onClick={() => {
+          const message = prompt("Enter You Message");
+          if (message) {
+            connection.meeting.sendChatMessage(message);
+          } else {
+            alert("Empty Message ");
+          }
+        }}
+        className={"button"}
+      >
+        Send Meessage
+      </button>
+
+      <button
+        onClick={() => {
+          connection.meeting.end();
+        }}
+        className={"button"}
+      >
+        End Meeting
+      </button>
+      <p>
+        {connection.id} : {connection.payload}
+      </p>
+      {connectionParticipants.map((participant) => {
+        return (
+          <ConnectionParticipant
+            key={`${connection.id}_${participant.id}`}
+            participant={participant}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+const ConnectionsView = () => {
+  const { connections, meetingId } = useMeeting();
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexWrap: "wrap",
+        flexDirection: "column",
+        padding: borderRadius,
+      }}
+    >
+      <Title dark title={"Connections"} />
+      {chunk([...connections.keys()]).map((k) => (
+        <div style={{ display: "flex" }} key={k}>
+          {k.map((l) => (
+            <ConnectionView key={`${meetingId}_${l}`} connectionId={l} />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+function MeetingView({ onNewMeetingIdToken }) {
+  const [participantViewVisible, setParticipantViewVisible] = useState(true);
+
   function onParticipantJoined(participant) {
     console.log(" onParticipantJoined", participant);
   }
@@ -489,6 +659,29 @@ function MeetingView() {
   const onPinStateChanged = (data) => {
     console.log("onPinStateChanged", data);
   };
+  const onSwitchMeeting = (data) => {
+    window.focus();
+    confirmAlert({
+      title: "Confirm to submit",
+      message: "Are you sure you want to switch Meeting ?",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => {
+            onNewMeetingIdToken(data);
+          },
+        },
+        {
+          label: "No",
+          onClick: () => {},
+        },
+      ],
+    });
+  };
+
+  const onConnectionOpen = (data) => {
+    console.log("onConnectionOpen", data);
+  };
 
   const {
     meetingId,
@@ -508,6 +701,7 @@ function MeetingView() {
     //
     join,
     leave,
+    connectTo,
     end,
     //
     startRecording,
@@ -560,6 +754,8 @@ function MeetingView() {
     onWebcamRequested,
     onMicRequested,
     onPinStateChanged,
+    onSwitchMeeting,
+    onConnectionOpen,
   });
 
   const handlestartVideo = () => {
@@ -569,11 +765,9 @@ function MeetingView() {
       link: "https://www.learningcontainer.com/wp-content/uploads/2020/05/sample-mp4-file.mp4",
     });
   };
-
   const handlestopVideo = () => {
     stopVideo();
   };
-
   const handleresumeVideo = () => {
     resumeVideo();
   };
@@ -591,7 +785,6 @@ function MeetingView() {
       },
     ]);
   };
-
   const handleStopLiveStream = () => {
     stopLivestream();
   };
@@ -602,7 +795,7 @@ function MeetingView() {
     stopRecording();
   };
 
-  const tollbarHeight = 60;
+  const tollbarHeight = 120;
 
   return (
     <div
@@ -643,7 +836,6 @@ function MeetingView() {
         <button className={"button blue"} onClick={handlesseekVideo}>
           seekVideo
         </button>
-
         <button className={"button blue"} onClick={handleStartLiveStream}>
           Start Live Stream
         </button>
@@ -656,7 +848,38 @@ function MeetingView() {
         <button className={"button blue"} onClick={handleStopRecording}>
           stop recording
         </button>
+        <button
+          className={"button blue"}
+          onClick={() => setParticipantViewVisible((s) => !s)}
+        >
+          Switch to {participantViewVisible ? "Connections" : "Participants"}{" "}
+          view
+        </button>
+
+        <button
+          className={"button blue"}
+          onClick={async () => {
+            const meetingId = prompt(
+              `Please enter meeting id where you want Connect`
+            );
+            if (meetingId) {
+              try {
+                await connectTo({
+                  meetingId,
+                  payload: "This is Testing Payload",
+                });
+              } catch (e) {
+                console.log("Connect to Error", e);
+              }
+            } else {
+              alert("Empty meetingId!");
+            }
+          }}
+        >
+          Make Connections
+        </button>
       </div>
+      <h1>Meeting id is : {meetingId}</h1>
       <div style={{ display: "flex", flex: 1 }}>
         <div
           style={{
@@ -669,7 +892,8 @@ function MeetingView() {
           }}
         >
           <ExternalVideo />
-          <ParticipantsView />
+          {/* <ParticipantsView /> */}
+          {participantViewVisible ? <ParticipantsView /> : <ConnectionsView />}
         </div>
         <MeetingChat tollbarHeight={tollbarHeight} />
       </div>
@@ -683,69 +907,39 @@ const App = () => {
 
   const getMeetingAndToken = async () => {
     const token = await getToken();
-    const meetingId = await createMeeting({ token });
+
+    const _meetingId = await createMeeting({ token });
+
+    const meetingId = prompt("enter meeting id:", _meetingId);
 
     setToken(token);
     setMeetingId(meetingId);
   };
 
   useEffect(getMeetingAndToken, []);
-
   return token && meetingId ? (
     <MeetingProvider
       config={{
         meetingId,
         micEnabled: true,
-        webcamEnabled: false,
-        name: "Participant Name",
+        webcamEnabled: true,
+        name: "TestUser",
       }}
       token={token}
+      reinitialiseMeetingOnConfigChange={true}
+      joinWithoutUserInteraction={true}
     >
-      <MeetingConsumer
-        {...{
-          onParticipantJoined: (participant) => {
-            console.log(" onParticipantJoined", participant);
-          },
-          onParticipantLeft: (participant) => {
-            console.log(" onParticipantLeft", participant);
-          },
-          onSpeakerChanged: (activeSpeakerId) => {
-            console.log(" onSpeakerChanged", activeSpeakerId);
-          },
-          onPresenterChanged: (presenterId) => {
-            console.log(" onPresenterChanged", presenterId);
-          },
-          onMainParticipantChanged: (participant) => {
-            console.log(" onMainParticipantChanged", participant);
-          },
-          onEntryRequested: (participantId, name) => {
-            console.log(" onEntryRequested", participantId, name);
-          },
-          onEntryResponded: (participantId, name) => {
-            console.log(" onEntryResponded", participantId, name);
-          },
-          onRecordingStarted: () => {
-            console.log(" onRecordingStarted");
-          },
-          onRecordingStopped: () => {
-            console.log(" onRecordingStopped");
-          },
-          onChatMessage: (data) => {
-            console.log(" onChatMessage", data);
-          },
-          onMeetingJoined: () => {
-            console.log("onMeetingJoined");
-          },
-          onMeetingLeft: () => {
-            console.log("onMeetingLeft");
-          },
+      <MeetingView
+        onNewMeetingIdToken={({ meetingId, token }) => {
+          setMeetingId(meetingId);
+          setToken(token);
         }}
-      >
-        {() => <MeetingView />}
-      </MeetingConsumer>
+      />
     </MeetingProvider>
   ) : (
-    <p>loading...</p>
+    <>
+      <p>loading...</p>
+    </>
   );
 };
 
