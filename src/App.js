@@ -351,17 +351,21 @@ const ParticipantView = ({ participantId }) => {
               }
               onClick={async () => {
                 const meetingId = prompt(
-                  "j7p8-gegv-5wkl  7jsp-7j9m-k1xm  yeqr-do7u-5cdj please enter meeting id"
+                  `Please enter meeting id where you want to switch ${displayName}`
                 );
                 const token = await getToken();
                 if (meetingId && token) {
-                  switchTo({
-                    meetingId,
-                    payload: "Im Switching",
-                    token: token,
-                  });
+                  try {
+                    await switchTo({
+                      meetingId,
+                      payload: "Im Switching",
+                      token: token,
+                    });
+                  } catch (e) {
+                    console.log("swithc To Error", e);
+                  }
                 } else {
-                  alert("Empty meetingId  ");
+                  alert("Empty meetingId!");
                 }
               }}
             >
@@ -471,9 +475,9 @@ const ParticipantsView = () => {
 const ConnectionView = ({ connectionId }) => {
   const { connection } = useConnection(connectionId, {
     onMeeting: {
-      onChatMessage: ({ message, peerId, roomId }) => {
+      onChatMessage: ({ message, participantId }) => {
         alert(
-          `A Person ${peerId} from ${connectionId} Wants to say : ${message}`
+          `A Person ${participantId} from ${connectionId} Wants to say : ${message}`
         );
       },
     },
@@ -488,13 +492,15 @@ const ConnectionView = ({ connectionId }) => {
         <button
           onClick={async () => {
             const meetingId = prompt(
-              "j7p8-gegv-5wkl  7jsp-7j9m-k1xm  yeqr-do7u-5cdj  enter meeting id to switch participant"
+              `In Which meetingId you want to switch ${participant.displayName} ?`
             );
             const payload = prompt("enter payload you want to pass");
 
             const token = await getToken();
             if ((meetingId, token, payload)) {
-              participant.switchTo({ meetingId, token, payload });
+              participant
+                .switchTo({ meetingId, token, payload })
+                .catch(console.log);
             } else {
               alert("Empty meetingId or payload ");
             }
@@ -570,7 +576,6 @@ const ConnectionView = ({ connectionId }) => {
 
 const ConnectionsView = () => {
   const { connections, meetingId } = useMeeting();
-
   return (
     <div
       style={{
@@ -655,7 +660,6 @@ function MeetingView({ onNewMeetingIdToken }) {
     console.log("onPinStateChanged", data);
   };
   const onSwitchMeeting = (data) => {
-    console.log("onSwitchMeeting", data);
     window.focus();
     confirmAlert({
       title: "Confirm to submit",
@@ -673,6 +677,10 @@ function MeetingView({ onNewMeetingIdToken }) {
         },
       ],
     });
+  };
+
+  const onConnectionOpen = (data) => {
+    console.log("onConnectionOpen", data);
   };
 
   const {
@@ -747,6 +755,7 @@ function MeetingView({ onNewMeetingIdToken }) {
     onMicRequested,
     onPinStateChanged,
     onSwitchMeeting,
+    onConnectionOpen,
   });
 
   const handlestartVideo = () => {
@@ -847,47 +856,28 @@ function MeetingView({ onNewMeetingIdToken }) {
           view
         </button>
 
-        {meetingId !== "j7p8-gegv-5wkl" ? (
-          <button
-            className={"button blue"}
-            onClick={() => {
-              connectTo({
-                meetingId: "j7p8-gegv-5wkl",
-                payload: "hello",
-              });
-            }}
-          >
-            Connect To j7p8-gegv-5wkl
-          </button>
-        ) : null}
-
-        {meetingId !== "7jsp-7j9m-k1xm" ? (
-          <button
-            className={"button blue"}
-            onClick={() => {
-              connectTo({
-                meetingId: "7jsp-7j9m-k1xm",
-                payload: "hello",
-              });
-            }}
-          >
-            Connect To 7jsp-7j9m-k1xm
-          </button>
-        ) : null}
-
-        {meetingId !== "yeqr-do7u-5cdj" ? (
-          <button
-            className={"button blue"}
-            onClick={() => {
-              connectTo({
-                meetingId: "yeqr-do7u-5cdj",
-                payload: "hello",
-              });
-            }}
-          >
-            Connect To yeqr-do7u-5cdj
-          </button>
-        ) : null}
+        <button
+          className={"button blue"}
+          onClick={async () => {
+            const meetingId = prompt(
+              `Please enter meeting id where you want Connect`
+            );
+            if (meetingId) {
+              try {
+                await connectTo({
+                  meetingId,
+                  payload: "This is Testing Payload",
+                });
+              } catch (e) {
+                console.log("Connect to Error", e);
+              }
+            } else {
+              alert("Empty meetingId!");
+            }
+          }}
+        >
+          Make Connections
+        </button>
       </div>
       <h1>Meeting id is : {meetingId}</h1>
       <div style={{ display: "flex", flex: 1 }}>
@@ -914,48 +904,33 @@ function MeetingView({ onNewMeetingIdToken }) {
 const App = () => {
   const [token, setToken] = useState(null);
   const [meetingId, setMeetingId] = useState(null);
-  const [displayName, setDisplayname] = useState(null);
 
   const getMeetingAndToken = async () => {
-    console.log("getMeetingAndToken");
     const token = await getToken();
-    // console.log(token, "token");
 
-    // const meetingId = await createMeeting({ token });
-    // console.log(meetingId, "meetingId");
+    const _meetingId = await createMeeting({ token });
 
-    // const meetingId = prompt(
-    //   "j7p8-gegv-5wkl  7jsp-7j9m-k1xm  yeqr-do7u-5cdj  please enter meeting id"
-    // );
-    const displayName = prompt("please enter displayname");
+    const meetingId = prompt("enter meeting id:", _meetingId);
 
     setToken(token);
-    // setMeetingId(meetingId);
-    if (displayName) {
-      setDisplayname(displayName);
-    } else {
-      alert("Empty displayname ");
-    }
+    setMeetingId(meetingId);
   };
 
   useEffect(getMeetingAndToken, []);
-  console.log("Meeitg id", meetingId);
-  return token && meetingId && displayName ? (
+  return token && meetingId ? (
     <MeetingProvider
       config={{
         meetingId,
         micEnabled: true,
         webcamEnabled: true,
-        name: displayName,
-        participantId: displayName,
+        name: "TestUser",
       }}
       token={token}
-      listenOnProps
-      joinWithoutUserInteraction={false}
+      reinitialiseMeetingOnConfigChange={true}
+      joinWithoutUserInteraction={true}
     >
       <MeetingView
         onNewMeetingIdToken={({ meetingId, token }) => {
-          console.log("onNewMeetingIdToken", meetingId, token);
           setMeetingId(meetingId);
           setToken(token);
         }}
@@ -964,27 +939,6 @@ const App = () => {
   ) : (
     <>
       <p>loading...</p>
-      <button
-        onClick={() => {
-          setMeetingId("j7p8-gegv-5wkl");
-        }}
-      >
-        Join j7p8-gegv-5wkl
-      </button>
-      <button
-        onClick={() => {
-          setMeetingId("7jsp-7j9m-k1xm");
-        }}
-      >
-        Join 7jsp-7j9m-k1xm
-      </button>
-      <button
-        onClick={() => {
-          setMeetingId("yeqr-do7u-5cdj");
-        }}
-      >
-        Join yeqr-do7u-5cdj
-      </button>
     </>
   );
 };
