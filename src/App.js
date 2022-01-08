@@ -81,7 +81,7 @@ const ExternalVideo = () => {
   useMeeting({ onVideoStateChanged, onVideoSeeked });
   const externalPlayer = useRef();
 
-  return (
+  return !link ? null : (
     <div
       style={{
         borderRadius,
@@ -598,7 +598,7 @@ const ConnectionsView = () => {
 };
 
 function MeetingView({ onNewMeetingIdToken }) {
-  const [participantViewVisible, setParticipantViewVisible] = useState(false);
+  const [participantViewVisible, setParticipantViewVisible] = useState(true);
 
   function onParticipantJoined(participant) {
     console.log(" onParticipantJoined", participant);
@@ -891,11 +891,11 @@ function MeetingView({ onNewMeetingIdToken }) {
             height: `calc(100vh - ${tollbarHeight}px)`,
           }}
         >
-          {/* <ExternalVideo /> */}
+          <ExternalVideo />
           {/* <ParticipantsView /> */}
           {participantViewVisible ? <ParticipantsView /> : <ConnectionsView />}
         </div>
-        {/* <MeetingChat tollbarHeight={tollbarHeight} /> */}
+        <MeetingChat tollbarHeight={tollbarHeight} />
       </div>
     </div>
   );
