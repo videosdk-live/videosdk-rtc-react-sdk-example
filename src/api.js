@@ -3,7 +3,9 @@ const VIDEOSDK_TOKEN = process.env.REACT_APP_VIDEOSDK_TOKEN;
 const API_AUTH_URL = process.env.REACT_APP_AUTH_URL;
 
 export const getToken = async () => {
-  if(VIDEOSDK_TOKEN !== ""){
+  if(VIDEOSDK_TOKEN !=="" && API_AUTH_URL !== ""){
+    console.error("Error: Provide only ONE PARAMETER - either Token or Auth API");
+  }else if(VIDEOSDK_TOKEN !== ""){
       return VIDEOSDK_TOKEN;
   }else if(API_AUTH_URL !== ""){
     const res = await fetch(`${API_AUTH_URL}/get-token`, {
@@ -23,16 +25,16 @@ export const createMeeting = async ({ token }) => {
     headers: { Authorization: token, "Content-Type": "application/json" },
   };
 
-  const result = await fetch(url, options)
+  const { meetingId } = await fetch(url, options)
   .then((response) => response.json()) 
   .catch((error) => console.error("error", error));
   
-  return result.meetingId;
+  return meetingId;
 };
 
 export const validateMeeting = async ({ meetingId, token }) => {
 
-  const url = `${process.env.API_BASE_URL}/api/meetings/${meetingId}`;
+  const url = `${API_BASE_URL}/api/meetings/${meetingId}`;
 
   const options = {
     method: "POST",
@@ -41,4 +43,5 @@ export const validateMeeting = async ({ meetingId, token }) => {
 
   const result = await fetch(url, options)
     .then((response) => response.json()) //result will have meeting id
+    .catch((error) => console.error("error", error));
 };

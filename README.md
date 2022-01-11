@@ -45,11 +45,11 @@ You must have the following installed:
    cp .env.example .env
    ```
 
-3. Update the Token value in the `.env` file from the videosdk.live dashboard.
+3. Update the Token value from the videosdk.live dashboard or provide authentication server base url in the `.env` file.
 
    ```
-   REACT_APP_SERVER_URL="https://api.zujonow.com"
    REACT_APP_VIDEOSDK_TOKEN = ""
+   REACT_APP_AUTH_URL = ""
    ```
 
 4. Install NPM packages
@@ -65,6 +65,10 @@ You must have the following installed:
    ```
 
 For more information, visit [official documentation](https://docs.videosdk.live/docs/guide/video-and-audio-calling-api-sdk/getting-started)
+
+## Deployment
+
+While deploying for production, we recommend you to use authentication server for token generation instead of static token. Remove REACT_APP_VIDEOSDK_TOKEN from `.env` file and add REACT_APP_AUTH_URL to the `.env` file.
 
 Related
 
