@@ -1,30 +1,31 @@
 const API_BASE_URL = process.env.REACT_APP_SERVER_URL;
+const VIDEOSDK_TOKEN = process.env.REACT_APP_VIDEOSDK_TOKEN;
 
-export const getToken = async () => {
-  const res = await fetch(`${API_BASE_URL}/get-token`, {
-    method: "GET",
-  });
-
-  const { token } = await res.json();
-  return token;
+export const getToken =  () => {
+  return VIDEOSDK_TOKEN;
 };
 
 export const createMeeting = async ({ token }) => {
-  const res = await fetch(`${API_BASE_URL}/create-meeting`, {
+  const url = `${API_BASE_URL}/api/meetings`;
+  const options = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token }),
-  });
+    headers: { Authorization: token, "Content-Type": "application/json" },
+  };
 
-  const { meetingId } = await res.json();
-
-  return meetingId;
+  const result = await fetch(url, options)
+  .then((response) => response.json()) 
+  return result.meetingId;
 };
 
 export const validateMeeting = async ({ meetingId, token }) => {
-  await fetch(`${API_BASE_URL}/validate-meeting/${meetingId}`, {
+
+  const url = `${process.env.API_BASE_URL}/api/meetings/${meetingId}`;
+
+  const options = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token }),
-  });
+    headers: { Authorization: token },
+  };
+
+  const result = await fetch(url, options)
+    .then((response) => response.json()) //result will have meeting id
 };
