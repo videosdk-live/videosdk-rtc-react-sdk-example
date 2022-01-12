@@ -49,6 +49,7 @@ You must have the following installed:
 
    ```
    REACT_APP_VIDEOSDK_TOKEN = ""
+   #OR
    REACT_APP_AUTH_URL = ""
    ```
 
