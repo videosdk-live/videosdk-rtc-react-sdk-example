@@ -68,7 +68,6 @@ export function JoiningScreen({
   const styles = useStyles(theme);
 
   const [videoTrack, setVideoTrack] = useState(null);
-  const [audioTrack, setAudioTrack] = useState(null);
 
   const padding = useResponsiveSize({
     xl: 6,
@@ -79,14 +78,6 @@ export function JoiningScreen({
   });
 
   const _handleToggleMic = () => {
-    if(!micOn){
-      getAudio();
-    }else{
-      if (audioTrack) {
-        audioTrack.stop();
-        setAudioTrack(null);
-      }
-    }
     setMicOn(!micOn);
   };
   const _handleToggleWebcam = () => {
@@ -102,7 +93,7 @@ export function JoiningScreen({
   };
 
   const getVideo = async () => {
-    if(videoPlayerRef.current){
+    if (videoPlayerRef.current) {
       const videoConstraints = {
         video: {
           width: 1280,
@@ -110,35 +101,22 @@ export function JoiningScreen({
         },
       };
 
-      const stream = await navigator.mediaDevices.getUserMedia(videoConstraints);
+      const stream = await navigator.mediaDevices.getUserMedia(
+        videoConstraints
+      );
       const videoTracks = stream.getVideoTracks();
 
       const videoTrack = videoTracks.length ? videoTracks[0] : null;
-      
-        videoPlayerRef.current.srcObject = new MediaStream([videoTrack]);
-        videoPlayerRef.current.play();
-      
+
+      videoPlayerRef.current.srcObject = new MediaStream([videoTrack]);
+      videoPlayerRef.current.play();
+
       setVideoTrack(videoTrack);
     }
   };
 
-  const getAudio = async ()=>{
-    const audioConstraints = {
-      audio: true,
-    };
-
-    const stream = await navigator.mediaDevices.getUserMedia(
-      audioConstraints
-    );
-    const audioTracks = stream.getAudioTracks();
-
-    const audioTrack = audioTracks.length ? audioTracks[0] : null;
-
-    setAudioTrack(audioTrack);
-  }
-
   useEffect(() => {
-    if (webcamOn && !videoTrack){
+    if (webcamOn && !videoTrack) {
       getVideo();
     }
   }, [webcamOn]);
@@ -282,7 +260,11 @@ export function JoiningScreen({
               }}
               id="outlined"
               label="Name"
-              helperText={participantName.length <3 ? "Enter Name with which you would like to join meeting":""}
+              helperText={
+                participantName.length < 3
+                  ? "Enter Name with which you would like to join meeting"
+                  : ""
+              }
               onChange={(e) => {
                 setParticipantName(e.target.value);
               }}
@@ -301,6 +283,10 @@ export function JoiningScreen({
                       color="primary"
                       variant="contained"
                       onClick={(e) => {
+                        if (videoTrack) {
+                          videoTrack.stop();
+                          setVideoTrack(null);
+                        }
                         onClickStartMeeting();
                       }}
                       id={"btnJoin"}>
@@ -315,16 +301,14 @@ export function JoiningScreen({
           <MeetingDetailsScreen
             onClickJoin={async (id) => {
               const token = await getToken();
-              const valid = await validateMeeting({meetingId:id, token});
-              if(valid){
+              const valid = await validateMeeting({ meetingId: id, token });
+              if (valid) {
                 setReadyToJoin(true);
                 setToken(token);
                 setMeetingId(id);
                 setWebcamOn(true);
                 setMicOn(true);
-              }
-              else
-                alert("Invalid Meeting Id")
+              } else alert("Invalid Meeting Id");
             }}
             onClickCreateMeeting={async () => {
               const token = await getToken();

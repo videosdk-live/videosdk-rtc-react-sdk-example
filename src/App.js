@@ -10,9 +10,6 @@ import { getToken, validateMeeting, createMeeting } from "./api";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { JoiningScreen } from "./components/JoiningScreen";
-import { Box } from "@material-ui/core";
-import { TopBar } from "./components/TopBar";
-import { MeetingContainer } from "./components/MeetingContainer/MeetingContainer";
 
 const primary = "#3E84F6";
 
@@ -811,9 +808,6 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
       }}
     >
       <div style={{ height: tollbarHeight }}>
-        <button className={"button blue"} onClick={join}>
-          JOIN
-        </button>
         <button className={"button red"} onClick={leave}>
           LEAVE
         </button>
@@ -912,9 +906,9 @@ const App = () => {
   const [participantName, setParticipantName] = useState("");
   const [micOn, setMicOn] = useState(false);
   const [webcamOn, setWebcamOn] = useState(false);
-  const [startMeeting, setStartMeeting] = useState(false);
+  const [isMeetingStarted, setMeetingStarted] = useState(false);
 
-  return startMeeting ? (
+  return isMeetingStarted ? (
     <MeetingProvider
       config={{
         meetingId,
@@ -926,8 +920,6 @@ const App = () => {
       reinitialiseMeetingOnConfigChange={true}
       joinWithoutUserInteraction={true}
     >
-      
-      {/* <MeetingContainer/> */}
       <MeetingView
         onNewMeetingIdToken={({ meetingId, token }) => {
           setMeetingId(meetingId);
@@ -938,7 +930,7 @@ const App = () => {
           setMeetingId("")
           setWebcamOn(false)
           setMicOn(false)
-          setStartMeeting(false)
+          setMeetingStarted(false)
         }}
       />
     </MeetingProvider>
@@ -954,9 +946,9 @@ const App = () => {
         webcamOn = {webcamOn}
         setWebcamOn = {setWebcamOn}
         onClickStartMeeting = {()=>{
-          setStartMeeting(true)
+          setMeetingStarted(true)
         }}
-        startMeeting = {startMeeting}
+        startMeeting = {isMeetingStarted}
       />
   );
 };

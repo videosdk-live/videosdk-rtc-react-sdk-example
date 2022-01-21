@@ -55,8 +55,8 @@ export function MeetingDetailsScreen({
             label="Meeting ID"
             helperText={
               meetingIdError
-                ? "Meeting ID is not valid"
-                : "Enter your Meeting ID Here"
+                ? "Meeting id is not valid"
+                : "Enter your meeting id Here"
             }
             onChange={(e) => {
               setMeetingId(e.target.value);
