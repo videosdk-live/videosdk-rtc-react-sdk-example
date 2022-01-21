@@ -1,30 +1,47 @@
-const API_BASE_URL = process.env.REACT_APP_SERVER_URL;
+const API_BASE_URL = "https://api.zujonow.com";
+const VIDEOSDK_TOKEN = process.env.REACT_APP_VIDEOSDK_TOKEN;
+const API_AUTH_URL = process.env.REACT_APP_AUTH_URL;
 
 export const getToken = async () => {
-  const res = await fetch(`${API_BASE_URL}/get-token`, {
-    method: "GET",
-  });
-
-  const { token } = await res.json();
-  return token;
+  if(VIDEOSDK_TOKEN && API_AUTH_URL){
+    console.error("Error: Provide only ONE PARAMETER - either Token or Auth API");
+  }else if(VIDEOSDK_TOKEN){
+      return VIDEOSDK_TOKEN;
+  }else if(API_AUTH_URL){
+    const res = await fetch(`${API_AUTH_URL}/get-token`, {
+      method: "GET",
+    });
+    const { token } = await res.json();
+    return token;
+  }else{
+    console.error("Error: ", Error("Please add a token or Auth Server URL"));
+  }
 };
 
 export const createMeeting = async ({ token }) => {
-  const res = await fetch(`${API_BASE_URL}/create-meeting`, {
+  const url = `${API_BASE_URL}/api/meetings`;
+  const options = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token }),
-  });
+    headers: { Authorization: token, "Content-Type": "application/json" },
+  };
 
-  const { meetingId } = await res.json();
-
+  const { meetingId } = await fetch(url, options)
+  .then((response) => response.json()) 
+  .catch((error) => console.error("error", error));
+  
   return meetingId;
 };
 
 export const validateMeeting = async ({ meetingId, token }) => {
-  await fetch(`${API_BASE_URL}/validate-meeting/${meetingId}`, {
+
+  const url = `${API_BASE_URL}/api/meetings/${meetingId}`;
+
+  const options = {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token }),
-  });
+    headers: { Authorization: token },
+  };
+
+  const result = await fetch(url, options)
+    .then((response) => response.json()) //result will have meeting id
+    .catch((error) => console.error("error", error));
 };
