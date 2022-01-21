@@ -9,6 +9,10 @@ import {
 import { getToken, validateMeeting, createMeeting } from "./api";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
+import { JoiningScreen } from "./components/JoiningScreen";
+import { Box } from "@material-ui/core";
+import { TopBar } from "./components/TopBar";
+import { MeetingContainer } from "./components/MeetingContainer/MeetingContainer";
 
 const primary = "#3E84F6";
 
@@ -597,7 +601,7 @@ const ConnectionsView = () => {
   );
 };
 
-function MeetingView({ onNewMeetingIdToken }) {
+function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
   const [participantViewVisible, setParticipantViewVisible] = useState(true);
 
   function onParticipantJoined(participant) {
@@ -635,6 +639,7 @@ function MeetingView({ onNewMeetingIdToken }) {
   }
   function onMeetingLeft() {
     console.log("onMeetingLeft");
+    onMeetingLeave()
   }
   const onLiveStreamStarted = (data) => {
     console.log("onLiveStreamStarted example", data);
@@ -902,44 +907,57 @@ function MeetingView({ onNewMeetingIdToken }) {
 }
 
 const App = () => {
-  const [token, setToken] = useState(null);
-  const [meetingId, setMeetingId] = useState(null);
+  const [token, setToken] = useState("");
+  const [meetingId, setMeetingId] = useState("");
+  const [participantName, setParticipantName] = useState("");
+  const [micOn, setMicOn] = useState(false);
+  const [webcamOn, setWebcamOn] = useState(false);
+  const [startMeeting, setStartMeeting] = useState(false);
 
-  const getMeetingAndToken = async () => {
-    const token = await getToken();
-
-    const _meetingId = await createMeeting({ token });
-
-    const meetingId = prompt("enter meeting id:", _meetingId);
-
-    setToken(token);
-    setMeetingId(meetingId);
-  };
-
-  useEffect(getMeetingAndToken, []);
-  return token && meetingId ? (
+  return startMeeting ? (
     <MeetingProvider
       config={{
         meetingId,
-        micEnabled: true,
-        webcamEnabled: true,
-        name: "TestUser",
+        micEnabled: micOn,
+        webcamEnabled: webcamOn,
+        name: participantName? participantName : "TestUser",
       }}
       token={token}
       reinitialiseMeetingOnConfigChange={true}
       joinWithoutUserInteraction={true}
     >
+      
+      {/* <MeetingContainer/> */}
       <MeetingView
         onNewMeetingIdToken={({ meetingId, token }) => {
           setMeetingId(meetingId);
           setToken(token);
         }}
+        onMeetingLeave={()=>{
+          setToken("")
+          setMeetingId("")
+          setWebcamOn(false)
+          setMicOn(false)
+          setStartMeeting(false)
+        }}
       />
     </MeetingProvider>
   ) : (
-    <>
-      <p>loading...</p>
-    </>
+      <JoiningScreen
+        participantName = {participantName}
+        setParticipantName = {setParticipantName}
+        meetinId = {meetingId}
+        setMeetingId ={setMeetingId}
+        setToken = {setToken}
+        setMicOn = {setMicOn}
+        micOn = {micOn}
+        webcamOn = {webcamOn}
+        setWebcamOn = {setWebcamOn}
+        onClickStartMeeting = {()=>{
+          setStartMeeting(true)
+        }}
+        startMeeting = {startMeeting}
+      />
   );
 };
 

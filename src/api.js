@@ -44,4 +44,6 @@ export const validateMeeting = async ({ meetingId, token }) => {
   const result = await fetch(url, options)
     .then((response) => response.json()) //result will have meeting id
     .catch((error) => console.error("error", error));
+  
+  return result? result.meetingId === meetingId :false;
 };
