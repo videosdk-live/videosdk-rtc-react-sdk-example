@@ -19,7 +19,6 @@ export function MeetingDetailsScreen({
 
   return (
         <Box
-          m={6}
           style={{
             display: "flex",
             flex: 1,

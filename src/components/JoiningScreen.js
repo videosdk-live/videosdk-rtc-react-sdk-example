@@ -130,7 +130,6 @@ export function JoiningScreen({
         height: "100vh",
         alignItems: "center",
         backgroundColor: theme.palette.background.default,
-        padding: padding,
       }}>
       {readyToJoin ? (
         <Box
