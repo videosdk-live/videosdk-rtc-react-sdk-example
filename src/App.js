@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   MeetingProvider,
-  MeetingConsumer,
   useMeeting,
   useParticipant,
   useConnection,
+  usePubSub,
 } from "@videosdk.live/react-sdk";
-import { getToken, validateMeeting, createMeeting } from "./api";
+import { getToken } from "./api";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { JoiningScreen } from "./components/JoiningScreen";
@@ -104,10 +104,48 @@ const ExternalVideo = () => {
   );
 };
 
-const MeetingChat = ({ tollbarHeight }) => {
-  const { sendChatMessage, messages } = useMeeting();
-  const [message, setMessage] = useState("");
+const MessageList = ({ messages }) => {
+  return (
+    <div>
+      {messages?.map((message, i) => {
+        const { senderName, message: text, timestamp } = message;
 
+        return (
+          <div
+            style={{
+              margin: 8,
+              backgroundColor: "darkblue",
+              borderRadius: 8,
+              overflow: "hidden",
+              padding: 8,
+              color: "#fff",
+            }}
+            key={i}
+          >
+            <p style={{ margin: 0, padding: 0, fontStyle: "italic" }}>
+              {senderName}
+            </p>
+            <h3 style={{ margin: 0, padding: 0, marginTop: 4 }}>{text}</h3>
+            <p
+              style={{
+                margin: 0,
+                padding: 0,
+                opacity: 0.6,
+                marginTop: 4,
+              }}
+            >
+              {formatAMPM(new Date(timestamp))}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const MeetingChat = ({ tollbarHeight }) => {
+  const { publish, messages } = usePubSub("CHAT", {});
+  const [message, setMessage] = useState("");
   return (
     <div
       style={{
@@ -136,8 +174,7 @@ const MeetingChat = ({ tollbarHeight }) => {
             const m = message;
 
             if (m.length) {
-              sendChatMessage(m);
-
+              publish(m, { persist: true });
               setMessage("");
             }
           }}
@@ -145,40 +182,7 @@ const MeetingChat = ({ tollbarHeight }) => {
           Send
         </button>
       </div>
-      <div>
-        {messages?.map((message, i) => {
-          const { senderId, senderName, text, timestamp } = message;
-
-          return (
-            <div
-              style={{
-                margin: 8,
-                backgroundColor: "darkblue",
-                borderRadius: 8,
-                overflow: "hidden",
-                padding: 8,
-                color: "#fff",
-              }}
-              key={i}
-            >
-              <p style={{ margin: 0, padding: 0, fontStyle: "italic" }}>
-                {senderName}
-              </p>
-              <h3 style={{ margin: 0, padding: 0, marginTop: 4 }}>{text}</h3>
-              <p
-                style={{
-                  margin: 0,
-                  padding: 0,
-                  opacity: 0.6,
-                  marginTop: 4,
-                }}
-              >
-                {formatAMPM(new Date(parseInt(timestamp)))}
-              </p>
-            </div>
-          );
-        })}
-      </div>
+      <MessageList messages={messages} />
     </div>
   );
 };
@@ -636,7 +640,7 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
   }
   function onMeetingLeft() {
     console.log("onMeetingLeft");
-    onMeetingLeave()
+    onMeetingLeave();
   }
   const onLiveStreamStarted = (data) => {
     console.log("onLiveStreamStarted example", data);
@@ -709,7 +713,6 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
     startRecording,
     stopRecording,
     //
-    sendChatMessage,
     respondEntry,
     //
     muteMic,
@@ -914,7 +917,7 @@ const App = () => {
         meetingId,
         micEnabled: micOn,
         webcamEnabled: webcamOn,
-        name: participantName? participantName : "TestUser",
+        name: participantName ? participantName : "TestUser",
       }}
       token={token}
       reinitialiseMeetingOnConfigChange={true}
@@ -925,31 +928,31 @@ const App = () => {
           setMeetingId(meetingId);
           setToken(token);
         }}
-        onMeetingLeave={()=>{
-          setToken("")
-          setMeetingId("")
-          setWebcamOn(false)
-          setMicOn(false)
-          setMeetingStarted(false)
+        onMeetingLeave={() => {
+          setToken("");
+          setMeetingId("");
+          setWebcamOn(false);
+          setMicOn(false);
+          setMeetingStarted(false);
         }}
       />
     </MeetingProvider>
   ) : (
-      <JoiningScreen
-        participantName = {participantName}
-        setParticipantName = {setParticipantName}
-        meetinId = {meetingId}
-        setMeetingId ={setMeetingId}
-        setToken = {setToken}
-        setMicOn = {setMicOn}
-        micOn = {micOn}
-        webcamOn = {webcamOn}
-        setWebcamOn = {setWebcamOn}
-        onClickStartMeeting = {()=>{
-          setMeetingStarted(true)
-        }}
-        startMeeting = {isMeetingStarted}
-      />
+    <JoiningScreen
+      participantName={participantName}
+      setParticipantName={setParticipantName}
+      meetinId={meetingId}
+      setMeetingId={setMeetingId}
+      setToken={setToken}
+      setMicOn={setMicOn}
+      micOn={micOn}
+      webcamOn={webcamOn}
+      setWebcamOn={setWebcamOn}
+      onClickStartMeeting={() => {
+        setMeetingStarted(true);
+      }}
+      startMeeting={isMeetingStarted}
+    />
   );
 };
 
