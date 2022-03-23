@@ -4,6 +4,9 @@
 
 At Video SDK, we’re building tools to help companies create world-class collaborative products with capabilities of live audio/videos, compose cloud recordings/rtmp/hls and interaction APIs
 
+## Demo App
+Check out demo [here](https://videosdk.live/prebuilt/)
+
 ## Steps to Integrate
 
 ### Prerequisites
