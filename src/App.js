@@ -800,6 +800,8 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
     stopRecording();
   };
 
+  const [toggleWebcamTimeout, setToggleWebcamTimeout] = useState(false);
+
   const tollbarHeight = 120;
 
   return (
@@ -817,7 +819,17 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
         <button className={"button blue"} onClick={toggleMic}>
           toggleMic
         </button>
-        <button className={"button blue"} onClick={toggleWebcam}>
+        <button
+          className={"button blue"}
+          onClick={() => {
+            toggleWebcam();
+            setToggleWebcamTimeout(true);
+            setTimeout(() => {
+              setToggleWebcamTimeout(false);
+            }, 500);
+          }}
+          disabled={toggleWebcamTimeout}
+        >
           toggleWebcam
         </button>
         <button className={"button blue"} onClick={toggleScreenShare}>
