@@ -5,7 +5,6 @@ import {
   useParticipant,
   useConnection,
   usePubSub,
-  createCameraVideoTrack
 } from "@videosdk.live/react-sdk";
 import { getToken } from "./api";
 import { confirmAlert } from "react-confirm-alert"; // Import
@@ -194,9 +193,7 @@ const ParticipantView = ({ participantId }) => {
   const micRef = useRef(null);
   const screenShareRef = useRef(null);
 
-  const onStreamEnabled = (stream) => {
-    console.log({ stream });
-  };
+  const onStreamEnabled = (stream) => { };
   const onStreamDisabled = (stream) => { };
 
   const {
@@ -798,8 +795,6 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
     stopRecording();
   };
 
-  const [toggleWebcamTimeout, setToggleWebcamTimeout] = useState(false);
-
   const tollbarHeight = 120;
 
   return (
@@ -821,12 +816,7 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
           className={"button blue"}
           onClick={() => {
             toggleWebcam();
-            // setToggleWebcamTimeout(true);
-            // setTimeout(() => {
-            //   setToggleWebcamTimeout(false);
-            // }, 500);
           }}
-        // disabled={toggleWebcamTimeout}
         >
           toggleWebcam
         </button>
@@ -907,7 +897,7 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
           {/* <ParticipantsView /> */}
           {participantViewVisible ? <ParticipantsView /> : <ConnectionsView />}
         </div>
-        {/* <MeetingChat tollbarHeight={tollbarHeight} /> */}
+        <MeetingChat tollbarHeight={tollbarHeight} />
       </div>
     </div>
   );
@@ -928,7 +918,6 @@ const App = () => {
         micEnabled: micOn,
         webcamEnabled: webcamOn,
         name: participantName ? participantName : "TestUser",
-        // preferredProtocol:"UDP_OVER_TCP"
       }}
       token={token}
       reinitialiseMeetingOnConfigChange={true}
