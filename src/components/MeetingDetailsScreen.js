@@ -52,7 +52,7 @@ export function MeetingDetailsScreen({
             }}
             required
             id="outlined"
-            label="Meeting ID"
+            label="会议编号"
             helperText={
               meetingIdError
                 ? "会议 ID 无效"
