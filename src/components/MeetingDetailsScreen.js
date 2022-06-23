@@ -52,11 +52,11 @@ export function MeetingDetailsScreen({
             }}
             required
             id="outlined"
-            label="Meeting ID"
+            label="会议编号"
             helperText={
               meetingIdError
-                ? "Meeting id is not valid"
-                : "Enter your meeting id Here"
+                ? "会议 ID 无效"
+                : "在此处输入您的会议 ID"
             }
             onChange={(e) => {
               setMeetingId(e.target.value);

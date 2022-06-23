@@ -212,7 +212,7 @@ export function JoiningScreen({
                   spacing={2}>
                   <Grid item>
                     <Tooltip
-                      title={micOn ? "Turn off mic" : "Turn on mic"}
+                      title={micOn ? "关闭麦克风" : "打开麦克风"}
                       arrow
                       placement="top">
                       <Button
@@ -233,7 +233,7 @@ export function JoiningScreen({
                   </Grid>
                   <Grid item>
                     <Tooltip
-                      title={webcamOn ? "Turn off camera" : "Turn on camera"}
+                      title={webcamOn ? "关闭相机" : "打开相机"}
                       arrow
                       placement="top">
                       <Button
@@ -264,7 +264,7 @@ export function JoiningScreen({
               label="Name"
               helperText={
                 participantName.length < 3
-                  ? "Enter Name with which you would like to join meeting"
+                  ? "输入您想加入会议的姓名"
                   : ""
               }
               onChange={(e) => {
@@ -310,7 +310,7 @@ export function JoiningScreen({
                 setMeetingId(id);
                 setWebcamOn(true);
                 setMicOn(true);
-              } else alert("Invalid Meeting Id");
+              } else alert("无效的会议 ID");
             }}
             onClickCreateMeeting={async () => {
               const token = await getToken();
