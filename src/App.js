@@ -193,8 +193,8 @@ const ParticipantView = ({ participantId }) => {
   const micRef = useRef(null);
   const screenShareRef = useRef(null);
 
-  const onStreamEnabled = (stream) => { };
-  const onStreamDisabled = (stream) => { };
+  const onStreamEnabled = (stream) => {};
+  const onStreamDisabled = (stream) => {};
 
   const {
     displayName,
@@ -225,12 +225,19 @@ const ParticipantView = ({ participantId }) => {
 
   useEffect(() => {
     if (webcamRef.current && !isLocal && webcamStream) {
-      setViewPort(webcamRef.current.wrapper.offsetWidth, webcamRef.current.wrapper.offsetHeight);
+      setViewPort(
+        webcamRef.current.wrapper.offsetWidth,
+        webcamRef.current.wrapper.offsetHeight
+      );
     }
-  }, [webcamRef.current?.offsetHeight, webcamRef.current?.offsetWidth, webcamStream])
+  }, [
+    webcamRef.current?.offsetHeight,
+    webcamRef.current?.offsetWidth,
+    webcamStream,
+  ]);
 
   const webcamMediaStream = useMemo(() => {
-    if (webcamOn) {
+    if (webcamOn && webcamStream) {
       const mediaStream = new MediaStream();
       mediaStream.addTrack(webcamStream.track);
       return mediaStream;
@@ -247,16 +254,14 @@ const ParticipantView = ({ participantId }) => {
 
   useEffect(() => {
     if (micRef.current) {
-      if (micOn) {
+      if (micOn && micStream) {
         const mediaStream = new MediaStream();
         mediaStream.addTrack(micStream.track);
 
         micRef.current.srcObject = mediaStream;
         micRef.current
           .play()
-          .catch((error) =>
-            console.error("mic  play() failed", error)
-          );
+          .catch((error) => console.error("mic  play() failed", error));
       } else {
         micRef.current.srcObject = null;
       }
@@ -681,7 +686,7 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
         },
         {
           label: "No",
-          onClick: () => { },
+          onClick: () => {},
         },
       ],
     });
