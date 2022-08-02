@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   MeetingProvider,
   useMeeting,
@@ -10,6 +10,7 @@ import { getToken } from "./api";
 import { confirmAlert } from "react-confirm-alert"; // Import
 import "react-confirm-alert/src/react-confirm-alert.css"; // Import css
 import { JoiningScreen } from "./components/JoiningScreen";
+import ReactPlayer from "react-player";
 
 const primary = "#3E84F6";
 
@@ -210,6 +211,7 @@ const ParticipantView = ({ participantId }) => {
     switchTo,
     pinState,
     setQuality,
+    setViewPort,
     enableMic,
     disableMic,
     enableWebcam,
@@ -222,58 +224,49 @@ const ParticipantView = ({ participantId }) => {
   });
 
   useEffect(() => {
-    if (webcamRef.current) {
-      if (webcamOn) {
-        const mediaStream = new MediaStream();
-        mediaStream.addTrack(webcamStream.track);
+    if (webcamRef.current && !isLocal && webcamStream) {
+      setViewPort(
+        webcamRef.current.wrapper.offsetWidth,
+        webcamRef.current.wrapper.offsetHeight
+      );
+    }
+  }, [
+    webcamRef.current?.offsetHeight,
+    webcamRef.current?.offsetWidth,
+    webcamStream,
+  ]);
 
-        webcamRef.current.srcObject = mediaStream;
-        webcamRef.current
-          .play()
-          .catch((error) =>
-            console.error("videoElem.current.play() failed", error)
-          );
-      } else {
-        webcamRef.current.srcObject = null;
-      }
+  const webcamMediaStream = useMemo(() => {
+    if (webcamOn && webcamStream) {
+      const mediaStream = new MediaStream();
+      mediaStream.addTrack(webcamStream.track);
+      return mediaStream;
     }
   }, [webcamStream, webcamOn]);
 
+  const screenShareMediaStream = useMemo(() => {
+    if (screenShareOn) {
+      const mediaStream = new MediaStream();
+      mediaStream.addTrack(screenShareStream.track);
+      return mediaStream;
+    }
+  }, [screenShareStream, screenShareOn]);
+
   useEffect(() => {
     if (micRef.current) {
-      if (micOn) {
+      if (micOn && micStream) {
         const mediaStream = new MediaStream();
         mediaStream.addTrack(micStream.track);
 
         micRef.current.srcObject = mediaStream;
         micRef.current
           .play()
-          .catch((error) =>
-            console.error("videoElem.current.play() failed", error)
-          );
+          .catch((error) => console.error("mic  play() failed", error));
       } else {
         micRef.current.srcObject = null;
       }
     }
   }, [micStream, micOn]);
-
-  useEffect(() => {
-    if (screenShareRef.current) {
-      if (screenShareOn) {
-        const mediaStream = new MediaStream();
-        mediaStream.addTrack(screenShareStream.track);
-
-        screenShareRef.current.srcObject = mediaStream;
-        screenShareRef.current
-          .play()
-          .catch((error) =>
-            console.error("videoElem.current.play() failed", error)
-          );
-      } else {
-        screenShareRef.current.srcObject = null;
-      }
-    }
-  }, [screenShareStream, screenShareOn]);
 
   return (
     <div
@@ -297,7 +290,7 @@ const ParticipantView = ({ participantId }) => {
           position: "relative",
           borderRadius: borderRadius,
           overflow: "hidden",
-          backgroundColor: "pink",
+          backgroundColor: "black",
           width: "100%",
           height: 300,
         }}
@@ -305,21 +298,28 @@ const ParticipantView = ({ participantId }) => {
         <div
           style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
         >
-          <video
-            height={"100%"}
-            width={"100%"}
-            ref={webcamRef}
-            style={{
-              backgroundColor: "black",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              objectFit: "contain",
-            }}
-            autoPlay
-          />
+          <>
+            <ReactPlayer
+              ref={webcamRef}
+              //
+              playsinline // very very imp prop
+              playIcon={<></>}
+              //
+              pip={false}
+              light={false}
+              controls={false}
+              muted={true}
+              playing={true}
+              //
+              url={webcamMediaStream}
+              //
+              height={"100%"}
+              width={"100%"}
+              onError={(err) => {
+                console.log(err, "participant video error");
+              }}
+            />
+          </>
           <div
             style={{
               position: "absolute",
@@ -386,7 +386,7 @@ const ParticipantView = ({ participantId }) => {
           position: "relative",
           borderRadius: borderRadius,
           overflow: "hidden",
-          backgroundColor: "lightgreen",
+          backgroundColor: "black",
           width: "100%",
           height: 300,
         }}
@@ -394,21 +394,28 @@ const ParticipantView = ({ participantId }) => {
         <div
           style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
         >
-          <video
-            height={"100%"}
-            width={"100%"}
-            ref={screenShareRef}
-            style={{
-              backgroundColor: "black",
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              objectFit: "contain",
-            }}
-            autoPlay
-          />
+          <>
+            <ReactPlayer
+              ref={screenShareRef}
+              //
+              playsinline // very very imp prop
+              playIcon={<></>}
+              //
+              pip={false}
+              light={false}
+              controls={false}
+              muted={true}
+              playing={true}
+              //
+              url={screenShareMediaStream}
+              //
+              height={"100%"}
+              width={"100%"}
+              onError={(err) => {
+                console.log(err, "participant video error");
+              }}
+            />
+          </>
           <div
             style={{
               position: "absolute",
@@ -817,7 +824,12 @@ function MeetingView({ onNewMeetingIdToken, onMeetingLeave }) {
         <button className={"button blue"} onClick={toggleMic}>
           toggleMic
         </button>
-        <button className={"button blue"} onClick={toggleWebcam}>
+        <button
+          className={"button blue"}
+          onClick={() => {
+            toggleWebcam();
+          }}
+        >
           toggleWebcam
         </button>
         <button className={"button blue"} onClick={toggleScreenShare}>

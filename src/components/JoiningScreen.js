@@ -110,7 +110,9 @@ export function JoiningScreen({
 
       videoPlayerRef.current.srcObject = new MediaStream([videoTrack]);
       videoPlayerRef.current.play();
-
+      if (!videoTrack) {
+        setWebcamOn(false);
+      }
       setVideoTrack(videoTrack);
     }
   };
@@ -220,9 +222,9 @@ export function JoiningScreen({
                           micOn
                             ? {}
                             : {
-                                backgroundColor: red[500],
-                                color: "white",
-                              }
+                              backgroundColor: red[500],
+                              color: "white",
+                            }
                         }
                         className={styles.toggleButton}>
                         {micOn ? <Mic /> : <MicOff />}
@@ -241,9 +243,9 @@ export function JoiningScreen({
                           webcamOn
                             ? {}
                             : {
-                                backgroundColor: red[500],
-                                color: "white",
-                              }
+                              backgroundColor: red[500],
+                              color: "white",
+                            }
                         }
                         className={styles.toggleButton}>
                         {webcamOn ? <Videocam /> : <VideocamOff />}
