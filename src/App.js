@@ -211,7 +211,6 @@ const ParticipantView = ({ participantId }) => {
     switchTo,
     pinState,
     setQuality,
-    setViewPort,
     enableMic,
     disableMic,
     enableWebcam,
@@ -223,23 +222,12 @@ const ParticipantView = ({ participantId }) => {
     onStreamDisabled,
   });
 
-  useEffect(() => {
-    if (webcamRef.current && !isLocal && webcamStream) {
-      setViewPort(
-        webcamRef.current.wrapper.offsetWidth,
-        webcamRef.current.wrapper.offsetHeight
-      );
-    }
-  }, [
-    webcamRef.current?.offsetHeight,
-    webcamRef.current?.offsetWidth,
-    webcamStream,
-  ]);
 
   const webcamMediaStream = useMemo(() => {
     if (webcamOn && webcamStream) {
       const mediaStream = new MediaStream();
       mediaStream.addTrack(webcamStream.track);
+      setQuality("high");
       return mediaStream;
     }
   }, [webcamStream, webcamOn]);
