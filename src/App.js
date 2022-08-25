@@ -224,17 +224,8 @@ const ParticipantView = ({ participantId }) => {
   });
 
   useEffect(() => {
-    if (webcamRef.current && !isLocal && webcamStream) {
-      setViewPort(
-        webcamRef.current.wrapper.offsetWidth,
-        webcamRef.current.wrapper.offsetHeight
-      );
-    }
-  }, [
-    webcamRef.current?.offsetHeight,
-    webcamRef.current?.offsetWidth,
-    webcamStream,
-  ]);
+    webcamOn && setQuality("high");
+  }, [webcamStream, webcamOn]);
 
   const webcamMediaStream = useMemo(() => {
     if (webcamOn && webcamStream) {
