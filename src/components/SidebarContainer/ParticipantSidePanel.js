@@ -1,7 +1,10 @@
 import { Box, Typography, useTheme, Avatar, Icon } from "@material-ui/core";
-import { Mic, MicOff, Videocam, VideocamOff } from "@material-ui/icons";
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import React from "react";
+import MicOffIcon from "../../icons/ParticipantTabPanel/MicOffIcon";
+import MicOnIcon from "../../icons/ParticipantTabPanel/MicOnIcon";
+import VideoCamOffIcon from "../../icons/ParticipantTabPanel/VideoCamOffIcon";
+import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
 import { nameTructed } from "../../utils/helper";
 
 function ParticipantListItem({ participantId }) {
@@ -10,55 +13,37 @@ function ParticipantListItem({ participantId }) {
 
   const theme = useTheme();
   return (
-    <Box
-      mt={1}
-      m={1}
-      p={1}
-      style={{
-        backgroundColor: theme.palette.common.sidePanel,
-        borderRadius: 6,
-      }}
-    >
-      <Box
-        style={{
-          display: "flex",
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          position: "relative",
-        }}
-      >
+    <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg ">
+      <div className="flex flex-1 items-center justify-center relative">
         <Avatar variant={"rounded"}>{displayName?.charAt(0)}</Avatar>
-        <Box ml={1} mr={0.5} style={{ flex: 1, display: "flex" }}>
-          <Typography
-            style={{
-              textOverflow: "ellipsis",
-              overflow: "hidden",
-              whiteSpace: "pre-wrap",
-            }}
-            variant="body1"
-            noWrap
-          >
+        <div className="ml-2 mr-1 flex flex-1">
+          <p className="text-base text-white overflow-hidden whitespace-pre-wrap overflow-ellipsis">
             {isLocal ? "You" : nameTructed(displayName, 15)}
-          </Typography>
-        </Box>
-        <Icon
+          </p>
+        </div>
+        <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
+        <div className="m-1 p-1">
+          {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
+        </div>
+
+        {/* <Icon
           style={{
             color: "#fff",
             marginRight: theme.spacing(1),
           }}
         >
-          {micOn ? <Mic /> : <MicOff />}
+          {" "}
+          *{micOn ? <MicOnIcon /> : <MicOffIcon />}
         </Icon>
         <Icon
           style={{
             color: "#fff",
           }}
         >
-          {webcamOn ? <Videocam /> : <VideocamOff />}
-        </Icon>
-      </Box>
-    </Box>
+          {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
+        </Icon> */}
+      </div>
+    </div>
   );
 }
 
@@ -73,7 +58,7 @@ export function ParticipantSidePanel({ panelHeight }) {
         widht: "100%",
         display: "flex",
         flexDirection: "column",
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: theme.palette.darkTheme.slightLighter,
       }}
     >
       <Box

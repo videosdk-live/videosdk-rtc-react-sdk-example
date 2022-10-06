@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { MeetingProvider } from "@videosdk.live/react-sdk";
 import { JoiningScreen } from "./components/JoiningScreen";
 import { MeetingContainer } from "./components/MeetingContainer/MeetingContainer";
+import { SnackbarProvider } from "notistack";
 
 const App = () => {
   const [token, setToken] = useState("");
@@ -12,27 +13,37 @@ const App = () => {
   const [isMeetingStarted, setMeetingStarted] = useState(false);
 
   return isMeetingStarted ? (
-    <MeetingProvider
-      config={{
-        meetingId,
-        micEnabled: micOn,
-        webcamEnabled: webcamOn,
-        name: participantName ? participantName : "TestUser",
+    <SnackbarProvider
+      anchorOrigin={{
+        // vertical: isTab || isMobile ? "top" : "bottom",
+        vertical: "bottom",
+        horizontal: "left",
       }}
-      token={token}
-      reinitialiseMeetingOnConfigChange={true}
-      joinWithoutUserInteraction={true}
+      autoHideDuration={5000}
+      maxSnack={3}
     >
-      <MeetingContainer
-        onMeetingLeave={() => {
-          setToken("");
-          setMeetingId("");
-          setWebcamOn(false);
-          setMicOn(false);
-          setMeetingStarted(false);
+      <MeetingProvider
+        config={{
+          meetingId,
+          micEnabled: micOn,
+          webcamEnabled: webcamOn,
+          name: participantName ? participantName : "TestUser",
         }}
-      />
-    </MeetingProvider>
+        token={token}
+        reinitialiseMeetingOnConfigChange={true}
+        joinWithoutUserInteraction={true}
+      >
+        <MeetingContainer
+          onMeetingLeave={() => {
+            setToken("");
+            setMeetingId("");
+            setWebcamOn(false);
+            setMicOn(false);
+            setMeetingStarted(false);
+          }}
+        />
+      </MeetingProvider>
+    </SnackbarProvider>
   ) : (
     <JoiningScreen
       participantName={participantName}

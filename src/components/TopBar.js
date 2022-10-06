@@ -1,11 +1,17 @@
 import {
+  Badge,
   Box,
+  ButtonBase,
   IconButton,
   makeStyles,
   Tooltip,
   Typography,
   useTheme,
 } from "@material-ui/core";
+import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import React, { useState } from "react";
+import useResponsiveSize from "../utils/useResponsiveSize";
+import Lottie from "react-lottie";
 import {
   Person,
   Message,
@@ -18,70 +24,119 @@ import {
   RadioButtonChecked,
   FileCopy,
 } from "@material-ui/icons";
-import { useMeeting } from "@videosdk.live/react-sdk";
-import React, { useState } from "react";
-import useResponsiveSize from "../utils/useResponsiveSize";
+import RaiseHandIcon from "../icons/RaiseHandIcon";
 
-const useStyles = makeStyles({
-  row: { display: "flex", alignItems: "center" },
-  borderRight: { borderRight: "1ps solid #ffffff33" },
-  popover: { backgroundColor: "transparent" },
-  popoverBorder: {
-    borderRadius: "12px",
-    backgroundColor: "#212032",
-    marginTop: 8,
-    width: 300,
-  },
-});
-
-const OutlinedButton = ({ bgColor, onClick, icon, isFocused, tooltip }) => {
+const OutlinedButton = ({
+  bgColor,
+  onClick,
+  Icon,
+  isFocused,
+  tooltip,
+  badge,
+  lottieOption,
+  disabledOpacity,
+  disabled,
+  large,
+  btnID,
+  color,
+  focusIconColor,
+}) => {
   const theme = useTheme();
   const [mouseOver, setMouseOver] = useState(false);
+  const [mouseDown, setMouseDown] = useState(false);
+
+  const iconSize = useResponsiveSize({
+    xl: 24 * (large ? 1.7 : 1),
+    lg: 24 * (large ? 1.7 : 1),
+    md: 32 * (large ? 1.7 : 1),
+    sm: 28 * (large ? 1.7 : 1),
+    xs: 24 * (large ? 1.7 : 1),
+  });
 
   return (
-    <Tooltip placement="bottom" title={tooltip}>
-      <Box
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          borderRadius: theme.spacing(1),
-          backgroundColor: bgColor
-            ? bgColor
-            : isFocused
-            ? "#fff"
-            : theme.palette.background.default,
-          border: mouseOver
-            ? "2px solid transparent"
+    <Tooltip placement="top" title={tooltip} open={mouseOver || mouseDown}>
+      <div
+        className={`flex items-center justify-center  rounded-lg ${
+          bgColor ? `${bgColor}` : isFocused ? "bg-white" : "bg-gray-750"
+        } ${
+          mouseOver
+            ? "border-2 border-transparent border-solid"
             : bgColor
-            ? "2px solid transparent"
-            : "2px solid #ffffff33",
+            ? "border-2 border-transparent border-solid"
+            : "border-2 border-solid border-[#ffffff33]"
+        } m-2`}
+        style={{
           transition: "all 200ms",
           transitionTimingFunction: "ease-in-out",
-          margin: theme.spacing(1),
-        }}
-        onMouseEnter={() => {
-          setMouseOver(true);
-        }}
-        onMouseLeave={() => {
-          setMouseOver(false);
         }}
       >
-        <IconButton
-          variant="outlined"
-          onClick={() => {
-            onClick();
+        <div
+          className="cursor-pointer"
+          id={btnID}
+          onMouseEnter={() => {
+            setMouseOver(true);
           }}
-          style={{
-            transition: "all 200ms",
-            color: isFocused ? "#1C1F2E" : "#fff",
-            transitionTimingFunction: "ease-in-out",
-            transform: `scale(${mouseOver ? 1.1 : 1})`,
+          onMouseLeave={() => {
+            setMouseOver(false);
           }}
+          onMouseDown={() => {
+            setMouseDown(true);
+          }}
+          onMouseUp={() => {
+            setMouseDown(false);
+          }}
+          disabled={disabled}
+          onClick={onClick}
         >
-          {icon}
-        </IconButton>
-      </Box>
+          <div
+            className="flex items-center justify-center p-1 m-1 rounded-lg"
+            style={{
+              opacity: disabled ? disabledOpacity || 0.7 : 1,
+              transform: `scale(${mouseOver ? (mouseDown ? 0.95 : 1.1) : 1})`,
+              transition: `all ${200 * 1}ms`,
+              transitionTimingFunction: "linear",
+            }}
+          >
+            {Icon && (
+              <Badge max={1000} color={"secondary"} badgeContent={badge}>
+                {lottieOption ? (
+                  <div className={`flex items-center justify-center`}>
+                    <Lottie
+                      style={{ height: iconSize }}
+                      options={lottieOption}
+                      eventListeners={[{ eventName: "done" }]}
+                      height={iconSize}
+                      width={
+                        (iconSize * lottieOption?.width) / lottieOption?.height
+                      }
+                      isClickToPauseDisabled
+                    />
+                  </div>
+                ) : (
+                  <Icon
+                    style={{
+                      color: isFocused
+                        ? focusIconColor || "#1C1F2E"
+                        : color
+                        ? color
+                        : "#fff",
+                      height: iconSize,
+                      width: iconSize,
+                    }}
+                    fillColor={
+                      isFocused
+                        ? focusIconColor || "#1C1F2E"
+                        : color
+                        ? color
+                        : "#fff"
+                    }
+                  />
+                )}
+              </Badge>
+            )}
+          </div>
+        </div>
+      </div>
     </Tooltip>
   );
 };
@@ -89,18 +144,17 @@ const OutlinedButton = ({ bgColor, onClick, icon, isFocused, tooltip }) => {
 export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
   const mMeeting = useMeeting();
   const theme = useTheme();
-  const padding = useResponsiveSize({
-    xl: 6,
-    lg: 6,
-    md: 6,
-    sm: 4,
-    xs: 1.5,
-  });
+  const { publish } = usePubSub("RAISE_HAND");
+
+  const RaiseHand = () => {
+    publish("Raise Hand");
+  };
 
   const actions = [
     {
-      icon: <RadioButtonChecked />,
+      Icon: RadioButtonChecked,
       type: "RECORDING",
+      large: false,
       onClick: () => {
         mMeeting.isRecording
           ? mMeeting.stopRecording()
@@ -111,8 +165,9 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
     },
 
     {
-      icon: mMeeting.localMicOn ? <Mic /> : <MicOff />,
+      Icon: mMeeting.localMicOn ? Mic : MicOff,
       type: "MIC",
+      large: false,
       onClick: () => {
         mMeeting.toggleMic();
       },
@@ -120,8 +175,9 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
       tooltip: "Toggle Mic",
     },
     {
-      icon: mMeeting.localWebcamOn ? <Videocam /> : <VideocamOff />,
+      Icon: mMeeting.localWebcamOn ? Videocam : VideocamOff,
       type: "WEBCAM",
+      large: false,
       onClick: () => {
         mMeeting.toggleWebcam();
       },
@@ -129,7 +185,8 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
       tooltip: "Toggle Webcam",
     },
     {
-      icon: <ScreenShare />,
+      Icon: ScreenShare,
+      large: false,
       type: "SCREENSHARE",
       onClick: () => {
         mMeeting?.toggleScreenShare();
@@ -138,7 +195,7 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
       tooltip: "Toggle ScreenShare",
     },
     {
-      icon: <Person />,
+      Icon: Person,
       type: "PARTICIPANTS",
       onClick: () => {
         setSideBarMode("PARTICIPANTS");
@@ -147,8 +204,17 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
       tooltip: "View Participants",
     },
     {
-      icon: <Message />,
+      Icon: RaiseHandIcon,
+      type: "RAISE_HAND",
+      onClick: () => {
+        RaiseHand();
+      },
+      tooltip: "Raise Hand",
+    },
+    {
+      Icon: Message,
       type: "CHAT",
+      large: false,
       onClick: () => {
         //handle chat sidebar toggle
         setSideBarMode("CHAT");
@@ -157,9 +223,10 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
       tooltip: "View Chat",
     },
     {
-      icon: <CallEnd />,
+      Icon: CallEnd,
+      large: false,
       type: "END_CALL",
-      bgColor: "#D32F2F",
+      bgColor: "bg-red-150",
       onClick: () => {
         mMeeting.leave();
       },
@@ -167,52 +234,24 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
     },
   ];
   return (
-    <Box
-      style={{
-        height: topBarHeight,
-        display: "flex",
-        flex: 1,
-        justifyContent: "space-between",
-        backgroundColor: theme.palette.background.default,
-        borderBottom: "1px solid #ffffff33",
-        position: "relative",
-        paddingLeft: theme.spacing(2),
-        paddingRight: theme.spacing(2),
-      }}
+    <div
+      className={`flex flex-1 items-center justify-center h-[${topBarHeight}px] bg-gray-800 relative px-2`}
+      style={{ borderTop: "1px solid #ffffff33" }}
     >
-      <Box
-        style={{
-          display: "flex",
-          alignItem: "center",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <Typography variant="h6" style={{ alignSelf: "center" }}>
-          {mMeeting.meetingId}
-        </Typography>
-        <OutlinedButton
-          onClick={() => {
-            navigator.clipboard.writeText(mMeeting.meetingId);
-          }}
-          icon={<FileCopy />}
-          isFocused={false}
-          tooltip={"Copy Meeting id"}
-        />
-      </Box>
-      <Box style={{ display: "flex", flexDirection: "row" }}>
+      <h1 className="text-white">{mMeeting.meetingId}</h1>
+      <div style={{ display: "flex", flexDirection: "row" }}>
         {actions.map((action) => {
           return (
             <OutlinedButton
               onClick={action.onClick}
               bgColor={action.bgColor}
-              icon={action.icon}
+              Icon={action.Icon}
               isFocused={action.isFocused}
               tooltip={action.tooltip}
             />
           );
         })}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

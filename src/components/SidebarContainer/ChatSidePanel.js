@@ -1,15 +1,13 @@
 import {
-  Box,
   IconButton,
-  Typography,
   useTheme,
   Fade,
   InputAdornment,
   TextField,
 } from "@material-ui/core";
 import { Send } from "@material-ui/icons";
-import { useMeeting } from "@videosdk.live/react-sdk";
-import React, { useState } from "react";
+import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import React, { useEffect, useRef, useState } from "react";
 import { formatAMPM, json_verify, nameTructed } from "../../utils/helper";
 
 const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
@@ -22,111 +20,101 @@ const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
   const theme = useTheme();
 
   return (
-    <Box
+    <div
+      className={`flex ${localSender ? "justify-end" : "justify-start"} mt-4`}
       style={{
-        display: "flex",
-        justifyContent: localSender ? "flex-end" : "flex-start",
         maxWidth: "100%",
       }}
-      mt={2}
     >
-      <Box
-        style={{
-          paddingTop: theme.spacing(0.5),
-          paddingBottom: theme.spacing(0.5),
-          paddingLeft: theme.spacing(1),
-          paddingRight: theme.spacing(1),
-          borderRadius: 6,
-          backgroundColor: theme.palette.common.sidePanel,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: localSender ? "flex-end" : "flex-start",
-        }}
+      <div
+        className={`flex ${
+          localSender ? "items-end" : "items-start"
+        } flex-col py-1 px-2 rounded-md bg-gray-700`}
       >
-        <Typography style={{ color: "#ffffff80" }}>
+        <p style={{ color: "#ffffff80" }}>
           {localSender ? "You" : nameTructed(senderName, 15)}
-        </Typography>
-        <Box mt={0.5}>
-          <Typography
-            style={{
-              display: "inline-block",
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-            }}
-          >
-            {text}
-          </Typography>
-        </Box>
-        <Box mt={0.5}>
-          <Typography
-            variant={"caption"}
-            style={{ color: "#ffffff80", fontStyle: "italic" }}
-          >
-            {formatAMPM(new Date(parseInt(timestamp)))}
-          </Typography>
-        </Box>
-      </Box>
-    </Box>
+        </p>
+        <div>
+          <p className="inline-block pre-wrap break-words text-white">{text}</p>
+        </div>
+        <div className="mt-1">
+          <p className="text-xs italic" style={{ color: "#ffffff80" }}>
+            {formatAMPM(new Date(timestamp))}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export function ChatSidePanel({ panelHeight }) {
   const [message, setMessage] = useState("");
   const mMeeting = useMeeting();
-  const sendChatMessage = mMeeting.sendChatMessage;
+
   const theme = useTheme();
-  const chatMessages = mMeeting.messages;
+
+  const { publish } = usePubSub("CHAT");
+
+  const { messages } = usePubSub("CHAT");
+
+  const listRef = useRef();
+  const input = useRef();
+
+  const scrollToBottom = (data) => {
+    if (!data) {
+      if (listRef.current) {
+        listRef.current.scrollTop = listRef.current.scrollHeight;
+      }
+    } else {
+      const { text } = data;
+
+      if (json_verify(text)) {
+        const { type } = JSON.parse(text);
+        if (type === "CHAT") {
+          if (listRef.current) {
+            listRef.current.scrollTop = listRef.current.scrollHeight;
+          }
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   return (
-    <Box
-      style={{
-        height: panelHeight,
-        widht: "100%",
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: theme.palette.background.paper,
-      }}
+    <div
+      className={` w-full flex flex-col bg-gray-750`}
+      style={{ height: panelHeight }}
     >
-      <Box
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          height: panelHeight - 100,
-        }}
+      <div
+        style={{ height: panelHeight - 100 }}
+        className={`flex flex-col flex-1 `}
       >
-        {chatMessages ? (
-          <Box
-            // ref={listRef}
-            style={{ overflowY: "scroll", height: panelHeight }}
-          >
-            <Box p={2}>
-              {chatMessages.map((msg, i) => {
-                const { senderId, senderName, text, timestamp } = msg;
-                if (json_verify(text)) {
-                  const { type, data } = JSON.parse(text);
-                  if (type === "CHAT") {
-                    return (
-                      <ChatMessage
-                        key={`chat_item_${i}`}
-                        {...{
-                          senderId,
-                          senderName,
-                          text: data.message,
-                          timestamp,
-                        }}
-                      />
-                    );
-                  }
-                  return <></>;
-                }
-                return <></>;
+        {messages ? (
+          <div ref={listRef} className={`overflow-y-auto h-[${panelHeight}]px`}>
+            <div className="px-2">
+              {messages.map((msg, i) => {
+                const { senderId, senderName, message, timestamp } = msg;
+                return (
+                  <ChatMessage
+                    key={`chat_item_${i}`}
+                    {...{
+                      senderId,
+                      senderName,
+                      text: message,
+                      timestamp,
+                    }}
+                  />
+                );
               })}
-            </Box>
-          </Box>
+            </div>
+          </div>
         ) : (
           <p>no messages</p>
         )}
-      </Box>
+      </div>
 
       <TextField
         style={{
@@ -136,6 +124,7 @@ export function ChatSidePanel({ panelHeight }) {
         onChange={(e) => {
           setMessage(e.target.value);
         }}
+        ref={input}
         value={message}
         placeholder="Write your message"
         variant="outlined"
@@ -144,13 +133,11 @@ export function ChatSidePanel({ panelHeight }) {
             const messageText = message.trim();
 
             if (messageText.length > 0) {
-              sendChatMessage(
-                JSON.stringify({
-                  type: "CHAT",
-                  data: { message: messageText },
-                })
-              );
-              setMessage("");
+              publish(messageText, { persist: true });
+              setTimeout(() => {
+                setMessage("");
+              }, 100);
+              input.current?.focus();
             }
           }
         }}
@@ -163,13 +150,11 @@ export function ChatSidePanel({ panelHeight }) {
                 onClick={() => {
                   const messageText = message.trim();
                   if (messageText.length > 0) {
-                    sendChatMessage(
-                      JSON.stringify({
-                        type: "CHAT",
-                        data: { messageText },
-                      })
-                    );
-                    setMessage("");
+                    publish(messageText, { persist: true });
+                    setTimeout(() => {
+                      setMessage("");
+                    }, 100);
+                    input.current?.focus();
                   }
                 }}
               >
@@ -179,6 +164,6 @@ export function ChatSidePanel({ panelHeight }) {
           ),
         }}
       />
-    </Box>
+    </div>
   );
 }

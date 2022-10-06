@@ -131,7 +131,7 @@ export function JoiningScreen({
         flexDirection: "column",
         height: "100vh",
         alignItems: "center",
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: theme.palette.darkTheme.main,
       }}
     >
       {readyToJoin ? (

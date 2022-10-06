@@ -36,7 +36,7 @@ export function PresenterView({ height }) {
       style={{
         height: height - theme.spacing(4),
         width: "100%",
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: theme.palette.darkTheme.slightLighter,
         position: "relative",
         overflow: "hidden",
         borderRadius: theme.spacing(1),

@@ -67,34 +67,18 @@ function ParticipantView({ participantId }) {
   }, [micStream, micOn]);
 
   return (
-    <div
-      style={{
-        height: "100%",
-        width: "100%",
-        backgroundColor: theme.palette.background.paper,
-        position: "relative",
-        overflow: "hidden",
-        borderRadius: theme.spacing(1),
-      }}
-    >
+    <div className="h-full w-full bg-gray-750 relative overflow-hidden rounded-lg">
       <div
+        className="absolute bottom-2 left-2 rounded-md flex items-center justify-center p-2"
         style={{
-          position: "absolute",
-          bottom: theme.spacing(1),
-          left: theme.spacing(1),
           backgroundColor: "#00000066",
-          borderRadius: 6,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
           transition: "all 200ms",
           transitionTimingFunction: "linear",
-          padding: theme.spacing(1),
         }}
       >
         {!micOn ? <MicOff fontSize="small" color="primary"></MicOff> : <></>}
 
-        <Typography variant="subtitle2">
+        <p className="text-sm text-white">
           {isPresenting
             ? isLocal
               ? `You are presenting`
@@ -102,7 +86,7 @@ function ParticipantView({ participantId }) {
             : isLocal
             ? "You"
             : nameTructed(displayName, 26)}
-        </Typography>
+        </p>
       </div>
       <audio ref={micRef} autoPlay />
       {webcamOn ? (
@@ -111,36 +95,32 @@ function ParticipantView({ participantId }) {
           width={"100%"}
           ref={webcamRef}
           autoPlay
-          style={{ objectFit: "cover", objectPosition: "center center" }}
+          // style={{ objectFit: "cover", objectPosition: "center center" }}
         />
       ) : (
         <div
-          style={{
-            height: "100%",
-            width: "100%",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+          className="h-full w-full flex items-center justify-center"
+          // style={{
+          //   height: "100%",
+          //   width: "100%",
+          //   display: "flex",
+          //   alignItems: "center",
+          //   justifyContent: "center",
+          // }}
         >
-          <Box
+          <div
+            className={`z-10 flex items-center justify-center rounded-full bg-gray-800`}
             style={{
-              zIndex: 10,
               height: dpSize,
               width: dpSize,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 100,
-              backgroundColor: theme.palette.background.default,
               transition: "height 800ms, width 800ms",
               transitionTimingFunction: "ease-in-out",
             }}
           >
-            <Typography variant="h5">
+            <p className="text-2xl text-white">
               {String(displayName).charAt(0).toUpperCase()}
-            </Typography>
-          </Box>
+            </p>
+          </div>
         </div>
       )}
     </div>
@@ -153,21 +133,22 @@ export function ParticipantsViewer({ height }) {
   const participants = mMeeting?.participants;
 
   return (
-    <Box
+    <div
       style={{
         display: "flex",
         flexDirection: "row",
         flexGrow: 1,
+        margin: 8,
       }}
-      m={1}
     >
       <Grid
         container
-        spacing={1}
+        spacing={2}
         style={{
-          height: height - theme.spacing(1) * 2.5,
+          height: height - theme.spacing(1),
           justifyContent: "center",
-          backgroundColor: theme.palette.background.default,
+          alignItems: "center",
+          backgroundColor: theme.palette.darkTheme.main,
         }}
       >
         {[...participants.keys()].map((participantId) => {
@@ -177,7 +158,7 @@ export function ParticipantsViewer({ height }) {
               style={{
                 height:
                   participants.size < 3
-                    ? height - theme.spacing(1) * 2
+                    ? height - theme.spacing(1) * 8
                     : participants.size < 5
                     ? height / 2 - theme.spacing(1) * 2
                     : participants.size < 7
@@ -203,6 +184,6 @@ export function ParticipantsViewer({ height }) {
           );
         })}
       </Grid>
-    </Box>
+    </div>
   );
 }

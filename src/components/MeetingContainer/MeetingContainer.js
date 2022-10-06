@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useMeeting } from "@videosdk.live/react-sdk";
+import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import { TopBar } from "../TopBar";
-import { Box, Grid, useTheme } from "@material-ui/core";
+import { Box, useTheme } from "@material-ui/core";
 import { SidebarConatiner } from "../SidebarContainer/SidebarContainer";
 import { ParticipantsViewer } from "./ParticipantView";
 import { PresenterView } from "./PresenterView";
+import { useSnackbar } from "notistack";
+import { nameTructed } from "../../utils/helper";
 
 export function MeetingContainer({ onMeetingLeave }) {
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const containerRef = useRef();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     containerRef.current?.offsetHeight &&
@@ -114,47 +117,52 @@ export function MeetingContainer({ onMeetingLeave }) {
 
   const topBarHeight = 60;
   const [sideBarMode, setSideBarMode] = useState(null);
+
+  usePubSub("RAISE_HAND", {
+    onMessageReceived: (data) => {
+      const localParticipantId = mMeeting?.localParticipant?.id;
+
+      const { senderId, senderName } = data;
+
+      const isLocal = senderId === localParticipantId;
+
+      new Audio(
+        `https://static.videosdk.live/prebuilt/notification.mp3`
+      ).play();
+
+      enqueueSnackbar(
+        `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
+      );
+    },
+  });
+
   return (
     <div
       ref={containerRef}
-      style={{
-        height: "100vh",
-        width: "100",
-        flexDirection: "column",
-        display: "flex",
-        backgroundColor: theme.palette.background.default,
-      }}
+      className="h-screen w-full flex flex-col bg-gray-800"
     >
-      <TopBar
-        topbarHeight={topBarHeight}
-        sideBarMode={sideBarMode}
-        setSideBarMode={setSideBarMode}
-      />
-      <Box
-        style={{
-          height: containerHeight - topBarHeight,
-          display: "flex",
-          backgroundColor: theme.palette.background.default,
-        }}
+      <div
+        className={` flex flex-row bg-gray-800 `}
+        style={{ height: containerHeight - topBarHeight }}
       >
         {isPresenting ? (
           <PresenterView height={containerHeight - topBarHeight} />
         ) : (
           <ParticipantsViewer height={containerHeight - topBarHeight} />
         )}
-        <Box
-          style={{
-            display: "flex",
-            flexDirection: "row",
-          }}
-        >
+        <div className="flex flex-row">
           <SidebarConatiner
             height={containerHeight - topBarHeight}
             setSideBarMode={setSideBarMode}
             sideBarMode={sideBarMode}
           />
-        </Box>
-      </Box>
+        </div>
+      </div>
+      <TopBar
+        topbarHeight={topBarHeight}
+        sideBarMode={sideBarMode}
+        setSideBarMode={setSideBarMode}
+      />
     </div>
   );
 }

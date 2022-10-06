@@ -59,13 +59,13 @@ export function SidebarConatiner({ height, sideBarMode, setSideBarMode }) {
         paddingLeft: panelPadding,
         paddingRight: panelPadding,
         paddingBottom: panelPadding,
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: theme.palette.darkTheme.main,
       }}
     >
       <Fade in={sideBarMode}>
         <div
           style={{
-            backgroundColor: theme.palette.background.paper,
+            backgroundColor: theme.palette.darkTheme.slightLighter,
             height: paddedHeight,
             borderRadius: 10,
             overflow: "hidden",
