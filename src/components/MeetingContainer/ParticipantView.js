@@ -146,12 +146,12 @@ export function ParticipantsViewer({ height }) {
                   participants.size < 3
                     ? height - theme.spacing(1) * 8
                     : participants.size < 5
-                    ? height / 2 - theme.spacing(1) * 2
+                    ? height / 2 - theme.spacing(1) * 1
                     : participants.size < 7
-                    ? height / 2 - theme.spacing(1) * 2
+                    ? height / 2 - theme.spacing(1) * 1
                     : participants.size < 9
-                    ? height / 2 - theme.spacing(1) * 2
-                    : height / 3 - theme.spacing(1) * 2,
+                    ? height / 2 - theme.spacing(1) * 1
+                    : height / 3 - theme.spacing(1) * 1,
               }}
               xs={
                 participants.size < 2
