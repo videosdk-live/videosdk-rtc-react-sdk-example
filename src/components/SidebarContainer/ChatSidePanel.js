@@ -151,7 +151,11 @@ export function ChatSidePanel({ panelHeight }) {
         className={`flex flex-col flex-1`}
       >
         {messages ? (
-          <div ref={listRef} className={`overflow-y-auto h-[${panelHeight}]px`}>
+          <div
+            ref={listRef}
+            style={{ height: panelHeight }}
+            className={`overflow-y-auto `}
+          >
             <div className="px-2">
               {messages.map((msg, i) => {
                 const { senderId, senderName, message, timestamp } = msg;

@@ -26,9 +26,14 @@ export function MeetingDetailsScreen({
   });
 
   return (
-    <div className={`flex flex-1 flex-col w-full p-[${padding}]`}>
+    <div
+      className={`flex flex-1 flex-col w-full `}
+      style={{
+        padding: padding,
+      }}
+    >
       {iscreateMeetingClicked ? (
-        <div className="border border-solid border-[#ffffff33] rounded-md px-4 py-3  flex items-center justify-center">
+        <div className="border border-solid border-gray-400 rounded-md px-4 py-3  flex items-center justify-center">
           <p className="text-white text-base">Meeting code: {meetingId}</p>
           <button
             className="ml-2"

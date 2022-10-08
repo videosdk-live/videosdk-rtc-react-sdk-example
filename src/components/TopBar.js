@@ -3,22 +3,20 @@ import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import useResponsiveSize from "../utils/useResponsiveSize";
 import Lottie from "react-lottie";
-import {
-  Person,
-  Message,
-  VideocamOff,
-  MicOff,
-  Mic,
-  Videocam,
-  CallEnd,
-  ScreenShare,
-  RadioButtonChecked,
-} from "@material-ui/icons";
-import RaiseHandIcon from "../icons/RaiseHandIcon";
 import { sideBarModes } from "./MeetingContainer/MeetingContainer";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
 import recordingBlink from "../animations/recording-blink.json";
 import useIsRecording from "./MeetingContainer/useIsRecording";
+import RecordingIcon from "../icons/Topbar/RecordingIcon";
+import MicOnIcon from "../icons/Topbar/MicOnIcon";
+import MicOffIcon from "../icons/Topbar/MicOffIcon";
+import WebcamOnIcon from "../icons/Topbar/WebcamOnIcon";
+import WebcamOffIcon from "../icons/Topbar/WebcamOffIcon";
+import ScreenShareIcon from "../icons/Topbar/ScreenShareIcon";
+import ChatIcon from "../icons/Topbar/ChatIcon";
+import ParticipantsIcon from "../icons/Topbar/ParticipantsIcon";
+import EndIcon from "../icons/Topbar/EndIcon";
+import RaiseHandIcon from "../icons/Topbar/RaiseHandIcon";
 
 const OutlinedButton = ({
   bgColor,
@@ -36,7 +34,6 @@ const OutlinedButton = ({
   focusIconColor,
   isRequestProcessing,
 }) => {
-  console.log("isRequestProcessing", isRequestProcessing);
   const [mouseOver, setMouseOver] = useState(false);
   const [mouseDown, setMouseDown] = useState(false);
   const [blinkingState, setBlinkingState] = useState(1);
@@ -52,7 +49,6 @@ const OutlinedButton = ({
   });
 
   const startBlinking = () => {
-    console.log("sdhsabd");
     intervalRef.current = setInterval(() => {
       setBlinkingState((s) => (s === 1 ? 0.4 : 1));
     }, 600);
@@ -123,22 +119,22 @@ const OutlinedButton = ({
               transitionTimingFunction: "linear",
             }}
           >
-            {Icon && (
-              <Badge max={1000} color={"secondary"} badgeContent={badge}>
-                {lottieOption ? (
-                  <div className={`flex items-center justify-center`}>
-                    <Lottie
-                      style={{ height: iconSize }}
-                      options={lottieOption}
-                      eventListeners={[{ eventName: "done" }]}
-                      height={iconSize}
-                      width={
-                        (iconSize * lottieOption?.width) / lottieOption?.height
-                      }
-                      isClickToPauseDisabled
-                    />
-                  </div>
-                ) : (
+            {Icon &&
+              (lottieOption ? (
+                <div className={`flex items-center justify-center`}>
+                  <Lottie
+                    style={{ height: iconSize }}
+                    options={lottieOption}
+                    eventListeners={[{ eventName: "done" }]}
+                    height={iconSize}
+                    width={
+                      (iconSize * lottieOption?.width) / lottieOption?.height
+                    }
+                    isClickToPauseDisabled
+                  />
+                </div>
+              ) : (
+                <>
                   <Icon
                     style={{
                       color: isFocused
@@ -157,9 +153,11 @@ const OutlinedButton = ({
                         : "#fff"
                     }
                   />
-                )}
-              </Badge>
-            )}
+                  {badge && (
+                    <p className="text-white text-base ml-2">{badge}</p>
+                  )}
+                </>
+              ))}
           </div>
         </div>
       </div>
@@ -174,8 +172,12 @@ export function TopBar({
   setIsMeetingLeft,
 }) {
   const mMeeting = useMeeting();
+  const { participants } = useMeeting();
+
   const { publish } = usePubSub("RAISE_HAND");
   const [isCopied, setIsCopied] = useState(false);
+
+  console.log("participants", participants);
 
   const defaultOptions = {
     loop: true,
@@ -225,7 +227,7 @@ export function TopBar({
 
   const actions = [
     {
-      Icon: RadioButtonChecked,
+      Icon: RecordingIcon,
       onClick: () => {
         _handleClick();
       },
@@ -245,7 +247,8 @@ export function TopBar({
     },
 
     {
-      Icon: mMeeting.localMicOn ? Mic : MicOff,
+      Icon: mMeeting.localMicOn ? MicOnIcon : MicOffIcon,
+      bgColor: mMeeting.localMicOn ? "" : "bg-white",
       onClick: () => {
         mMeeting.toggleMic();
       },
@@ -253,7 +256,8 @@ export function TopBar({
       tooltip: "Toggle Mic",
     },
     {
-      Icon: mMeeting.localWebcamOn ? Videocam : VideocamOff,
+      Icon: mMeeting.localWebcamOn ? WebcamOnIcon : WebcamOffIcon,
+      bgColor: mMeeting.localWebcamOn ? "" : "bg-white",
       onClick: () => {
         mMeeting.toggleWebcam();
       },
@@ -261,7 +265,7 @@ export function TopBar({
       tooltip: "Toggle Webcam",
     },
     {
-      Icon: ScreenShare,
+      Icon: ScreenShareIcon,
       onClick: () => {
         mMeeting?.toggleScreenShare();
       },
@@ -278,7 +282,7 @@ export function TopBar({
     },
 
     {
-      Icon: CallEnd,
+      Icon: EndIcon,
       bgColor: "bg-red-150",
       onClick: () => {
         mMeeting.leave();
@@ -290,7 +294,7 @@ export function TopBar({
 
   const iconsArr = [
     {
-      Icon: Message,
+      Icon: ChatIcon,
       onClick: () => {
         setSideBarMode((s) =>
           s === sideBarModes.CHAT ? null : sideBarModes.CHAT
@@ -300,7 +304,7 @@ export function TopBar({
       tooltip: "View Chat",
     },
     {
-      Icon: Person,
+      Icon: ParticipantsIcon,
       onClick: () => {
         setSideBarMode((s) =>
           s === sideBarModes.PARTICIPANTS ? null : sideBarModes.PARTICIPANTS
@@ -308,6 +312,7 @@ export function TopBar({
       },
       isFocused: sideBarMode === "PARTICIPANTS",
       tooltip: "View Participants",
+      badge: `${new Map(participants)?.size}`,
     },
   ];
 
@@ -364,6 +369,7 @@ export function TopBar({
               Icon={action.Icon}
               isFocused={action.isFocused}
               tooltip={action.tooltip}
+              badge={action.badge}
             />
           );
         })}
