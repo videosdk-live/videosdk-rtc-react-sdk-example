@@ -154,7 +154,13 @@ const OutlinedButton = ({
                     }
                   />
                   {badge && (
-                    <p className="text-white text-base ml-2">{badge}</p>
+                    <p
+                      className={`${
+                        isFocused ? "text-black" : "text-white"
+                      } text-base ml-2`}
+                    >
+                      {badge}
+                    </p>
                   )}
                 </>
               ))}
