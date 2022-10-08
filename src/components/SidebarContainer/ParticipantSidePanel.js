@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, Avatar, Icon } from "@material-ui/core";
+import { Avatar } from "@material-ui/core";
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import React from "react";
 import MicOffIcon from "../../icons/ParticipantTabPanel/MicOffIcon";
@@ -11,9 +11,8 @@ function ParticipantListItem({ participantId }) {
   const { participant, micOn, webcamOn, displayName, isLocal } =
     useParticipant(participantId);
 
-  const theme = useTheme();
   return (
-    <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg ">
+    <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg mb-0">
       <div className="flex flex-1 items-center justify-center relative">
         <Avatar variant={"rounded"}>{displayName?.charAt(0)}</Avatar>
         <div className="ml-2 mr-1 flex flex-1">
@@ -25,54 +24,27 @@ function ParticipantListItem({ participantId }) {
         <div className="m-1 p-1">
           {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
         </div>
-
-        {/* <Icon
-          style={{
-            color: "#fff",
-            marginRight: theme.spacing(1),
-          }}
-        >
-          {" "}
-          *{micOn ? <MicOnIcon /> : <MicOffIcon />}
-        </Icon>
-        <Icon
-          style={{
-            color: "#fff",
-          }}
-        >
-          {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
-        </Icon> */}
       </div>
     </div>
   );
 }
 
 export function ParticipantSidePanel({ panelHeight }) {
-  const theme = useTheme();
   const mMeeting = useMeeting();
   const participants = mMeeting.participants;
   return (
-    <Box
-      style={{
-        height: panelHeight,
-        widht: "100%",
-        display: "flex",
-        flexDirection: "column",
-        backgroundColor: theme.palette.darkTheme.slightLighter,
-      }}
+    <div
+      className={`flex w-full flex-col bg-gray-750 overflow-y-auto `}
+      style={{ height: panelHeight }}
     >
-      <Box
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          height: panelHeight - 100,
-        }}
+      <div
+        className="flex flex-col flex-1"
+        style={{ height: panelHeight - 100 }}
       >
         {[...participants.keys()].map((participantId) => {
           return <ParticipantListItem participantId={participantId} />;
         })}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

@@ -1,23 +1,30 @@
 import {
   IconButton,
-  useTheme,
-  Fade,
   InputAdornment,
-  TextField,
+  OutlinedInput as Input,
+  makeStyles,
 } from "@material-ui/core";
 import { Send } from "@material-ui/icons";
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useRef, useState } from "react";
 import { formatAMPM, json_verify, nameTructed } from "../../utils/helper";
 
+const useStyles = makeStyles(() => ({
+  textField: {
+    "& .MuiInputBase-input": {
+      color: "white",
+    },
+  },
+  inputFocused: {
+    borderColor: "none",
+    outline: "none",
+  },
+}));
+
 const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
   const mMeeting = useMeeting();
-
   const localParticipantId = mMeeting?.localParticipant?.id;
-
   const localSender = localParticipantId === senderId;
-
-  const theme = useTheme();
 
   return (
     <div
@@ -47,18 +54,69 @@ const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
   );
 };
 
+const ChatInput = ({ message, setMessage, publish }) => {
+  const input = useRef();
+  const classes = useStyles();
+
+  return (
+    <Input
+      style={{ paddingRight: 0, margin: "1rem" }}
+      rows={1}
+      rowsMax={2}
+      multiline
+      id="outlined"
+      onChange={(e) => {
+        setMessage(e.target.value);
+      }}
+      classes={{
+        root: classes.textField,
+        focused: classes.inputFocused,
+      }}
+      ref={input}
+      value={message}
+      placeholder="Write your message"
+      onKeyPress={(e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          const messageText = message.trim();
+
+          if (messageText.length > 0) {
+            publish(messageText, { persist: true });
+            setTimeout(() => {
+              setMessage("");
+            }, 100);
+            input.current?.focus();
+          }
+        }
+      }}
+      endAdornment={
+        <InputAdornment position="end">
+          <IconButton
+            disabled={message.length < 3}
+            variant="outlined"
+            onClick={() => {
+              const messageText = message.trim();
+              if (messageText.length > 0) {
+                publish(messageText, { persist: true });
+                setTimeout(() => {
+                  setMessage("");
+                }, 100);
+                input.current?.focus();
+              }
+            }}
+          >
+            <Send />
+          </IconButton>
+        </InputAdornment>
+      }
+    />
+  );
+};
+
 export function ChatSidePanel({ panelHeight }) {
   const [message, setMessage] = useState("");
-  const mMeeting = useMeeting();
-
-  const theme = useTheme();
-
   const { publish } = usePubSub("CHAT");
-
   const { messages } = usePubSub("CHAT");
-
   const listRef = useRef();
-  const input = useRef();
 
   const scrollToBottom = (data) => {
     if (!data) {
@@ -90,7 +148,7 @@ export function ChatSidePanel({ panelHeight }) {
     >
       <div
         style={{ height: panelHeight - 100 }}
-        className={`flex flex-col flex-1 `}
+        className={`flex flex-col flex-1`}
       >
         {messages ? (
           <div ref={listRef} className={`overflow-y-auto h-[${panelHeight}]px`}>
@@ -115,55 +173,7 @@ export function ChatSidePanel({ panelHeight }) {
           <p>no messages</p>
         )}
       </div>
-
-      <TextField
-        style={{
-          margin: "1rem",
-        }}
-        id="outlined"
-        onChange={(e) => {
-          setMessage(e.target.value);
-        }}
-        ref={input}
-        value={message}
-        placeholder="Write your message"
-        variant="outlined"
-        onKeyPress={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            const messageText = message.trim();
-
-            if (messageText.length > 0) {
-              publish(messageText, { persist: true });
-              setTimeout(() => {
-                setMessage("");
-              }, 100);
-              input.current?.focus();
-            }
-          }
-        }}
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <IconButton
-                disabled={message.length < 3}
-                variant="outlined"
-                onClick={() => {
-                  const messageText = message.trim();
-                  if (messageText.length > 0) {
-                    publish(messageText, { persist: true });
-                    setTimeout(() => {
-                      setMessage("");
-                    }, 100);
-                    input.current?.focus();
-                  }
-                }}
-              >
-                <Send />
-              </IconButton>
-            </InputAdornment>
-          ),
-        }}
-      />
+      <ChatInput message={message} setMessage={setMessage} publish={publish} />
     </div>
   );
 }

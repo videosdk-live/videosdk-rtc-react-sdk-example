@@ -3,6 +3,7 @@ import { MeetingProvider } from "@videosdk.live/react-sdk";
 import { JoiningScreen } from "./components/JoiningScreen";
 import { MeetingContainer } from "./components/MeetingContainer/MeetingContainer";
 import { SnackbarProvider } from "notistack";
+import { LeaveScreen } from "./components/LeaveScreen";
 
 const App = () => {
   const [token, setToken] = useState("");
@@ -11,6 +12,7 @@ const App = () => {
   const [micOn, setMicOn] = useState(false);
   const [webcamOn, setWebcamOn] = useState(false);
   const [isMeetingStarted, setMeetingStarted] = useState(false);
+  const [isMeetingLeft, setIsMeetingLeft] = useState(false);
 
   return isMeetingStarted ? (
     <SnackbarProvider
@@ -41,14 +43,16 @@ const App = () => {
             setMicOn(false);
             setMeetingStarted(false);
           }}
+          setIsMeetingLeft={setIsMeetingLeft}
         />
       </MeetingProvider>
     </SnackbarProvider>
+  ) : isMeetingLeft ? (
+    <LeaveScreen setIsMeetingLeft={setIsMeetingLeft} />
   ) : (
     <JoiningScreen
       participantName={participantName}
       setParticipantName={setParticipantName}
-      meetinId={meetingId}
       setMeetingId={setMeetingId}
       setToken={setToken}
       setMicOn={setMicOn}
@@ -59,6 +63,7 @@ const App = () => {
         setMeetingStarted(true);
       }}
       startMeeting={isMeetingStarted}
+      setIsMeetingLeft={setIsMeetingLeft}
     />
   );
 };

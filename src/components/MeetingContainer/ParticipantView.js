@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Box, Grid, Icon, Typography, useTheme } from "@material-ui/core";
+import { Grid, useTheme } from "@material-ui/core";
 import { useParticipant, useMeeting } from "@videosdk.live/react-sdk";
 import { nameTructed } from "../../utils/helper";
 import useResponsiveSize from "../../utils/useResponsiveSize";
@@ -8,7 +8,6 @@ import { MicOff } from "@material-ui/icons";
 function ParticipantView({ participantId }) {
   const webcamRef = useRef(null);
   const micRef = useRef(null);
-  const theme = useTheme();
 
   const dpSize = useResponsiveSize({
     xl: 92,
@@ -18,15 +17,8 @@ function ParticipantView({ participantId }) {
     xs: 52,
   });
 
-  const {
-    displayName,
-    webcamStream,
-    micStream,
-    webcamOn,
-    micOn,
-    isLocal,
-    isActiveSpeaker,
-  } = useParticipant(participantId);
+  const { displayName, webcamStream, micStream, webcamOn, micOn, isLocal } =
+    useParticipant(participantId);
   const mMeeting = useMeeting();
   const isPresenting = mMeeting.isPresenting;
 
@@ -91,23 +83,15 @@ function ParticipantView({ participantId }) {
       <audio ref={micRef} autoPlay />
       {webcamOn ? (
         <video
-          height="100%"
-          width={"100%"}
+          // height="100%"
+          // width={"100%"}
           ref={webcamRef}
           autoPlay
-          // style={{ objectFit: "cover", objectPosition: "center center" }}
+          className="w-full h-full"
+          style={{ objectFit: "cover" }}
         />
       ) : (
-        <div
-          className="h-full w-full flex items-center justify-center"
-          // style={{
-          //   height: "100%",
-          //   width: "100%",
-          //   display: "flex",
-          //   alignItems: "center",
-          //   justifyContent: "center",
-          // }}
-        >
+        <div className="h-full w-full flex items-center justify-center">
           <div
             className={`z-10 flex items-center justify-center rounded-full bg-gray-800`}
             style={{
@@ -131,12 +115,13 @@ export function ParticipantsViewer({ height }) {
   const theme = useTheme();
   const mMeeting = useMeeting();
   const participants = mMeeting?.participants;
+  const isXStoSM = theme.breakpoints.between("xs", "sm");
 
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: "row",
+        flexDirection: isXStoSM ? "column" : "row",
         flexGrow: 1,
         margin: 8,
       }}
@@ -154,6 +139,7 @@ export function ParticipantsViewer({ height }) {
         {[...participants.keys()].map((participantId) => {
           return (
             <Grid
+              key={`participant_${participantId}`}
               item
               style={{
                 height:

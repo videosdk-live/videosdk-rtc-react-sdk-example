@@ -1,3 +1,9 @@
+export const trimSnackBarText = (text = "") => {
+  const maxLength = 52;
+
+  return text.length > maxLength ? `${text.substr(0, maxLength - 5)}...` : text;
+};
+
 export const nameTructed = (name, tructedLength) => {
   if (name?.length > tructedLength) {
     if (tructedLength === 15) {

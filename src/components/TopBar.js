@@ -1,15 +1,6 @@
-import {
-  Badge,
-  Box,
-  ButtonBase,
-  IconButton,
-  makeStyles,
-  Tooltip,
-  Typography,
-  useTheme,
-} from "@material-ui/core";
-import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
-import React, { useState } from "react";
+import { Badge, Tooltip } from "@material-ui/core";
+import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import useResponsiveSize from "../utils/useResponsiveSize";
 import Lottie from "react-lottie";
 import {
@@ -22,9 +13,12 @@ import {
   CallEnd,
   ScreenShare,
   RadioButtonChecked,
-  FileCopy,
 } from "@material-ui/icons";
 import RaiseHandIcon from "../icons/RaiseHandIcon";
+import { sideBarModes } from "./MeetingContainer/MeetingContainer";
+import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
+import recordingBlink from "../animations/recording-blink.json";
+import useIsRecording from "./MeetingContainer/useIsRecording";
 
 const OutlinedButton = ({
   bgColor,
@@ -40,10 +34,14 @@ const OutlinedButton = ({
   btnID,
   color,
   focusIconColor,
+  isRequestProcessing,
 }) => {
-  const theme = useTheme();
+  console.log("isRequestProcessing", isRequestProcessing);
   const [mouseOver, setMouseOver] = useState(false);
   const [mouseDown, setMouseDown] = useState(false);
+  const [blinkingState, setBlinkingState] = useState(1);
+
+  const intervalRef = useRef();
 
   const iconSize = useResponsiveSize({
     xl: 24 * (large ? 1.7 : 1),
@@ -52,6 +50,33 @@ const OutlinedButton = ({
     sm: 28 * (large ? 1.7 : 1),
     xs: 24 * (large ? 1.7 : 1),
   });
+
+  const startBlinking = () => {
+    console.log("sdhsabd");
+    intervalRef.current = setInterval(() => {
+      setBlinkingState((s) => (s === 1 ? 0.4 : 1));
+    }, 600);
+  };
+
+  const stopBlinking = () => {
+    clearInterval(intervalRef.current);
+
+    setBlinkingState(1);
+  };
+
+  useEffect(() => {
+    if (isRequestProcessing) {
+      startBlinking();
+    } else {
+      stopBlinking();
+    }
+  }, [isRequestProcessing]);
+
+  useEffect(() => {
+    return () => {
+      stopBlinking();
+    };
+  }, []);
 
   return (
     <Tooltip placement="top" title={tooltip} open={mouseOver || mouseDown}>
@@ -68,6 +93,7 @@ const OutlinedButton = ({
         style={{
           transition: "all 200ms",
           transitionTimingFunction: "ease-in-out",
+          opacity: blinkingState,
         }}
       >
         <div
@@ -141,10 +167,57 @@ const OutlinedButton = ({
   );
 };
 
-export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
+export function TopBar({
+  topBarHeight,
+  sideBarMode,
+  setSideBarMode,
+  setIsMeetingLeft,
+}) {
   const mMeeting = useMeeting();
-  const theme = useTheme();
   const { publish } = usePubSub("RAISE_HAND");
+  const [isCopied, setIsCopied] = useState(false);
+
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: recordingBlink,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+    height: 64,
+    width: 160,
+  };
+
+  const startRecording = mMeeting?.startRecording;
+  const stopRecording = mMeeting?.stopRecording;
+  const recordingState = mMeeting?.recordingState;
+
+  const isRecording = useIsRecording();
+
+  const isRecordingRef = useRef(isRecording);
+
+  useEffect(() => {
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
+
+  const { isRequestProcessing } = useMemo(
+    () => ({
+      isRequestProcessing:
+        recordingState === Constants.recordingEvents.RECORDING_STARTING ||
+        recordingState === Constants.recordingEvents.RECORDING_STOPPING,
+    }),
+    [recordingState]
+  );
+
+  const _handleClick = () => {
+    const isRecording = isRecordingRef.current;
+
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
 
   const RaiseHand = () => {
     publish("Raise Hand");
@@ -153,21 +226,26 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
   const actions = [
     {
       Icon: RadioButtonChecked,
-      type: "RECORDING",
-      large: false,
       onClick: () => {
-        mMeeting.isRecording
-          ? mMeeting.stopRecording()
-          : mMeeting.startRecording();
+        _handleClick();
       },
-      isFocused: mMeeting.isRecording,
-      tooltip: "Toggle Recording",
+      isFocused: isRecording,
+      tooltip:
+        recordingState === Constants.recordingEvents.RECORDING_STARTED
+          ? "Stop Recording"
+          : recordingState === Constants.recordingEvents.RECORDING_STARTING
+          ? "Starting Recording"
+          : recordingState === Constants.recordingEvents.RECORDING_STOPPED
+          ? "Start Recording"
+          : recordingState === Constants.recordingEvents.RECORDING_STOPPING
+          ? "Stopping Recording"
+          : "Start Recording",
+      lottieOption: isRecording ? defaultOptions : null,
+      isRequestProcessing: isRequestProcessing,
     },
 
     {
       Icon: mMeeting.localMicOn ? Mic : MicOff,
-      type: "MIC",
-      large: false,
       onClick: () => {
         mMeeting.toggleMic();
       },
@@ -176,8 +254,6 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
     },
     {
       Icon: mMeeting.localWebcamOn ? Videocam : VideocamOff,
-      type: "WEBCAM",
-      large: false,
       onClick: () => {
         mMeeting.toggleWebcam();
       },
@@ -186,63 +262,103 @@ export function TopBar({ topBarHeight, sideBarMode, setSideBarMode }) {
     },
     {
       Icon: ScreenShare,
-      large: false,
-      type: "SCREENSHARE",
       onClick: () => {
         mMeeting?.toggleScreenShare();
       },
       isFocused: mMeeting.localScreenShareOn,
       tooltip: "Toggle ScreenShare",
     },
-    {
-      Icon: Person,
-      type: "PARTICIPANTS",
-      onClick: () => {
-        setSideBarMode("PARTICIPANTS");
-      },
-      isFocused: sideBarMode === "PARTICIPANTS",
-      tooltip: "View Participants",
-    },
+
     {
       Icon: RaiseHandIcon,
-      type: "RAISE_HAND",
       onClick: () => {
         RaiseHand();
       },
       tooltip: "Raise Hand",
     },
+
+    {
+      Icon: CallEnd,
+      bgColor: "bg-red-150",
+      onClick: () => {
+        mMeeting.leave();
+        setIsMeetingLeft(true);
+      },
+      tooltip: "Leave Meeting",
+    },
+  ];
+
+  const iconsArr = [
     {
       Icon: Message,
-      type: "CHAT",
-      large: false,
       onClick: () => {
-        //handle chat sidebar toggle
-        setSideBarMode("CHAT");
+        setSideBarMode((s) =>
+          s === sideBarModes.CHAT ? null : sideBarModes.CHAT
+        );
       },
       isFocused: sideBarMode === "CHAT",
       tooltip: "View Chat",
     },
     {
-      Icon: CallEnd,
-      large: false,
-      type: "END_CALL",
-      bgColor: "bg-red-150",
+      Icon: Person,
       onClick: () => {
-        mMeeting.leave();
+        setSideBarMode((s) =>
+          s === sideBarModes.PARTICIPANTS ? null : sideBarModes.PARTICIPANTS
+        );
       },
-      tooltip: "Leave Meeting",
+      isFocused: sideBarMode === "PARTICIPANTS",
+      tooltip: "View Participants",
     },
   ];
+
   return (
-    <div
-      className={`flex flex-1 items-center justify-center h-[${topBarHeight}px] bg-gray-800 relative px-2`}
-      style={{ borderTop: "1px solid #ffffff33" }}
-    >
-      <h1 className="text-white">{mMeeting.meetingId}</h1>
-      <div style={{ display: "flex", flexDirection: "row" }}>
+    <div className="md:flex lg:px-6 pb-2 px-2 hidden">
+      <div className="flex items-center justify-center ">
+        <div className="flex border-2 border-gray-850 p-2 rounded-md items-center justify-center">
+          <h1 className="text-white text-base ">{mMeeting.meetingId}</h1>
+          <button
+            className="ml-2"
+            onClick={() => {
+              navigator.clipboard.writeText(mMeeting.meetingId);
+              setIsCopied(true);
+              setTimeout(() => {
+                setIsCopied(false);
+              }, 3000);
+            }}
+          >
+            {isCopied ? (
+              <CheckIcon className="h-5 w-5 text-green-400" />
+            ) : (
+              <ClipboardIcon className="h-5 w-5 text-white" />
+            )}
+          </button>
+        </div>
+
+        <div className="flex border-2 border-gray-850 p-2 ml-4 rounded-md items-center justify-center">
+          <h1 className="text-white">00:30</h1>
+        </div>
+      </div>
+
+      <div className="flex flex-1 items-center justify-center">
         {actions.map((action) => {
           return (
             <OutlinedButton
+              key={`action-${action.tooltip}`}
+              onClick={action.onClick}
+              bgColor={action.bgColor}
+              Icon={action.Icon}
+              isFocused={action.isFocused}
+              tooltip={action.tooltip}
+              lottieOption={action.lottieOption}
+            />
+          );
+        })}
+      </div>
+      <div className="flex items-center justify-center">
+        {iconsArr.map((action) => {
+          return (
+            <OutlinedButton
+              key={`action-${action.tooltip}`}
               onClick={action.onClick}
               bgColor={action.bgColor}
               Icon={action.Icon}
