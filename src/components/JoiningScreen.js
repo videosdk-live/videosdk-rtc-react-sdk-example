@@ -7,13 +7,17 @@ import {
   Tooltip,
   Typography,
   useMediaQuery,
+  IconButton,
 } from "@material-ui/core";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { VideocamOff, MicOff, Mic, Videocam } from "@material-ui/icons";
 import useResponsiveSize from "../utils/useResponsiveSize";
 import { red } from "@material-ui/core/colors";
 import { MeetingDetailsScreen } from "./MeetingDetailsScreen";
 import { createMeeting, getToken, validateMeeting } from "../api";
+import { CheckCircleIcon } from "@heroicons/react/outline";
+import SettingDialogueBox from "./SettingDialogueBox";
+import ConfirmBox from "./ConfirmBox";
 
 const useStyles = makeStyles((theme) => ({
   video: {
@@ -26,14 +30,12 @@ const useStyles = makeStyles((theme) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-
   toggleButton: {
     borderRadius: "100%",
     minWidth: "auto",
     width: "44px",
     height: "44px",
   },
-
   previewBox: {
     width: "100%",
     height: "45vh",
@@ -46,24 +48,40 @@ export function JoiningScreen({
   setParticipantName,
   setMeetingId,
   setToken,
+  setSelectedMic,
+  setSelectedWebcam,
+  onClickStartMeeting,
+  micEnabled,
+  webcamEnabled,
   setWebcamOn,
   setMicOn,
-  micOn,
-  webcamOn,
-  onClickStartMeeting,
 }) {
-  const videoPlayerRef = useRef();
-
   const theme = useTheme();
-  const styles = useStyles(theme);
   const classes = useStyles();
+
+  const [setting, setSetting] = useState("video");
+  const [{ webcams, mics }, setDevices] = useState({
+    devices: [],
+    webcams: [],
+    mics: [],
+  });
 
   const [videoTrack, setVideoTrack] = useState(null);
 
   const [dlgMuted, setDlgMuted] = useState(false);
   const [dlgDevices, setDlgDevices] = useState(false);
 
+  const videoPlayerRef = useRef();
+  const popupVideoPlayerRef = useRef();
+  const popupAudioPlayerRef = useRef();
+
+  const videoTrackRef = useRef();
+  const audioTrackRef = useRef();
+  const audioAnalyserIntervalRef = useRef();
+
   const [settingDialogueOpen, setSettingDialogueOpen] = useState(false);
+
+  const [audioTrack, setAudioTrack] = useState(null);
 
   const handleClickOpen = () => {
     setSettingDialogueOpen(true);
@@ -76,38 +94,120 @@ export function JoiningScreen({
   const isXStoSM = useMediaQuery(theme.breakpoints.between("xs", "sm"));
   const gtThenMD = useMediaQuery(theme.breakpoints.up("md"));
   const gtThenXL = useMediaQuery(theme.breakpoints.only("xl"));
-  const gtThenLG = useMediaQuery(theme.breakpoints.up("lg"));
-
   const isXSOnly = useMediaQuery(theme.breakpoints.only("xs"));
   const isSMOnly = useMediaQuery(theme.breakpoints.only("sm"));
   const isXLOnly = useMediaQuery(theme.breakpoints.only("xl"));
-  const isMDOnly = useMediaQuery(theme.breakpoints.only("md"));
 
-  const padding = useResponsiveSize({
-    xl: 10,
-    lg: 10,
-    md: 8,
-    sm: 6,
-    xs: 1.5,
-  });
+  const webcamOn = useMemo(() => !!videoTrack, [videoTrack]);
+  const micOn = useMemo(() => !!audioTrack, [audioTrack]);
 
-  const _handleToggleMic = () => {
-    setMicOn(!micOn);
+  const _handleTurnOffWebcam = () => {
+    const videoTrack = videoTrackRef.current;
+
+    if (videoTrack) {
+      videoTrack.stop();
+      setVideoTrack(null);
+      setWebcamOn(false);
+    }
   };
-  const _handleToggleWebcam = () => {
-    if (!webcamOn) {
-      getVideo();
+  const _handleTurnOnWebcam = () => {
+    const videoTrack = videoTrackRef.current;
+
+    if (!videoTrack) {
+      getDefaultMediaTracks({ mic: false, webcam: true });
+      setWebcamOn(true);
+    }
+  };
+
+  const _toggleWebcam = () => {
+    const videoTrack = videoTrackRef.current;
+
+    if (videoTrack) {
+      _handleTurnOffWebcam();
     } else {
-      if (videoTrack) {
-        videoTrack.stop();
-        setVideoTrack(null);
+      _handleTurnOnWebcam();
+    }
+  };
+  const _handleTurnOffMic = () => {
+    const audioTrack = audioTrackRef.current;
+
+    if (audioTrack) {
+      audioTrack.stop();
+
+      setAudioTrack(null);
+      setMicOn(false);
+    }
+  };
+  const _handleTurnOnMic = () => {
+    const audioTrack = audioTrackRef.current;
+
+    if (!audioTrack) {
+      getDefaultMediaTracks({ mic: true, webcam: false });
+      setMicOn(true);
+    }
+  };
+  const _handleToggleMic = () => {
+    const audioTrack = audioTrackRef.current;
+
+    if (audioTrack) {
+      _handleTurnOffMic();
+    } else {
+      _handleTurnOnMic();
+    }
+  };
+
+  const changeWebcam = async (deviceId) => {
+    const currentvideoTrack = videoTrackRef.current;
+
+    if (currentvideoTrack) {
+      currentvideoTrack.stop();
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { deviceId },
+    });
+    const videoTracks = stream.getVideoTracks();
+
+    const videoTrack = videoTracks.length ? videoTracks[0] : null;
+
+    setVideoTrack(videoTrack);
+  };
+  const changeMic = async (deviceId) => {
+    const currentAudioTrack = audioTrackRef.current;
+    currentAudioTrack && currentAudioTrack.stop();
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { deviceId },
+    });
+    const audioTracks = stream.getAudioTracks();
+
+    const audioTrack = audioTracks.length ? audioTracks[0] : null;
+    clearInterval(audioAnalyserIntervalRef.current);
+
+    setAudioTrack(audioTrack);
+  };
+
+  const getDefaultMediaTracks = async ({ mic, webcam, firstTime }) => {
+    if (mic) {
+      const audioConstraints = {
+        audio: true,
+      };
+
+      const stream = await navigator.mediaDevices.getUserMedia(
+        audioConstraints
+      );
+      const audioTracks = stream.getAudioTracks();
+
+      const audioTrack = audioTracks.length ? audioTracks[0] : null;
+
+      setAudioTrack(audioTrack);
+      if (firstTime) {
+        setSelectedMic({
+          id: audioTrack?.getSettings()?.deviceId,
+        });
       }
     }
-    setWebcamOn(!webcamOn);
-  };
 
-  const getVideo = async () => {
-    if (videoPlayerRef.current) {
+    if (webcam) {
       const videoConstraints = {
         video: {
           width: 1280,
@@ -121,13 +221,52 @@ export function JoiningScreen({
       const videoTracks = stream.getVideoTracks();
 
       const videoTrack = videoTracks.length ? videoTracks[0] : null;
-
-      videoPlayerRef.current.srcObject = new MediaStream([videoTrack]);
-      videoPlayerRef.current.play();
-      if (!videoTrack) {
-        setWebcamOn(false);
-      }
       setVideoTrack(videoTrack);
+      if (firstTime) {
+        setSelectedWebcam({
+          id: videoTrack?.getSettings()?.deviceId,
+        });
+      }
+    }
+  };
+
+  async function startMuteListener() {
+    const currentAudioTrack = audioTrackRef.current;
+
+    if (currentAudioTrack) {
+      if (currentAudioTrack.muted) {
+        setDlgMuted(true);
+      }
+
+      currentAudioTrack.addEventListener("mute", (ev) => {
+        setDlgMuted(true);
+      });
+    }
+  }
+
+  const getDevices = async ({ micEnabled, webcamEnabled }) => {
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+
+      const webcams = devices.filter((d) => d.kind === "videoinput");
+      const mics = devices.filter((d) => d.kind === "audioinput");
+
+      const hasMic = mics.length > 0;
+      const hasWebcam = webcams.length > 0;
+
+      setDevices({ webcams, mics, devices });
+
+      if (hasMic) {
+        startMuteListener();
+      }
+
+      getDefaultMediaTracks({
+        mic: hasMic && micEnabled,
+        webcam: hasWebcam && webcamEnabled,
+        firstTime: true,
+      });
+    } catch (err) {
+      console.log(err);
     }
   };
 
@@ -149,7 +288,7 @@ export function JoiningScreen({
 
   const spacingSettingChip = useResponsiveSize({
     xl: 190,
-    lg: 190,
+    lg: 175,
     md: 80,
     sm: 160,
   });
@@ -158,10 +297,41 @@ export function JoiningScreen({
   );
 
   useEffect(() => {
-    if (webcamOn && !videoTrack) {
-      getVideo();
+    audioTrackRef.current = audioTrack;
+
+    startMuteListener();
+  }, [audioTrack]);
+
+  useEffect(() => {
+    videoTrackRef.current = videoTrack;
+
+    if (videoTrack) {
+      const videoSrcObject = new MediaStream([videoTrack]);
+
+      if (videoPlayerRef.current) {
+        videoPlayerRef.current.srcObject = videoSrcObject;
+        videoPlayerRef.current.play();
+      }
+
+      setTimeout(() => {
+        if (popupVideoPlayerRef.current) {
+          popupVideoPlayerRef.current.srcObject = videoSrcObject;
+          popupVideoPlayerRef.current.play();
+        }
+      }, 1000);
+    } else {
+      if (videoPlayerRef.current) {
+        videoPlayerRef.current.srcObject = null;
+      }
+      if (popupVideoPlayerRef.current) {
+        popupVideoPlayerRef.current.srcObject = null;
+      }
     }
-  }, [webcamOn]);
+  }, [videoTrack, setting, settingDialogueOpen]);
+
+  useEffect(() => {
+    getDevices({ micEnabled, webcamEnabled });
+  }, []);
 
   return (
     <>
@@ -172,12 +342,11 @@ export function JoiningScreen({
           flex: 1,
           flexDirection: "column",
           height: "100vh",
-
           backgroundColor: theme.palette.darkTheme.main,
         }}
       >
         <Box
-          m={isXStoSM ? 8 : isMDOnly ? 0 : 9}
+          m={isXSOnly ? 8 : gtThenMD ? 9 : 0}
           style={{
             display: "flex",
             flex: 1,
@@ -263,7 +432,7 @@ export function JoiningScreen({
                         </>
                       ) : null}
 
-                      {/* {settingDialogueOpen ? (
+                      {settingDialogueOpen ? (
                         <SettingDialogueBox
                           open={settingDialogueOpen}
                           onClose={handleClose}
@@ -279,15 +448,8 @@ export function JoiningScreen({
                           setSelectedWebcam={setSelectedWebcam}
                           videoTrack={videoTrack}
                           audioTrack={audioTrack}
-                          participantCanToggleSelfMic={
-                            participantCanToggleSelfMic
-                          }
-                          participantCanToggleSelfWebcam={
-                            participantCanToggleSelfWebcam
-                          }
-                          // appTheme={appTheme}
                         />
-                      ) : null} */}
+                      ) : null}
 
                       <Box
                         position="absolute"
@@ -334,7 +496,7 @@ export function JoiningScreen({
                               placement="top"
                             >
                               <Button
-                                onClick={() => _handleToggleWebcam()}
+                                onClick={() => _toggleWebcam()}
                                 variant="contained"
                                 style={
                                   webcamOn
@@ -354,18 +516,20 @@ export function JoiningScreen({
                       </Box>
                     </Box>
                   </Box>
-                  {/* {!isXSOnly && (
+                  {!isXSOnly && (
                     <Box
-                      style={{
-                        position: "absolute",
-                        left: spacingSettingChip,
-                        right: spacingSettingChip,
-                        bottom: -72,
-                        // top: 0,
-                        backgroundColor: theme.palette.darkTheme.seven,
-                        borderRadius: 4,
-                        cursor: "pointer",
-                      }}
+                      className="absolute md:left-52 lg:left-24 xl:left-44 md:right-52 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
+                      // style={{
+                      //   position: "absolute",
+                      //   display: "flex",
+                      //   alignItems: "center",
+                      //   justifyContent: "center",
+                      //   left: spacingSettingChip,
+                      //   right: spacingSettingChip,
+                      //   backgroundColor: theme.palette.darkTheme.seven,
+                      //   borderRadius: 4,
+                      //   cursor: "pointer",
+                      // }}
                       m={2}
                       onClick={(e) => {
                         handleClickOpen();
@@ -398,7 +562,7 @@ export function JoiningScreen({
                         </Typography>
                       </Box>
                     </Box>
-                  )} */}
+                  )}
                 </Box>
               </Box>
             </Grid>
@@ -415,7 +579,7 @@ export function JoiningScreen({
                 justifyContent: "center",
               }}
             >
-              <div className="w-full flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-14 md:mx-24 md:mt-4 ">
+              <div className="w-full flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mx-44 md:mt-11 lg:mt-4">
                 <MeetingDetailsScreen
                   participantName={participantName}
                   setParticipantName={setParticipantName}
@@ -437,6 +601,7 @@ export function JoiningScreen({
                         setVideoTrack(null);
                       }
                       onClickStartMeeting();
+                      setParticipantName("");
                     } else alert("Invalid Meeting Id");
                   }}
                   onClickCreateMeeting={async () => {
@@ -444,6 +609,7 @@ export function JoiningScreen({
                     const _meetingId = await createMeeting({ token });
                     setToken(token);
                     setMeetingId(_meetingId);
+                    setParticipantName("");
                     return _meetingId;
                   }}
                 />
@@ -451,8 +617,7 @@ export function JoiningScreen({
             </Grid>
           </Grid>
 
-          {/* <ConfirmBox
-            appTheme={appTheme}
+          <ConfirmBox
             open={dlgMuted}
             successText="OKAY"
             onSuccess={() => {
@@ -464,7 +629,6 @@ export function JoiningScreen({
           />
 
           <ConfirmBox
-            appTheme={appTheme}
             open={dlgDevices}
             successText="DISMISS"
             onSuccess={() => {
@@ -472,7 +636,7 @@ export function JoiningScreen({
             }}
             title="Mic or webcam not available"
             subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
-          /> */}
+          />
         </Box>
       </Box>
     </>

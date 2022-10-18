@@ -2,23 +2,15 @@ import React, { useEffect, useRef } from "react";
 import { Grid, useTheme } from "@material-ui/core";
 import { useParticipant, useMeeting } from "@videosdk.live/react-sdk";
 import { nameTructed } from "../../utils/helper";
-import useResponsiveSize from "../../utils/useResponsiveSize";
 import { MicOff } from "@material-ui/icons";
 
 function ParticipantView({ participantId }) {
+  const { displayName, webcamStream, micStream, webcamOn, micOn, isLocal } =
+    useParticipant(participantId);
+
   const webcamRef = useRef(null);
   const micRef = useRef(null);
 
-  const dpSize = useResponsiveSize({
-    xl: 92,
-    lg: 52,
-    md: 52,
-    sm: 52,
-    xs: 52,
-  });
-
-  const { displayName, webcamStream, micStream, webcamOn, micOn, isLocal } =
-    useParticipant(participantId);
   const mMeeting = useMeeting();
   const isPresenting = mMeeting.isPresenting;
 
@@ -59,7 +51,9 @@ function ParticipantView({ participantId }) {
   }, [micStream, micOn]);
 
   return (
-    <div className="h-full w-full bg-gray-750 relative overflow-hidden rounded-lg">
+    <div
+      className={`h-full w-full bg-gray-750 relative overflow-hidden rounded-lg `}
+    >
       <div
         className="absolute bottom-2 left-2 rounded-md flex items-center justify-center p-2"
         style={{
@@ -83,23 +77,14 @@ function ParticipantView({ participantId }) {
       <audio ref={micRef} autoPlay />
       {webcamOn ? (
         <video
-          // height="100%"
-          // width={"100%"}
           ref={webcamRef}
           autoPlay
-          className="w-full h-full"
-          style={{ objectFit: "cover" }}
+          className=" w-full h-full object-cover"
         />
       ) : (
         <div className="h-full w-full flex items-center justify-center">
           <div
-            className={`z-10 flex items-center justify-center rounded-full bg-gray-800`}
-            style={{
-              height: dpSize,
-              width: dpSize,
-              transition: "height 800ms, width 800ms",
-              transitionTimingFunction: "ease-in-out",
-            }}
+            className={`z-10 flex items-center justify-center rounded-full bg-gray-800 2xl:h-[92px] h-[52px] 2xl:w-[92px] w-[52px]`}
           >
             <p className="text-2xl text-white">
               {String(displayName).charAt(0).toUpperCase()}
@@ -111,11 +96,34 @@ function ParticipantView({ participantId }) {
   );
 }
 
-export function ParticipantsViewer({ height }) {
+export function ParticipantsViewer({ isPresenting, sideBarMode }) {
   const theme = useTheme();
   const mMeeting = useMeeting();
   const participants = mMeeting?.participants;
   const isXStoSM = theme.breakpoints.between("xs", "sm");
+  const isMobile = window.matchMedia(
+    "only screen and (max-width: 768px)"
+  ).matches;
+  const perRow =
+    isMobile || isPresenting
+      ? participants.size < 3
+        ? 1
+        : participants.size < 4 || participants.size < 9
+        ? 2
+        : 3
+      : participants.size < 2
+      ? 1
+      : participants.size < 5
+      ? 2
+      : participants.size < 7
+      ? 3
+      : participants.size < 9
+      ? 4
+      : participants.size < 10
+      ? 3
+      : participants.size < 11
+      ? 4
+      : 4;
 
   return (
     <div
@@ -123,53 +131,54 @@ export function ParticipantsViewer({ height }) {
         display: "flex",
         flexDirection: isXStoSM ? "column" : "row",
         flexGrow: 1,
-        margin: 8,
+        margin: 12,
+        justifyContent: "center",
+        alignItems: "center",
       }}
+      className={`${
+        participants.size < 2 && !sideBarMode
+          ? "md:px-0"
+          : participants.size < 4 && !sideBarMode
+          ? "md:px-16"
+          : participants.size > 4 && !sideBarMode
+          ? "md:px-14"
+          : "md:px-0"
+      }`}
     >
-      <Grid
-        container
-        spacing={2}
-        style={{
-          height: height - theme.spacing(1),
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: theme.palette.darkTheme.main,
-        }}
-      >
-        {[...participants.keys()].map((participantId) => {
-          return (
-            <Grid
-              key={`participant_${participantId}`}
-              item
-              style={{
-                height:
-                  participants.size < 3
-                    ? height - theme.spacing(1) * 8
-                    : participants.size < 5
-                    ? height / 2 - theme.spacing(1) * 1
-                    : participants.size < 7
-                    ? height / 2 - theme.spacing(1) * 1
-                    : participants.size < 9
-                    ? height / 2 - theme.spacing(1) * 1
-                    : height / 3 - theme.spacing(1) * 1,
-              }}
-              xs={
-                participants.size < 2
-                  ? 8
-                  : participants.size < 5
-                  ? 6
-                  : participants.size < 7
-                  ? 4
-                  : participants.size < 9
-                  ? 3
-                  : 3
-              }
-            >
-              <ParticipantView participantId={participantId} />
-            </Grid>
-          );
-        })}
-      </Grid>
+      <div className="flex flex-col w-full h-full">
+        {Array.from(
+          { length: Math.ceil(participants.size / perRow) },
+          (_, i) => {
+            return (
+              <div className="flex flex-1 justify-center items-center">
+                {[...participants.keys()]
+                  .slice(i * perRow, (i + 1) * perRow)
+                  .map((participantId) => {
+                    return (
+                      <div
+                        key={`participant_${participantId}`}
+                        // className={`flex flex-1 w-full items-center justify-center h-full max-h-96 max-w-lg p-1`}
+                        className={`flex flex-1 w-full h-full items-center justify-center  ${
+                          participants.size < 2
+                            ? "md:max-h-[530px] md:max-w-5xl"
+                            : participants.size < 3
+                            ? "md:max-h-96 md:max-w-4xl  "
+                            : participants.size >= 3 && participants.size < 9
+                            ? "md:max-h-[270px]"
+                            : participants.size >= 9
+                            ? "md:max-h-44  "
+                            : "md:max-h-96  "
+                        }  md:max-w-lg  p-1`}
+                      >
+                        <ParticipantView participantId={participantId} />
+                      </div>
+                    );
+                  })}
+              </div>
+            );
+          }
+        )}
+      </div>
     </div>
   );
 }

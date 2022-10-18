@@ -38,9 +38,18 @@ code {
 div .button {
   margin: 0 15px 15px 0;
 }
-
-input[type="text"]:focus{
+.video-contain video {
+  object-fit: contain;
+}
+textarea:focus{
   outline: none;
   border-color: none;
+  box-shadow: none;
+}
+
+input:focus-visible{
+  outline: none;
+  border-color: none;
+  box-shadow: none;
 }
 

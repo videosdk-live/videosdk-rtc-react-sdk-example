@@ -2,24 +2,12 @@ import {
   IconButton,
   InputAdornment,
   OutlinedInput as Input,
-  makeStyles,
+  useTheme,
 } from "@material-ui/core";
 import { Send } from "@material-ui/icons";
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useRef, useState } from "react";
 import { formatAMPM, json_verify, nameTructed } from "../../utils/helper";
-
-const useStyles = makeStyles(() => ({
-  textField: {
-    "& .MuiInputBase-input": {
-      color: "white",
-    },
-  },
-  inputFocused: {
-    borderColor: "none",
-    outline: "none",
-  },
-}));
 
 const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
   const mMeeting = useMeeting();
@@ -42,7 +30,9 @@ const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
           {localSender ? "You" : nameTructed(senderName, 15)}
         </p>
         <div>
-          <p className="inline-block pre-wrap break-words text-white">{text}</p>
+          <p className="inline-block whitespace-pre-wrap break-words text-right text-white">
+            {text}
+          </p>
         </div>
         <div className="mt-1">
           <p className="text-xs italic" style={{ color: "#ffffff80" }}>
@@ -54,69 +44,80 @@ const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
   );
 };
 
-const ChatInput = ({ message, setMessage, publish }) => {
+const ChatInput = ({ inputHeight }) => {
+  const [message, setMessage] = useState("");
+  const { publish } = usePubSub("CHAT");
   const input = useRef();
-  const classes = useStyles();
+  const theme = useTheme();
 
   return (
-    <Input
-      style={{ paddingRight: 0, margin: "1rem" }}
-      rows={1}
-      rowsMax={2}
-      multiline
-      id="outlined"
-      onChange={(e) => {
-        setMessage(e.target.value);
+    <div
+      style={{
+        height: inputHeight,
+        width: "100%",
+        display: "flex",
+        alignItems: "center",
+        paddingRight: theme.spacing(1),
+        paddingLeft: theme.spacing(1),
       }}
-      classes={{
-        root: classes.textField,
-        focused: classes.inputFocused,
-      }}
-      ref={input}
-      value={message}
-      placeholder="Write your message"
-      onKeyPress={(e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-          const messageText = message.trim();
+    >
+      <Input
+        style={{
+          paddingRight: 0,
+          width: "100%",
+        }}
+        rows={1}
+        rowsMax={2}
+        multiline
+        id="outlined"
+        onChange={(e) => {
+          setMessage(e.target.value);
+        }}
+        ref={input}
+        value={message}
+        placeholder="Write your message"
+        onKeyPress={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            const messageText = message.trim();
 
-          if (messageText.length > 0) {
-            publish(messageText, { persist: true });
-            setTimeout(() => {
-              setMessage("");
-            }, 100);
-            input.current?.focus();
+            if (messageText.length > 0) {
+              publish(messageText, { persist: true });
+              setTimeout(() => {
+                setMessage("");
+              }, 100);
+              input.current?.focus();
+            }
           }
+        }}
+        endAdornment={
+          <InputAdornment position="end">
+            <IconButton
+              disabled={message.length < 2}
+              variant="outlined"
+              onClick={() => {
+                const messageText = message.trim();
+                if (messageText.length > 0) {
+                  publish(messageText, { persist: true });
+                  setTimeout(() => {
+                    setMessage("");
+                  }, 100);
+                  input.current?.focus();
+                }
+              }}
+            >
+              <Send />
+            </IconButton>
+          </InputAdornment>
         }
-      }}
-      endAdornment={
-        <InputAdornment position="end">
-          <IconButton
-            disabled={message.length < 3}
-            variant="outlined"
-            onClick={() => {
-              const messageText = message.trim();
-              if (messageText.length > 0) {
-                publish(messageText, { persist: true });
-                setTimeout(() => {
-                  setMessage("");
-                }, 100);
-                input.current?.focus();
-              }
-            }}
-          >
-            <Send />
-          </IconButton>
-        </InputAdornment>
-      }
-    />
+      />
+    </div>
   );
 };
 
-export function ChatSidePanel({ panelHeight }) {
-  const [message, setMessage] = useState("");
-  const { publish } = usePubSub("CHAT");
-  const { messages } = usePubSub("CHAT");
+const ChatMessages = ({ listHeight }) => {
   const listRef = useRef();
+  const { messages } = usePubSub("CHAT");
 
   const scrollToBottom = (data) => {
     if (!data) {
@@ -141,43 +142,33 @@ export function ChatSidePanel({ panelHeight }) {
     scrollToBottom();
   }, [messages]);
 
-  return (
-    <div
-      className={` w-full flex flex-col bg-gray-750`}
-      style={{ height: panelHeight }}
-    >
-      <div
-        style={{ height: panelHeight - 100 }}
-        className={`flex flex-col flex-1`}
-      >
-        {messages ? (
-          <div
-            ref={listRef}
-            style={{ height: panelHeight }}
-            className={`overflow-y-auto `}
-          >
-            <div className="px-2">
-              {messages.map((msg, i) => {
-                const { senderId, senderName, message, timestamp } = msg;
-                return (
-                  <ChatMessage
-                    key={`chat_item_${i}`}
-                    {...{
-                      senderId,
-                      senderName,
-                      text: message,
-                      timestamp,
-                    }}
-                  />
-                );
-              })}
-            </div>
-          </div>
-        ) : (
-          <p>no messages</p>
-        )}
+  return messages ? (
+    <div ref={listRef} style={{ overflowY: "scroll", height: listHeight }}>
+      <div className="p-4">
+        {messages.map((msg, i) => {
+          const { senderId, senderName, message, timestamp } = msg;
+          return (
+            <ChatMessage
+              key={`chat_item_${i}`}
+              {...{ senderId, senderName, text: message, timestamp }}
+            />
+          );
+        })}
       </div>
-      <ChatInput message={message} setMessage={setMessage} publish={publish} />
+    </div>
+  ) : (
+    <p>No messages</p>
+  );
+};
+
+export function ChatSidePanel({ panelHeight }) {
+  const inputHeight = 72;
+  const listHeight = panelHeight - inputHeight;
+
+  return (
+    <div>
+      <ChatMessages listHeight={listHeight} />
+      <ChatInput inputHeight={inputHeight} />
     </div>
   );
 }
