@@ -33,7 +33,7 @@ export function MeetingDetailsScreen({
       }}
     >
       {iscreateMeetingClicked ? (
-        <div className="border border-solid border-gray-400 rounded-md px-4 py-3  flex items-center justify-center">
+        <div className="border border-solid border-gray-400 rounded-xl px-4 py-3  flex items-center justify-center">
           <p className="text-white text-base">Meeting code: {meetingId}</p>
           <button
             className="ml-2"
@@ -60,7 +60,7 @@ export function MeetingDetailsScreen({
               setMeetingId(e.target.value);
             }}
             placeholder="Enter meeting Id"
-            className="px-4 py-3 bg-gray-650 rounded-md text-white w-full text-center"
+            className="px-4 py-3 bg-gray-650 rounded-xl text-white w-full text-center"
           />
           {meetingIdError && (
             <p className="text-xs text-red-600">Please enter valid meetingId</p>
@@ -74,7 +74,7 @@ export function MeetingDetailsScreen({
             value={participantName}
             onChange={(e) => setParticipantName(e.target.value)}
             placeholder="Enter your name"
-            className="px-4 py-3 mt-5 bg-gray-650 rounded-md text-white w-full text-center"
+            className="px-4 py-3 mt-5 bg-gray-650 rounded-xl text-white w-full text-center"
           />
 
           {/* <p className="text-xs text-white mt-1 text-center">

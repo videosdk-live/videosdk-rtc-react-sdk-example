@@ -8,6 +8,7 @@ import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../../utils/helper";
 import useResponsiveSize from "../../utils/useResponsiveSize";
 import WaitingToJoin from "../WaitingToJoin";
+import useWindowSize from "../../utils/useWindowSize";
 
 export const sideBarModes = {
   PARTICIPANTS: "PARTICIPANTS",
@@ -55,7 +56,6 @@ export function MeetingContainer({
       containerRef.current?.offsetWidth &&
         setContainerWidth(containerRef.current.offsetWidth);
     });
-    // console.log("height", containerHeight);
   }, []);
 
   const { participantRaisedHand } = useRaisedHandParticipants();
@@ -227,47 +227,38 @@ export function MeetingContainer({
       }
     },
   });
+  const { width: windowWidth, height: windowHeight } = useWindowSize();
+  const isMobile = window.matchMedia(
+    "only screen and (max-width: 768px)"
+  ).matches;
 
   return (
     <div
+      style={{ height: windowHeight }}
       ref={containerRef}
-      className="h-screen w-full flex flex-col bg-gray-800"
+      className="h-screen flex flex-col bg-gray-800"
     >
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
-            <div
-              className={` flex flex-1 flex-row bg-gray-800 `}
-              // style={{
-              //   height: containerHeight - topBarHeight,
-              // }}
-            >
-              <div
-                // style={{
-                //   width: sideBarMode
-                //     ? containerWidth - presentingSideBarWidth
-                //     : "100%",
-                // }}
-                className={`flex flex-1 `}
-              >
+            <div className={` flex flex-1 flex-row bg-gray-800 `}>
+              <div className={`flex flex-1 `}>
                 {isPresenting ? (
                   <PresenterView height={containerHeight - topBarHeight} />
-                ) : (
+                ) : null}
+                {isPresenting && isMobile ? null : (
                   <ParticipantsViewer
-                    // height={containerHeight - topBarHeight}
                     isPresenting={isPresenting}
                     sideBarMode={sideBarMode}
                   />
                 )}
               </div>
-              {/* <div className="flex flex-row"> */}
               <SidebarConatiner
                 height={containerHeight - topBarHeight}
                 setSideBarMode={setSideBarMode}
                 sideBarMode={sideBarMode}
                 raisedHandsParticipants={raisedHandsParticipants}
               />
-              {/* </div> */}
             </div>
             <TopBar
               topbarHeight={topBarHeight}

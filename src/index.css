@@ -40,6 +40,7 @@ div .button {
 }
 .video-contain video {
   object-fit: contain;
+  overflow:hidden
 }
 textarea:focus{
   outline: none;
@@ -51,5 +52,11 @@ input:focus-visible{
   outline: none;
   border-color: none;
   box-shadow: none;
+}
+
+.video-cover video {
+  position: absolute;
+  object-fit: cover;
+  
 }
 

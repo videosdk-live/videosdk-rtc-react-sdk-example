@@ -595,9 +595,9 @@ export function TopBar({
           </button>
         </div>
 
-        <div className="flex border-2 border-gray-850 p-2 ml-4 rounded-md items-center justify-center">
+        {/* <div className="flex border-2 border-gray-850 p-2 ml-4 rounded-md items-center justify-center">
           <h1 className="text-white">00:30</h1>
-        </div>
+        </div> */}
       </div>
     );
   };
