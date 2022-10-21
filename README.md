@@ -403,9 +403,9 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
   - `TextField for ParticipantName` - This text field will contain name of the participant.
   - `Join Meeting Button` - This button will call api to join meeting with meetingId that participant want to join.
 
-    <p align="center">
-    <img width="600" height="338" src="/create_meeting.gif"/>
-    </p>
+  <p align="center">
+  <img width="600" height="338" src="/create_meeting.gif"/>
+  </p>
 
 - If `Join Meeting` is clicked, it will show following:
 
@@ -413,9 +413,9 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
   - `TextField for ParticipantName` - This text field will contain name of the participant.
   - `Join Meeting Button` - This button will call api to join meeting with meetingId that participant want to join.
 
-    <p align="center">
-    <img width="600" height="338" src="/join_meeting.gif"/>
-    </p>
+  <p align="center">
+  <img width="600" height="338" src="/join_meeting.gif"/>
+  </p>
 
 <br/>
 
@@ -443,7 +443,7 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 `SidebarContainer/ParticipantSidePanel.js` - This file is used to show the list of participants present in the meeting.
 
 <p align="center">
-<img width="600" height="338" src="/participant_list.gif"/>
+<img width="600" height="338" src="public/participant_list.gif"/>
 </p>
 
 **6. Chat**
