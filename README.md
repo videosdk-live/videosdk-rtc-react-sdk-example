@@ -438,6 +438,10 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 `MeetingContainer/ParticipantView.js` - It contains the grid of participant that are displayed in the main screen.
 
+<p align="center">
+<img width="1362" height="636" src="public/participant_view.png"/>
+</p>
+
 **4. PresenterView**
 
 `MeetingContainer/PresenterView.js` - It contains the view when participant share their screen.
