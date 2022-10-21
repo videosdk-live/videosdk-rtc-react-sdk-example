@@ -108,7 +108,7 @@ Token is used to create and validate a meeting using API and also initialise a m
 
 > **Note** :
 >
-> Development environment tokens only have a 7-day expiration period.
+> Development environment tokens have a 7-day expiration period.
 
 <br/>
 
@@ -257,7 +257,7 @@ const onPress = () => {
 
 <br/>
 
-## Recording
+## [Recording](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/recording-meeting)
 
 - Record meeting allows participants to record video & audio during the meeting. The recording files are available in developer dashboard. Any participant can start / stop recording any time during the meeting.
 
@@ -395,44 +395,56 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 - `components/JoiningScreen.js`: It shows the user with the option to create or join a meeting and to initiate webcam and mic status.
 
-- `api.js` : It incldes all the API calls for create and validate meeting.
+- `api.js` : It includes all the API calls for create and validate meeting.
 
 - If `Create Meeting` is clicked, it will show following:
 
   - `Meeting code` - This meeting code you can copy and share with other participants that wants to join meeting.
   - `TextField for ParticipantName` - This text field will contain name of the participant.
-  - `Join Meeting Button` - This button will call api for join meeting with meetingId that participant want to join.
+  - `Join Meeting Button` - This button will call api to join meeting with meetingId that participant want to join.
+
+    <p align="center">
+    <img width="600" height="338" src="/create_meeting.gif"/>
+    </p>
 
 - If `Join Meeting` is clicked, it will show following:
 
   - `TextField for MeetingId` - This text field will contain the meeting Id that you want to join.
   - `TextField for ParticipantName` - This text field will contain name of the participant.
-  - `Join Meeting Button` - This button will call api for join meeting with meetingId that participant want to join.
+  - `Join Meeting Button` - This button will call api to join meeting with meetingId that participant want to join.
+
+    <p align="center">
+    <img width="600" height="338" src="/join_meeting.gif"/>
+    </p>
 
 <br/>
 
-**2. Meeting Top Bar**
+**2. Meeting Bottom Bar**
 
-- `TopBar.js`: It contains the buttons that are displayed in bottom of the screen.
+- `BottomBar.js`: It contains the buttons that are displayed in bottom of the screen.
 
   - Starting from left it shows meetingId with copy icon button.
-  - In middle it shows recording indicator, raise hand icon button, mic icon button with available mics list, webcam icon button with available webcam list, screen share , leave meeting icon button.
-  - At last but not least it show chat icon button and partcipants icon with participant count.
+  - In middle, it shows recording indicator, raise hand icon button, mic icon button with available mics list, webcam icon button with available webcam list, screen share and leave meeting icon button.
+  - In right most corner, it shows chat icon button and partcipants icon with participant count.
 
-  - While In Mobile, tab and on lg screen it shows leave meeting button, recording button, mic & webcam button and more actions button.
-  - On click of more actions it open drawer that contain other remaining buttons.
+  - When screen resolution change to mobile, tab or lg screen, the order of bottom bar elements changes to leave meeting button, recording button, mic & webcam button and `more actions` button.
+  - On click of `more actions` button it opens a drawer that contains other remaining buttons.
 
 **3. ParticipantView**
 
-`MeetingContainer/ParticipantView.js` - It contain the grid of participant that display in main screen.
+`MeetingContainer/ParticipantView.js` - It contains the grid of participant that are displayed in the main screen.
 
 **4. PresenterView**
 
-`MeetingContainer/PresenterView.js` - It contain the view when participant share the screen.
+`MeetingContainer/PresenterView.js` - It contains the view when participant share their screen.
 
-**5. PartcipantList**
+**5. ParticipantList**
 
-`SidebarContainer/ParticipantSidePanel.js` - This file is used to show Participant list.
+`SidebarContainer/ParticipantSidePanel.js` - This file is used to show the list of participants present in the meeting.
+
+  <p align="center">
+  <img width="600" height="338" src="/participant_list.gif"/>
+  </p>
 
 **6. Chat**
 
@@ -440,11 +452,11 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 **7. Waiting Screen**
 
-`WaitingToJoin.js` - It contain lottie animation with messages. untill you receive `isMeetingJoined` true from `meeting` that you intialize using `useMeeting()` from `@videosdk.live/react-sdk`. this screen will display.
+`WaitingToJoin.js` - It contains the lottie animation with messages. Untill you receive `isMeetingJoined` true from `meeting` that you intialize using `useMeeting()` from `@videosdk.live/react-sdk`, this screen will be displayed.
 
 **8. Leave Screen**
 
-`LeaveScreen.js` - This file contain the leave screen.
+`LeaveScreen.js` - This file contains the leave screen.
 
 ## Examples
 

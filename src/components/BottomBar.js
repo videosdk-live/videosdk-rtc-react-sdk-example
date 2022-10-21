@@ -4,16 +4,16 @@ import { sideBarModes } from "./MeetingContainer/MeetingContainer";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
 import recordingBlink from "../animations/recording-blink.json";
 import useIsRecording from "./MeetingContainer/useIsRecording";
-import RecordingIcon from "../icons/Topbar/RecordingIcon";
-import MicOnIcon from "../icons/Topbar/MicOnIcon";
-import MicOffIcon from "../icons/Topbar/MicOffIcon";
-import WebcamOnIcon from "../icons/Topbar/WebcamOnIcon";
-import WebcamOffIcon from "../icons/Topbar/WebcamOffIcon";
-import ScreenShareIcon from "../icons/Topbar/ScreenShareIcon";
-import ChatIcon from "../icons/Topbar/ChatIcon";
-import ParticipantsIcon from "../icons/Topbar/ParticipantsIcon";
-import EndIcon from "../icons/Topbar/EndIcon";
-import RaiseHandIcon from "../icons/Topbar/RaiseHandIcon";
+import RecordingIcon from "../icons/Bottombar/RecordingIcon";
+import MicOnIcon from "../icons/Bottombar/MicOnIcon";
+import MicOffIcon from "../icons/Bottombar/MicOffIcon";
+import WebcamOnIcon from "../icons/Bottombar/WebcamOnIcon";
+import WebcamOffIcon from "../icons/Bottombar/WebcamOffIcon";
+import ScreenShareIcon from "../icons/Bottombar/ScreenShareIcon";
+import ChatIcon from "../icons/Bottombar/ChatIcon";
+import ParticipantsIcon from "../icons/Bottombar/ParticipantsIcon";
+import EndIcon from "../icons/Bottombar/EndIcon";
+import RaiseHandIcon from "../icons/Bottombar/RaiseHandIcon";
 import { OutlinedButton } from "./OutlinedButton";
 import {
   Box,
@@ -52,8 +52,8 @@ const useStyles = makeStyles({
     padding: "6px 12px",
   },
 });
-export function TopBar({
-  topBarHeight,
+export function BottomBar({
+  bottomBarHeight,
   sideBarMode,
   setSideBarMode,
   setIsMeetingLeft,
@@ -617,7 +617,7 @@ export function TopBar({
     setOpen(false);
   };
 
-  const TopBarButtonTypes = useMemo(
+  const BottomBarButtonTypes = useMemo(
     () => ({
       END_CALL: "END_CALL",
       CHAT: "CHAT",
@@ -633,17 +633,17 @@ export function TopBar({
   );
 
   const otherFeatures = [
-    { icon: TopBarButtonTypes.RAISE_HAND },
-    { icon: TopBarButtonTypes.SCREEN_SHARE },
-    { icon: TopBarButtonTypes.CHAT },
-    { icon: TopBarButtonTypes.PARTICIPANTS },
-    { icon: TopBarButtonTypes.MEETING_ID_COPY },
+    { icon: BottomBarButtonTypes.RAISE_HAND },
+    { icon: BottomBarButtonTypes.SCREEN_SHARE },
+    { icon: BottomBarButtonTypes.CHAT },
+    { icon: BottomBarButtonTypes.PARTICIPANTS },
+    { icon: BottomBarButtonTypes.MEETING_ID_COPY },
   ];
 
   return isMobile || isTab ? (
     <div
       className="flex items-center justify-center"
-      style={{ height: topBarHeight }}
+      style={{ height: bottomBarHeight }}
     >
       <LeaveBTN />
       <MicBTN />
@@ -663,19 +663,19 @@ export function TopBar({
               <Grid
                 className="flex items-center justify-center"
                 item
-                xs={icon === TopBarButtonTypes.MEETING_ID_COPY ? 7 : 4}
-                sm={icon === TopBarButtonTypes.MEETING_ID_COPY ? 5 : 3}
-                md={icon === TopBarButtonTypes.MEETING_ID_COPY ? 3 : 2}
+                xs={icon === BottomBarButtonTypes.MEETING_ID_COPY ? 7 : 4}
+                sm={icon === BottomBarButtonTypes.MEETING_ID_COPY ? 5 : 3}
+                md={icon === BottomBarButtonTypes.MEETING_ID_COPY ? 3 : 2}
               >
-                {icon === TopBarButtonTypes.RAISE_HAND ? (
+                {icon === BottomBarButtonTypes.RAISE_HAND ? (
                   <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
-                ) : icon === TopBarButtonTypes.SCREEN_SHARE ? (
+                ) : icon === BottomBarButtonTypes.SCREEN_SHARE ? (
                   <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
-                ) : icon === TopBarButtonTypes.CHAT ? (
+                ) : icon === BottomBarButtonTypes.CHAT ? (
                   <ChatBTN isMobile={isMobile} isTab={isTab} />
-                ) : icon === TopBarButtonTypes.PARTICIPANTS ? (
+                ) : icon === BottomBarButtonTypes.PARTICIPANTS ? (
                   <ParticipantsBTN isMobile={isMobile} isTab={isTab} />
-                ) : icon === TopBarButtonTypes.MEETING_ID_COPY ? (
+                ) : icon === BottomBarButtonTypes.MEETING_ID_COPY ? (
                   <MeetingIdCopyBTN isMobile={isMobile} isTab={isTab} />
                 ) : null}
               </Grid>

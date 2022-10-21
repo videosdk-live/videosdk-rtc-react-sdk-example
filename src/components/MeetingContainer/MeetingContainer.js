@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
-import { TopBar } from "../TopBar";
+import { BottomBar } from "../BottomBar";
 import { SidebarConatiner } from "../SidebarContainer/SidebarContainer";
 import { ParticipantsViewer } from "./ParticipantView";
 import { PresenterView } from "./PresenterView";
@@ -185,7 +185,7 @@ export function MeetingContainer({
 
   const isPresenting = mMeeting.presenterId ? true : false;
 
-  const topBarHeight = 60;
+  const bottomBarHeight = 60;
   const [sideBarMode, setSideBarMode] = useState(null);
 
   usePubSub("RAISE_HAND", {
@@ -244,7 +244,7 @@ export function MeetingContainer({
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
               <div className={`flex flex-1 `}>
                 {isPresenting ? (
-                  <PresenterView height={containerHeight - topBarHeight} />
+                  <PresenterView height={containerHeight - bottomBarHeight} />
                 ) : null}
                 {isPresenting && isMobile ? null : (
                   <ParticipantsViewer
@@ -254,14 +254,14 @@ export function MeetingContainer({
                 )}
               </div>
               <SidebarConatiner
-                height={containerHeight - topBarHeight}
+                height={containerHeight - bottomBarHeight}
                 setSideBarMode={setSideBarMode}
                 sideBarMode={sideBarMode}
                 raisedHandsParticipants={raisedHandsParticipants}
               />
             </div>
-            <TopBar
-              topbarHeight={topBarHeight}
+            <BottomBar
+              bottomBarHeight={bottomBarHeight}
               sideBarMode={sideBarMode}
               setSideBarMode={setSideBarMode}
               setIsMeetingLeft={setIsMeetingLeft}
