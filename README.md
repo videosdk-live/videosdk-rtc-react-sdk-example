@@ -442,9 +442,9 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 `SidebarContainer/ParticipantSidePanel.js` - This file is used to show the list of participants present in the meeting.
 
-  <p align="center">
-  <img width="600" height="338" src="participant_list.gif"/>
-  </p>
+<p align="center">
+<img width="600" height="338" src="/participant_list.gif"/>
+</p>
 
 **6. Chat**
 
