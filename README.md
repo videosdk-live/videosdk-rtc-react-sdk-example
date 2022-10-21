@@ -446,6 +446,10 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 `MeetingContainer/PresenterView.js` - It contains the view when participant share their screen.
 
+<p align="center">
+<img width="600" height="338" src="public/presenter-view.gif"/>
+</p>
+
 **5. ParticipantList**
 
 `SidebarContainer/ParticipantSidePanel.js` - This file is used to show the list of participants present in the meeting.
