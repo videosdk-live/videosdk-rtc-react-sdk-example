@@ -404,7 +404,7 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
   - `Join Meeting Button` - This button will call api to join meeting with meetingId that participant want to join.
 
   <p align="center">
-  <img width="600" height="338" src="/create_meeting.gif"/>
+  <img width="600" height="338" src="public/create_meeting.gif"/>
   </p>
 
 - If `Join Meeting` is clicked, it will show following:
@@ -414,7 +414,7 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
   - `Join Meeting Button` - This button will call api to join meeting with meetingId that participant want to join.
 
   <p align="center">
-  <img width="600" height="338" src="/join_meeting.gif"/>
+  <img width="600" height="338" src="public/join_meeting.gif"/>
   </p>
 
 <br/>
