@@ -430,9 +430,9 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
   - When screen resolution change to mobile, tab or lg screen, the order of bottom bar elements changes to leave meeting button, recording button, mic & webcam button and `more actions` button.
   - On click of `more actions` button it opens a drawer that contains other remaining buttons.
 
-  <p align="center">
-  <img width="1363" height="80" src="public/bottombar.png"/>
-  </p>
+<p align="center">
+<img width="1363" height="80" src="public/bottombar.png"/>
+</p>
 
 **3. ParticipantView**
 
@@ -454,9 +454,17 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 `SidebarContainer/ChatSidePanel.js` - It contains the chat side panel with chat input and chat messages list.
 
+<p align="center">
+<img width="600" height="338" src="public/chat.gif"/>
+</p>
+
 **7. Waiting Screen**
 
 `WaitingToJoin.js` - It contains the lottie animation with messages. Untill you receive `isMeetingJoined` true from `meeting` that you intialize using `useMeeting()` from `@videosdk.live/react-sdk`, this screen will be displayed.
+
+<p align="center">
+<img width="600" height="338" src="public/waiting-screen.gif"/>
+</p>
 
 **8. Leave Screen**
 
