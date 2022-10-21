@@ -10,12 +10,21 @@ import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
 import { nameTructed } from "../../utils/helper";
+import useResponsiveSize from "../../utils/useResponsiveSize";
 
 export function PresenterView({ height }) {
   const mMeeting = useMeeting();
   const presenterId = mMeeting?.presenterId;
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.between("xs", "sm"));
+
+  const padding = useResponsiveSize({
+    xs: 4,
+    sm: 4,
+    md: 26,
+    lg: 52,
+    xl: 24,
+  });
 
   // const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
 
@@ -69,7 +78,7 @@ export function PresenterView({ height }) {
   return (
     <div
       style={{
-        height: height - theme.spacing(4),
+        height: height - padding,
         // width: "700px",
         width: "100%",
         backgroundColor: theme.palette.darkTheme.slightLighter,

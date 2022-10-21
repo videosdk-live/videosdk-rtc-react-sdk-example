@@ -173,10 +173,10 @@ export function ParticipantsViewer({ isPresenting, sideBarMode }) {
                         className={`flex flex-1 ${
                           isPresenting
                             ? participants.length === 1
-                              ? "md:h-34 md:w-32 xl:w-52 xl:h-48 "
+                              ? "md:h-48 md:w-44 xl:w-52 xl:h-48 "
                               : participants.length === 2
-                              ? "md:w-36 xl:w-56"
-                              : "md:w-32 xl:w-48"
+                              ? "md:w-44 xl:w-56"
+                              : "md:w-44 xl:w-48"
                             : "w-full"
                         } items-center justify-center h-full ${
                           participants.length === 1
