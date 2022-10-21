@@ -430,6 +430,10 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
   - When screen resolution change to mobile, tab or lg screen, the order of bottom bar elements changes to leave meeting button, recording button, mic & webcam button and `more actions` button.
   - On click of `more actions` button it opens a drawer that contains other remaining buttons.
 
+  <p align="center">
+  <img width="1363" height="80" src="public/bottombar.png"/>
+  </p>
+
 **3. ParticipantView**
 
 `MeetingContainer/ParticipantView.js` - It contains the grid of participant that are displayed in the main screen.
@@ -457,6 +461,10 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 **8. Leave Screen**
 
 `LeaveScreen.js` - This file contains the leave screen.
+
+<p align="center">
+<img width="1366" height="635" src="public/leave-screen.png"/>
+</p>
 
 ## Examples
 
