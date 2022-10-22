@@ -431,7 +431,7 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
   - On click of `more actions` button it opens a drawer that contains other remaining buttons.
 
 <p align="center">
-<img width="1363" height="80" src="public/bottombar.png"/>
+<img width="600" src="public/bottombar.png"/>
 </p>
 
 **3. ParticipantView**
@@ -439,7 +439,7 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 `MeetingContainer/ParticipantView.js` - It contains the grid of participant that are displayed in the main screen.
 
 <p align="center">
-<img width="1362" height="636" src="public/participant_view.png"/>
+<img width="600" height="338" src="public/participant_view.png"/>
 </p>
 
 **4. PresenterView**
@@ -479,7 +479,7 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 `LeaveScreen.js` - This file contains the leave screen.
 
 <p align="center">
-<img width="1366" height="635" src="public/leave-screen.png"/>
+<img width="600"  src="public/leave-screen.png"/>
 </p>
 
 ## Examples

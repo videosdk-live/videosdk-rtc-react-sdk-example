@@ -152,7 +152,6 @@ export function BottomBar({
 
   const SingleMicMenu = ({
     micArr,
-    Icon,
     label,
     classes,
     changeMic,
@@ -200,8 +199,6 @@ export function BottomBar({
                 root: classes.popoverHoverDark,
               }}
             >
-              {/* {deviceId === selectMicDeviceId && <SelectedIcon />} */}
-
               <MenuItem
                 disableRipple
                 style={{
@@ -231,7 +228,6 @@ export function BottomBar({
   };
 
   const MicMenu = ({
-    localMicOn,
     downArrow,
     mics,
     classes,
@@ -264,7 +260,6 @@ export function BottomBar({
           <SingleMicMenu
             micArr={mics}
             label={"MICROPHONE"}
-            // Icon={MicrophoneIcon}
             changeMic={changeMic}
             classes={classes}
             handleClose={handleClose}
@@ -330,7 +325,6 @@ export function BottomBar({
           }}
         />
         <MicMenu
-          localMicOn={mMeeting.localMicOn}
           downArrow={downArrow}
           tollTipEl={tollTipEl}
           changeMic={changeMic}

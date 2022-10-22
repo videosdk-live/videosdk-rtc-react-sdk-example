@@ -89,7 +89,6 @@ const App = () => {
       {isMeetingStarted ? (
         <SnackbarProvider
           anchorOrigin={{
-            // vertical: isTab || isMobile ? "top" : "bottom",
             vertical: "bottom",
             horizontal: "left",
           }}
