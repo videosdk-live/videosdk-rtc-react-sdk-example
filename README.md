@@ -384,8 +384,8 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 > **Note :**
 >
-> - **main** branch: Simple UI with all features and methods.
-> - **redesign/v2** branch: Better UI with basic features.
+> - **main** branch: Better UI with basic features.
+> - **design/v1** branch: Simple UI with all features and methods. 
 
 <br/>
 
