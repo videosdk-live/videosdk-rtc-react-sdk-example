@@ -65,7 +65,9 @@ export function MeetingContainer({
   };
 
   function onParticipantJoined(participant) {
-    // console.log(" onParticipantJoined", participant);
+    // Change quality to low, med or high based on resolution
+    participant && participant.setQuality("high");
+    console.log(" onParticipantJoined", participant);
   }
   function onParticipantLeft(participant) {
     // console.log(" onParticipantLeft", participant);
