@@ -166,7 +166,6 @@ export function ParticipantsViewer({ isPresenting, sideBarMode }) {
                 {participants
                   .slice(i * perRow, (i + 1) * perRow)
                   .map((participantId) => {
-                    console.log("participantId", participantId);
                     return (
                       <div
                         key={`participant_${participantId}`}

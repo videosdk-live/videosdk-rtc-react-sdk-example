@@ -45,7 +45,7 @@ Check out demo [here](https://videosdk.live/prebuilt/demo)
 Clone the repository to your local environment.
 
 ```js
-git clone https://github.com/videosdk-live/videosdk-rtc-react-native-sdk-example.git
+git clone https://github.com/videosdk-live/videosdk-rtc-react-sdk-example.git
 ```
 
 ### Step 2: Copy the .env.example file to .env file.
@@ -385,7 +385,7 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 > **Note :**
 >
 > - **main** branch: Better UI with basic features.
-> - **design/v1** branch: Simple UI with all features and methods. 
+> - **design/v1** branch: Simple UI with all features and methods.
 
 <br/>
 
