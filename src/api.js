@@ -1,4 +1,4 @@
-const API_BASE_URL = "https://api.zujonow.com";
+const API_BASE_URL = "https://api.videosdk.live";
 const VIDEOSDK_TOKEN = process.env.REACT_APP_VIDEOSDK_TOKEN;
 const API_AUTH_URL = process.env.REACT_APP_AUTH_URL;
 
@@ -21,30 +21,31 @@ export const getToken = async () => {
 };
 
 export const createMeeting = async ({ token }) => {
-  const url = `${API_BASE_URL}/api/meetings`;
+  const url = `${API_BASE_URL}/v2/rooms`;
   const options = {
     method: "POST",
     headers: { Authorization: token, "Content-Type": "application/json" },
   };
 
-  const { meetingId } = await fetch(url, options)
+  const { roomId } = await fetch(url, options)
     .then((response) => response.json())
     .catch((error) => console.error("error", error));
 
-  return meetingId;
+  return roomId;
 };
 
-export const validateMeeting = async ({ meetingId, token }) => {
-  const url = `${API_BASE_URL}/api/meetings/${meetingId}`;
+export const validateMeeting = async ({ roomId, token }) => {
+  const url = `${API_BASE_URL}/v2/rooms/validate/${roomId}`;
 
   const options = {
-    method: "POST",
-    headers: { Authorization: token },
+    method: "GET",
+    headers: { Authorization: token, "Content-Type": "application/json" },
   };
 
   const result = await fetch(url, options)
     .then((response) => response.json()) //result will have meeting id
     .catch((error) => console.error("error", error));
 
-  return result ? result.meetingId === meetingId : false;
+  console.log("RESPONSE", result);
+  return result ? result.roomId === roomId : false;
 };

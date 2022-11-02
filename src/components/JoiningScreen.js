@@ -589,7 +589,7 @@ export function JoiningScreen({
                   onClickJoin={async (id) => {
                     const token = await getToken();
                     const valid = await validateMeeting({
-                      meetingId: id,
+                      roomId: id,
                       token,
                     });
 
