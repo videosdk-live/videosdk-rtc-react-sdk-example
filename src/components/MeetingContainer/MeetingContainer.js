@@ -6,9 +6,9 @@ import { ParticipantsViewer } from "./ParticipantView";
 import { PresenterView } from "./PresenterView";
 import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../../utils/helper";
-import useResponsiveSize from "../../utils/useResponsiveSize";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
 import WaitingToJoin from "../WaitingToJoin";
-import useWindowSize from "../../utils/useWindowSize";
+import useWindowSize from "../../hooks/useWindowSize";
 
 export const sideBarModes = {
   PARTICIPANTS: "PARTICIPANTS",

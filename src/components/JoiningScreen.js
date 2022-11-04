@@ -11,7 +11,7 @@ import {
 } from "@material-ui/core";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { VideocamOff, MicOff, Mic, Videocam } from "@material-ui/icons";
-import useResponsiveSize from "../utils/useResponsiveSize";
+import useResponsiveSize from "../hooks/useResponsiveSize";
 import { red } from "@material-ui/core/colors";
 import { MeetingDetailsScreen } from "./MeetingDetailsScreen";
 import { createMeeting, getToken, validateMeeting } from "../api";

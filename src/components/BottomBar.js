@@ -32,8 +32,8 @@ import {
   ArrowDropDown as ArrowDropDownIcon,
   MoreHoriz as MoreHorizIcon,
 } from "@material-ui/icons";
-import useIsTab from "../utils/useIsTab";
-import useIsMobile from "../utils/useIsMobile";
+import useIsTab from "../hooks/useIsTab";
+import useIsMobile from "../hooks/useIsMobile";
 import { MobileIconButton } from "./MobileIconButton";
 
 const useStyles = makeStyles({

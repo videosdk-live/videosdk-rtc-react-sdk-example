@@ -10,7 +10,7 @@ import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
 import { nameTructed } from "../../utils/helper";
-import useResponsiveSize from "../../utils/useResponsiveSize";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
 
 export function PresenterView({ height }) {
   const mMeeting = useMeeting();

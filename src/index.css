@@ -60,3 +60,14 @@ input:focus-visible{
   
 }
 
+input[type="radio"]:checked + label span {
+background-color: #fff; 
+box-shadow: 0px 0px 0px 2px black inset;
+}
+
+
+input[type="radio"]:checked + label{
+ color: #fff; 
+}
+
+

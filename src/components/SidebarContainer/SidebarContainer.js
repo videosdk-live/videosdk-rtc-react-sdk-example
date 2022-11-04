@@ -11,9 +11,9 @@ import {
 import { Close } from "@material-ui/icons";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import React from "react";
-import useIsMobile from "../../utils/useIsMobile";
-import useIsTab from "../../utils/useIsTab";
-import useResponsiveSize from "../../utils/useResponsiveSize";
+import useIsMobile from "../../hooks/useIsMobile";
+import useIsTab from "../../hooks/useIsTab";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
 import { ChatSidePanel } from "./ChatSidePanel";
 import { ParticipantSidePanel } from "./ParticipantSidePanel";
 

@@ -15,8 +15,8 @@ import {
 } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import React, { useEffect, useRef, useState } from "react";
-import useResponsiveSize from "../utils/useResponsiveSize";
-import useWindowSize from "../utils/useWindowSize";
+import useResponsiveSize from "../hooks/useResponsiveSize";
+import useWindowSize from "../hooks/useWindowSize";
 import ConfirmBox from "./ConfirmBox";
 
 const AudioAnalyser = ({ audioTrack }) => {

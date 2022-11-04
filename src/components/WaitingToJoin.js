@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import useResponsiveSize from "../utils/useResponsiveSize";
+import useResponsiveSize from "../hooks/useResponsiveSize";
 import animationData from "../../src/animations/join_meeting.json";
 import Lottie from "react-lottie";
 import { useTheme } from "@material-ui/core";
