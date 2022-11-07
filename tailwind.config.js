@@ -52,6 +52,7 @@ module.exports = windmill({
         },
         orange: {
           250: "#FF5810",
+          350: "#FF5D5D",
         },
         yellow: {
           150: "#FF900C",
@@ -90,6 +91,8 @@ module.exports = windmill({
           600: "#C4C4C4",
           700: "#272727",
           800: "#343434",
+          850: "#9E9DA6",
+          900: "#373C43",
         },
       },
     },

@@ -1,20 +1,20 @@
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { sideBarModes } from "./MeetingContainer/MeetingContainer";
+import { sideBarModes } from "../../components/MeetingContainer/MeetingContainer";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
-import recordingBlink from "../animations/recording-blink.json";
-import useIsRecording from "./MeetingContainer/useIsRecording";
-import RecordingIcon from "../icons/Bottombar/RecordingIcon";
-import MicOnIcon from "../icons/Bottombar/MicOnIcon";
-import MicOffIcon from "../icons/Bottombar/MicOffIcon";
-import WebcamOnIcon from "../icons/Bottombar/WebcamOnIcon";
-import WebcamOffIcon from "../icons/Bottombar/WebcamOffIcon";
-import ScreenShareIcon from "../icons/Bottombar/ScreenShareIcon";
-import ChatIcon from "../icons/Bottombar/ChatIcon";
-import ParticipantsIcon from "../icons/Bottombar/ParticipantsIcon";
-import EndIcon from "../icons/Bottombar/EndIcon";
-import RaiseHandIcon from "../icons/Bottombar/RaiseHandIcon";
-import { OutlinedButton } from "./OutlinedButton";
+import recordingBlink from "../../animations/recording-blink.json";
+import useIsRecording from "../../components/MeetingContainer/useIsRecording";
+import RecordingIcon from "../../icons/Bottombar/RecordingIcon";
+import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
+import MicOffIcon from "../../icons/Bottombar/MicOffIcon";
+import WebcamOnIcon from "../../icons/Bottombar/WebcamOnIcon";
+import WebcamOffIcon from "../../icons/Bottombar/WebcamOffIcon";
+import ScreenShareIcon from "../../icons/Bottombar/ScreenShareIcon";
+import ChatIcon from "../../icons/Bottombar/ChatIcon";
+import ParticipantsIcon from "../../icons/Bottombar/ParticipantsIcon";
+import EndIcon from "../../icons/Bottombar/EndIcon";
+import RaiseHandIcon from "../../icons/Bottombar/RaiseHandIcon";
+import { OutlinedButton } from "../../components/OutlinedButton";
 import {
   Box,
   Grid,
@@ -32,9 +32,9 @@ import {
   ArrowDropDown as ArrowDropDownIcon,
   MoreHoriz as MoreHorizIcon,
 } from "@material-ui/icons";
-import useIsTab from "../hooks/useIsTab";
-import useIsMobile from "../hooks/useIsMobile";
-import { MobileIconButton } from "./MobileIconButton";
+import useIsTab from "../../hooks/useIsTab";
+import useIsMobile from "../../hooks/useIsMobile";
+import { MobileIconButton } from "../../components/MobileIconButton";
 
 const useStyles = makeStyles({
   popoverHoverDark: {

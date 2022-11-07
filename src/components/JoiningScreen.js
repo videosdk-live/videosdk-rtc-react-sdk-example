@@ -55,6 +55,9 @@ export function JoiningScreen({
   webcamEnabled,
   setWebcamOn,
   setMicOn,
+  meetingType,
+  setMeetingType,
+  setMeetingMode,
 }) {
   const theme = useTheme();
   const classes = useStyles();
@@ -585,6 +588,9 @@ export function JoiningScreen({
                   setParticipantName={setParticipantName}
                   videoTrack={videoTrack}
                   setVideoTrack={setVideoTrack}
+                  meetingType={meetingType}
+                  setMeetingType={setMeetingType}
+                  setMeetingMode={setMeetingMode}
                   onClickStartMeeting={onClickStartMeeting}
                   onClickJoin={async (id) => {
                     const token = await getToken();

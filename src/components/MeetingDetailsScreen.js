@@ -1,11 +1,7 @@
 import { CheckIcon, ClipboardIcon } from "@heroicons/react/outline";
 import React, { useState } from "react";
+import { meetingModes, meetingTypes } from "../App";
 import useResponsiveSize from "../hooks/useResponsiveSize";
-
-export const meetingTypes = {
-  MEETING: "MEETING",
-  ILS: "ILS",
-};
 
 export function MeetingDetailsScreen({
   onClickJoin,
@@ -15,11 +11,13 @@ export function MeetingDetailsScreen({
   videoTrack,
   setVideoTrack,
   onClickStartMeeting,
+  meetingType,
+  setMeetingType,
+  setMeetingMode,
 }) {
   const [meetingId, setMeetingId] = useState("");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
-  const [meetingType, setMeetingType] = useState("meeting");
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);
   const [isJoinMeetingClicked, setIsJoinMeetingClicked] = useState(false);
   const padding = useResponsiveSize({
@@ -133,11 +131,11 @@ export function MeetingDetailsScreen({
                 type="radio"
                 name="radio"
                 class="hidden"
-                value="meeting"
+                value={meetingTypes.MEETING}
                 onClick={(e) => {
                   setMeetingType(e.target.value);
                 }}
-                checked={meetingType === "meeting"}
+                checked={meetingType === meetingTypes.MEETING}
               />
               <label
                 for="radio1"
@@ -154,7 +152,7 @@ export function MeetingDetailsScreen({
                 type="radio"
                 name="radio"
                 class="hidden"
-                value="ILS"
+                value={meetingTypes.ILS}
                 onClick={(e) => {
                   setMeetingType(e.target.value);
                 }}
@@ -176,6 +174,9 @@ export function MeetingDetailsScreen({
                 const meetingId = await onClickCreateMeeting();
                 setMeetingId(meetingId);
                 setIscreateMeetingClicked(true);
+                if (meetingType === meetingTypes.ILS) {
+                  setMeetingMode(meetingModes.CONFERENCE);
+                }
               }}
             >
               {meetingType === meetingTypes.MEETING
@@ -186,6 +187,9 @@ export function MeetingDetailsScreen({
               className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-5"
               onClick={(e) => {
                 setIsJoinMeetingClicked(true);
+                if (meetingType === meetingTypes.ILS) {
+                  setMeetingMode(meetingModes.VIEWER);
+                }
               }}
             >
               {meetingType === meetingTypes.MEETING

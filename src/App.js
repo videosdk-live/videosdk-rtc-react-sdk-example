@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MeetingProvider } from "@videosdk.live/react-sdk";
 import { JoiningScreen } from "./components/JoiningScreen";
 import { MeetingContainer } from "./components/MeetingContainer/MeetingContainer";
@@ -6,6 +6,23 @@ import { SnackbarProvider } from "notistack";
 import { LeaveScreen } from "./components/LeaveScreen";
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
+
+export const meetingTypes = {
+  MEETING: "MEETING",
+  ILS: "ILS",
+};
+
+export const meetingLayoutTopics = {
+  MEETING_LAYOUT: "MEETING_LAYOUT",
+  RECORDING_LAYOUT: "RECORDING_LAYOUT",
+  LIVE_STREAM_LAYOUT: "LIVE_STREAM_LAYOUT",
+  HLS_LAYOUT: "HLS_LAYOUT",
+};
+
+export const meetingModes = {
+  VIEWER: "VIEWER",
+  CONFERENCE: "CONFERENCE",
+};
 
 const App = () => {
   const [token, setToken] = useState("");
@@ -18,10 +35,29 @@ const App = () => {
   const [selectWebcamDeviceId, setSelectWebcamDeviceId] = useState(
     selectedWebcam.id
   );
+  const [meetingType, setMeetingType] = useState(meetingTypes.MEETING);
+  const [meetingMode, setMeetingMode] = useState(meetingModes.CONFERENCE);
   const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
   const [raisedHandsParticipants, setRaisedHandsParticipants] = useState([]);
+
+  const [draftPolls, setDraftPolls] = useState([]);
+  const [optionArr, setOptionArr] = useState([]);
+
+  const [createdPolls, setCreatedPolls] = useState([]);
+  const [endedPolls, setEndedPolls] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
+
+  const polls = useMemo(
+    () =>
+      createdPolls.map((poll) => ({
+        ...poll,
+        isActive:
+          endedPolls.findIndex(({ pollId }) => pollId === poll.id) === -1,
+      })),
+    [createdPolls, endedPolls]
+  );
 
   const useRaisedHandParticipants = () => {
     const raisedHandsParticipantsRef = useRef();
@@ -125,6 +161,19 @@ const App = () => {
               raisedHandsParticipants={raisedHandsParticipants}
               micEnabled={micOn}
               webcamEnabled={webcamOn}
+              meetingType={meetingType}
+              meetingMode={meetingMode}
+              polls={polls}
+              draftPolls={draftPolls}
+              setDraftPolls={setDraftPolls}
+              optionArr={optionArr}
+              setOptionArr={setOptionArr}
+              createdPolls={createdPolls}
+              setCreatedPolls={setCreatedPolls}
+              endedPolls={endedPolls}
+              setEndedPolls={setEndedPolls}
+              submissions={submissions}
+              setSubmissions={setSubmissions}
             />
           </MeetingProvider>
         </SnackbarProvider>
@@ -147,6 +196,10 @@ const App = () => {
           }}
           startMeeting={isMeetingStarted}
           setIsMeetingLeft={setIsMeetingLeft}
+          meetingType={meetingType}
+          setMeetingType={setMeetingType}
+          meetingMode={meetingMode}
+          setMeetingMode={setMeetingMode}
         />
       )}
     </>

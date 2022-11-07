@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
-import { BottomBar } from "../BottomBar";
+import { BottomBar } from "../../meeting/pages/BottomBar";
 import { SidebarConatiner } from "../SidebarContainer/SidebarContainer";
 import { ParticipantsViewer } from "./ParticipantView";
 import { PresenterView } from "./PresenterView";
@@ -9,10 +9,18 @@ import { nameTructed, trimSnackBarText } from "../../utils/helper";
 import useResponsiveSize from "../../hooks/useResponsiveSize";
 import WaitingToJoin from "../WaitingToJoin";
 import useWindowSize from "../../hooks/useWindowSize";
+import { meetingTypes } from "../../App";
+import { ILSBottomBar } from "../../interactive-live-streaming/pages/ILSBottomBar";
+import { TopBar } from "../../interactive-live-streaming/pages/TopBar";
+import useIsTab from "../../hooks/useIsTab";
+import PollsListner from "../../interactive-live-streaming/pages/pollContainer/PollListner";
 
 export const sideBarModes = {
   PARTICIPANTS: "PARTICIPANTS",
   CHAT: "CHAT",
+  LAYOUT: "LAYOUT",
+  POLLS: "POLLS",
+  CREATE_POLL: "CREATE_POLL",
 };
 export function MeetingContainer({
   onMeetingLeave,
@@ -27,6 +35,19 @@ export function MeetingContainer({
   raisedHandsParticipants,
   micEnabled,
   webcamEnabled,
+  meetingType,
+  meetingMode,
+  polls,
+  draftPolls,
+  setDraftPolls,
+  optionArr,
+  setOptionArr,
+  createdPolls,
+  setCreatedPolls,
+  endedPolls,
+  setEndedPolls,
+  submissions,
+  setSubmissions,
 }) {
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -188,6 +209,7 @@ export function MeetingContainer({
   const isPresenting = mMeeting.presenterId ? true : false;
 
   const bottomBarHeight = 60;
+  const topBarHeight = 60;
   const [sideBarMode, setSideBarMode] = useState(null);
 
   usePubSub("RAISE_HAND", {
@@ -233,6 +255,7 @@ export function MeetingContainer({
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
   ).matches;
+  const isTab = useIsTab();
 
   return (
     <div
@@ -243,10 +266,34 @@ export function MeetingContainer({
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
+            <PollsListner
+              polls={polls}
+              setDraftPolls={setDraftPolls}
+              setCreatedPolls={setCreatedPolls}
+              setEndedPolls={setEndedPolls}
+              setSideBarMode={setSideBarMode}
+            />
+            {meetingType === meetingTypes.ILS && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: isTab || isMobile ? "" : "column",
+                  height: topBarHeight,
+                }}
+              >
+                <TopBar topBarHeight={topBarHeight} />
+              </div>
+            )}
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
               <div className={`flex flex-1 `}>
                 {isPresenting ? (
-                  <PresenterView height={containerHeight - bottomBarHeight} />
+                  <PresenterView
+                    height={
+                      meetingType === meetingTypes.MEETING
+                        ? containerHeight - bottomBarHeight
+                        : containerHeight - topBarHeight - bottomBarHeight
+                    }
+                  />
                 ) : null}
                 {isPresenting && isMobile ? null : (
                   <ParticipantsViewer
@@ -256,22 +303,42 @@ export function MeetingContainer({
                 )}
               </div>
               <SidebarConatiner
-                height={containerHeight - bottomBarHeight}
+                height={
+                  meetingType === meetingTypes.MEETING
+                    ? containerHeight - bottomBarHeight
+                    : containerHeight - topBarHeight - bottomBarHeight
+                }
                 setSideBarMode={setSideBarMode}
                 sideBarMode={sideBarMode}
                 raisedHandsParticipants={raisedHandsParticipants}
+                meetingMode={meetingMode}
+                polls={polls}
+                draftPolls={draftPolls}
               />
             </div>
-            <BottomBar
-              bottomBarHeight={bottomBarHeight}
-              sideBarMode={sideBarMode}
-              setSideBarMode={setSideBarMode}
-              setIsMeetingLeft={setIsMeetingLeft}
-              selectWebcamDeviceId={selectWebcamDeviceId}
-              setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-              selectMicDeviceId={selectMicDeviceId}
-              setSelectMicDeviceId={setSelectMicDeviceId}
-            />
+            {meetingType === meetingTypes.MEETING ? (
+              <BottomBar
+                bottomBarHeight={bottomBarHeight}
+                sideBarMode={sideBarMode}
+                setSideBarMode={setSideBarMode}
+                setIsMeetingLeft={setIsMeetingLeft}
+                selectWebcamDeviceId={selectWebcamDeviceId}
+                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                selectMicDeviceId={selectMicDeviceId}
+                setSelectMicDeviceId={setSelectMicDeviceId}
+              />
+            ) : (
+              <ILSBottomBar
+                bottomBarHeight={bottomBarHeight}
+                sideBarMode={sideBarMode}
+                setSideBarMode={setSideBarMode}
+                setIsMeetingLeft={setIsMeetingLeft}
+                selectWebcamDeviceId={selectWebcamDeviceId}
+                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                selectMicDeviceId={selectMicDeviceId}
+                setSelectMicDeviceId={setSelectMicDeviceId}
+              />
+            )}
           </>
         ) : (
           <></>

@@ -20,6 +20,7 @@ export const OutlinedButton = ({
   focusIconColor,
   isRequestProcessing,
   borderColor,
+  buttonText,
 }) => {
   const [mouseOver, setMouseOver] = useState(false);
   const [mouseDown, setMouseDown] = useState(false);
@@ -82,7 +83,7 @@ export const OutlinedButton = ({
         }}
       >
         <div
-          className="cursor-pointer"
+          className="cursor-pointer flex items-center justify-center"
           id={btnID}
           onMouseEnter={() => {
             setMouseOver(true);
@@ -154,6 +155,11 @@ export const OutlinedButton = ({
                 </>
               ))}
           </div>
+          {buttonText ? (
+            <p className="text-sm text-white font-semibold mr-2 text-center">
+              {buttonText}
+            </p>
+          ) : null}
         </div>
         {typeof renderRightComponent === "function" && renderRightComponent()}
       </div>
