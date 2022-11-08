@@ -306,52 +306,55 @@ const PollList = ({ panelHeight, polls, draftPolls, setSideBarMode }) => {
     >
       <div className="flex flex-1 flex-col justify-between h-full">
         <div className="flex flex-col overflow-y-auto ">
-          {draftPolls?.map((poll, index) => {
-            return (
-              <Poll
-                key={`draft_polls_${poll.id}`}
-                poll={poll}
-                panelHeight={panelHeight}
-                index={index}
-                isDraft={true}
-                publishDraftPoll={(poll) => {
-                  //
-                  RemoveFromDraftPublish(
-                    { pollId: poll.id },
-                    { persist: true }
-                  );
-                  //
-                  publishCreatePoll(
-                    {
-                      id: uuid(),
-                      question: poll.question,
-                      options: poll.options,
-                      // createdAt: new Date(),
-                      timeout: poll.timeout,
-                      hasTimer: poll.hasTimer,
-                      hasCorrectAnswer: poll.hasCorrectAnswer,
-                      isActive: true,
-                      index: polls.length + 1,
-                    },
-                    { persist: true }
-                  );
-                  //
-                  // setSideBarNestedMode(sideBarNestedModes.POLLS);
-                }}
-              />
-            );
-          })}
-          {polls?.map((poll, index) => {
-            return (
-              <Poll
-                key={`creator_polls_${poll.id}`}
-                // totalPolls={totalPolls}
-                poll={poll}
-                panelHeight={panelHeight}
-                index={index}
-              />
-            );
-          })}
+          {draftPolls &&
+            draftPolls.map((poll, index) => {
+              return (
+                <Poll
+                  key={`draft_polls_${poll.id}`}
+                  poll={poll}
+                  panelHeight={panelHeight}
+                  index={index}
+                  isDraft={true}
+                  publishDraftPoll={(poll) => {
+                    //
+                    RemoveFromDraftPublish(
+                      { pollId: poll.id },
+                      { persist: true }
+                    );
+                    //
+                    publishCreatePoll(
+                      {
+                        id: uuid(),
+                        question: poll.question,
+                        options: poll.options,
+                        // createdAt: new Date(),
+                        timeout: poll.timeout,
+                        hasTimer: poll.hasTimer,
+                        hasCorrectAnswer: poll.hasCorrectAnswer,
+                        isActive: true,
+                        index: polls.length + 1,
+                      },
+                      { persist: true }
+                    );
+                    setSideBarMode(sideBarModes.POLLS);
+                    //
+                    // setSideBarNestedMode(sideBarNestedModes.POLLS);
+                  }}
+                />
+              );
+            })}
+          {polls &&
+            polls.map((poll, index) => {
+              return (
+                <Poll
+                  key={`creator_polls_${poll.id}`}
+                  // totalPolls={totalPolls}
+                  poll={poll}
+                  panelHeight={panelHeight}
+                  index={index}
+                />
+              );
+            })}
         </div>
         <div style={{ padding: padding, marginTop: equalSpacing }}>
           <button

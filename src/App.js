@@ -43,11 +43,8 @@ const App = () => {
   const [raisedHandsParticipants, setRaisedHandsParticipants] = useState([]);
 
   const [draftPolls, setDraftPolls] = useState([]);
-  const [optionArr, setOptionArr] = useState([]);
-
   const [createdPolls, setCreatedPolls] = useState([]);
   const [endedPolls, setEndedPolls] = useState([]);
-  const [submissions, setSubmissions] = useState([]);
 
   const polls = useMemo(
     () =>
@@ -166,14 +163,8 @@ const App = () => {
               polls={polls}
               draftPolls={draftPolls}
               setDraftPolls={setDraftPolls}
-              optionArr={optionArr}
-              setOptionArr={setOptionArr}
-              createdPolls={createdPolls}
               setCreatedPolls={setCreatedPolls}
-              endedPolls={endedPolls}
               setEndedPolls={setEndedPolls}
-              submissions={submissions}
-              setSubmissions={setSubmissions}
             />
           </MeetingProvider>
         </SnackbarProvider>

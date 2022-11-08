@@ -101,7 +101,7 @@ const SideBarTabView = ({
             ) : sideBarMode === "CHAT" ? (
               <ChatSidePanel panelHeight={panelHeight} />
             ) : sideBarMode === "POLLS" && meetingMode !== "VIEWER" ? (
-              polls?.length === 0 && draftPolls?.length === 0 ? (
+              polls.length === 0 && draftPolls.length === 0 ? (
                 <CreatePoll {...{ panelHeight, polls }} />
               ) : (
                 <PollList
@@ -203,6 +203,7 @@ export function SidebarConatiner({
         handleClose={handleClose}
         meetingMode={meetingMode}
         polls={polls}
+        draftPolls={draftPolls}
         setSideBarMode={setSideBarMode}
       />
     )

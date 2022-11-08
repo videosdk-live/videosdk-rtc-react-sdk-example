@@ -40,14 +40,8 @@ export function MeetingContainer({
   polls,
   draftPolls,
   setDraftPolls,
-  optionArr,
-  setOptionArr,
-  createdPolls,
   setCreatedPolls,
-  endedPolls,
   setEndedPolls,
-  submissions,
-  setSubmissions,
 }) {
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
