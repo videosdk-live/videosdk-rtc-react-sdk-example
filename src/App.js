@@ -46,6 +46,10 @@ const App = () => {
   const [createdPolls, setCreatedPolls] = useState([]);
   const [endedPolls, setEndedPolls] = useState([]);
 
+  const [downstreamUrl, setDownstreamUrl] = useState(null);
+  const [afterMeetingJoinedHLSState, setAfterMeetingJoinedHLSState] =
+    useState(null);
+
   const polls = useMemo(
     () =>
       createdPolls.map((poll) => ({
@@ -160,11 +164,16 @@ const App = () => {
               webcamEnabled={webcamOn}
               meetingType={meetingType}
               meetingMode={meetingMode}
+              setMeetingMode={setMeetingMode}
               polls={polls}
               draftPolls={draftPolls}
               setDraftPolls={setDraftPolls}
               setCreatedPolls={setCreatedPolls}
               setEndedPolls={setEndedPolls}
+              downstreamUrl={downstreamUrl}
+              setDownstreamUrl={setDownstreamUrl}
+              afterMeetingJoinedHLSState={afterMeetingJoinedHLSState}
+              setAfterMeetingJoinedHLSState={setAfterMeetingJoinedHLSState}
             />
           </MeetingProvider>
         </SnackbarProvider>

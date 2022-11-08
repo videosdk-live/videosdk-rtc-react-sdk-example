@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { sideBarModes } from "../../components/MeetingContainer/MeetingContainer";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
 import recordingBlink from "../../animations/recording-blink.json";
+import liveHLS from "../../animations/live-hls.json";
 import useIsRecording from "../../components/MeetingContainer/useIsRecording";
 import RecordingIcon from "../../icons/Bottombar/RecordingIcon";
 import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
@@ -37,6 +38,8 @@ import useIsMobile from "../../hooks/useIsMobile";
 import { MobileIconButton } from "../../components/MobileIconButton";
 import PollIcon from "../../icons/Bottombar/PollIcon";
 import useIsHls from "../../components/MeetingContainer/useIsHls";
+import { meetingModes } from "../../App";
+import LiveIcon from "../../icons/LiveIcon";
 
 const useStyles = makeStyles({
   popoverHoverDark: {
@@ -63,6 +66,7 @@ export function ILSBottomBar({
   setSelectWebcamDeviceId,
   selectMicDeviceId,
   setSelectMicDeviceId,
+  meetingMode,
 }) {
   const RaiseHandBTN = ({ isMobile, isTab }) => {
     const { publish } = usePubSub("RAISE_HAND");
@@ -550,6 +554,7 @@ export function ILSBottomBar({
           );
         }}
         badge={`${new Map(participants)?.size}`}
+        disabled={meetingMode === meetingModes.VIEWER}
       />
     ) : (
       <OutlinedButton
@@ -562,6 +567,7 @@ export function ILSBottomBar({
         isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
         tooltip={"View Participants"}
         badge={`${new Map(participants)?.size}`}
+        disabled={meetingMode === meetingModes.VIEWER}
       />
     );
   };
@@ -596,117 +602,113 @@ export function ILSBottomBar({
     );
   };
 
-  // const HLSBTN = ({ isMobile, isTab }) => {
-  //   const mMeeting = useMeeting({});
+  const HLSBTN = ({ isMobile, isTab }) => {
+    const { startHls, stopHls, hlsState } = useMeeting({});
 
-  //   const startHls = mMeeting?.startHls;
-  //   const stopHls = mMeeting?.stopHls;
-  //   const hlsState = mMeeting?.hlsState;
+    const isHls = useIsHls();
 
-  //   const isHls = useIsHls();
+    const { isRequestProcessing } = useMemo(
+      () => ({
+        isRequestProcessing:
+          hlsState === Constants.hlsEvents.HLS_STARTING ||
+          hlsState === Constants.hlsEvents.HLS_STOPPING,
+      }),
+      [hlsState]
+    );
 
-  //   const { isRequestProcessing } = useMemo(
-  //     () => ({
-  //       isRequestProcessing:
-  //         hlsState === Constants.hlsEvents.HLS_STARTING ||
-  //         hlsState === Constants.hlsEvents.HLS_STOPPING,
-  //     }),
-  //     [hlsState]
-  //   );
+    const { type, priority, gridSize } = useMemo(
+      () => ({
+        type: "GRID",
+        priority: "SPEAKER",
+        gridSize: "12",
+      }),
+      []
+    );
 
-  //   const { type, priority, gridSize } = useMemo(
-  //     () => ({
-  //       type: "",
-  //       priority: "",
-  //       gridSize: "",
-  //     }),
-  //     []
-  //   );
+    const typeRef = useRef(type);
+    const priorityRef = useRef(priority);
+    const gridSizeRef = useRef(gridSize);
+    const isHlsRef = useRef(isHls);
 
-  //   const typeRef = useRef(type);
-  //   const priorityRef = useRef(priority);
-  //   const gridSizeRef = useRef(gridSize);
-  //   const isHlsRef = useRef(isHls);
+    useEffect(() => {
+      typeRef.current = type;
+    }, [type]);
 
-  //   useEffect(() => {
-  //     typeRef.current = type;
-  //   }, [type]);
+    useEffect(() => {
+      priorityRef.current = priority;
+    }, [priority]);
 
-  //   useEffect(() => {
-  //     priorityRef.current = priority;
-  //   }, [priority]);
+    useEffect(() => {
+      gridSizeRef.current = gridSize;
+    }, [gridSize]);
 
-  //   useEffect(() => {
-  //     gridSizeRef.current = gridSize;
-  //   }, [gridSize]);
+    useEffect(() => {
+      isHlsRef.current = isHls;
+    }, [isHls]);
 
-  //   useEffect(() => {
-  //     isHlsRef.current = isHls;
-  //   }, [isHls]);
+    const defaultOptions = {
+      loop: true,
+      autoplay: true,
+      animationData: liveHLS,
+      rendererSettings: {
+        preserveAspectRatio: "xMidYMid slice",
+      },
+      height: 64,
+      width: 170,
+    };
 
-  //   const defaultOptions = {
-  //     loop: true,
-  //     autoplay: true,
-  //     animationData: liveHLS,
-  //     rendererSettings: {
-  //       preserveAspectRatio: "xMidYMid slice",
-  //     },
-  //     height: 64,
-  //     width: 170,
-  //   };
+    const _handleStartHLS = () => {
+      const type = typeRef.current;
+      const priority = priorityRef.current;
+      const gridSize = gridSizeRef.current;
 
-  //   const _handleStartHLS = () => {
-  //     const type = typeRef.current;
-  //     const priority = priorityRef.current;
-  //     const gridSize = gridSizeRef.current;
+      const layout = { type, priority, gridSize };
 
-  //     const layout = { type, priority, gridSize };
+      startHls({ layout, theme: "DARK" });
+    };
 
-  //     startHls({ layout, theme: "hlsTheme" });
-  //   };
+    const _handleClick = () => {
+      const isHls = isHlsRef.current;
 
-  //   const _handleClick = () => {
-  //     const isHls = isHlsRef.current;
+      if (isHls) {
+        stopHls();
+      } else {
+        _handleStartHLS();
+      }
+    };
 
-  //     if (isHls) {
-  //       stopHls();
-  //     } else {
-  //       _handleStartHLS();
-  //     }
-  //   };
-
-  //   return isMobile || isTab &&
-  //     <MobileIconButton
-  //       onClick={_handleClick}
-  //       tooltipTitle={
-  //         hlsState === Constants.hlsEvents.HLS_STARTED
-  //           ? "Stop HLS"
-  //           : hlsState === Constants.hlsEvents.HLS_STARTING
-  //           ? "Starting HLS"
-  //           : hlsState === Constants.hlsEvents.HLS_STOPPED
-  //           ? "Start HLS"
-  //           : hlsState === Constants.hlsEvents.HLS_STOPPING
-  //           ? "Stopping HLS"
-  //           : "Start HLS"
-  //       }
-  //       Icon={LiveIcon}
-  //       buttonText={
-  //         hlsState === Constants.hlsEvents.HLS_STARTED
-  //           ? "Stop HLS"
-  //           : hlsState === Constants.hlsEvents.HLS_STARTING
-  //           ? "Starting HLS"
-  //           : hlsState === Constants.hlsEvents.HLS_STOPPED
-  //           ? "Start HLS"
-  //           : hlsState === Constants.hlsEvents.HLS_STOPPING
-  //           ? "Stopping HLS"
-  //           : "Start HLS"
-  //       }
-  //       isFocused={isHls}
-  //       lottieOption={isHls ? defaultOptions : null}
-  //       isRequestProcessing={isRequestProcessing}
-  //     />
-
-  // };
+    return isMobile || isTab ? (
+      <MobileIconButton
+        onClick={_handleClick}
+        tooltipTitle={
+          hlsState === Constants.hlsEvents.HLS_STARTED
+            ? "Stop HLS"
+            : hlsState === Constants.hlsEvents.HLS_STARTING
+            ? "Starting HLS"
+            : hlsState === Constants.hlsEvents.HLS_STOPPED
+            ? "Start HLS"
+            : hlsState === Constants.hlsEvents.HLS_STOPPING
+            ? "Stopping HLS"
+            : "Start HLS"
+        }
+        Icon={LiveIcon}
+        buttonText={
+          hlsState === Constants.hlsEvents.HLS_STARTED
+            ? "Stop HLS"
+            : hlsState === Constants.hlsEvents.HLS_STARTING
+            ? "Starting HLS"
+            : hlsState === Constants.hlsEvents.HLS_STOPPED
+            ? "Start HLS"
+            : hlsState === Constants.hlsEvents.HLS_STOPPING
+            ? "Stopping HLS"
+            : "Start HLS"
+        }
+        isFocused={isHls}
+        lottieOption={isHls ? defaultOptions : null}
+        isRequestProcessing={isRequestProcessing}
+      />
+    ) : null;
+  };
 
   const MeetingIdCopyBTN = () => {
     const mMeeting = useMeeting();
@@ -766,17 +768,24 @@ export function ILSBottomBar({
       RAISE_HAND: "RAISE_HAND",
       RECORDING: "RECORDING",
       MEETING_ID_COPY: "MEETING_ID_COPY",
+      HLS: "HLS",
+      POLL: "POLL",
     }),
     []
   );
 
   const otherFeatures = [
     { icon: BottomBarButtonTypes.RAISE_HAND },
-    { icon: BottomBarButtonTypes.SCREEN_SHARE },
     { icon: BottomBarButtonTypes.CHAT },
     { icon: BottomBarButtonTypes.PARTICIPANTS },
     { icon: BottomBarButtonTypes.MEETING_ID_COPY },
+    { icon: BottomBarButtonTypes.POLL },
   ];
+
+  if (meetingMode === meetingModes.CONFERENCE) {
+    otherFeatures.push({ icon: BottomBarButtonTypes.SCREEN_SHARE });
+    otherFeatures.push({ icon: BottomBarButtonTypes.HLS });
+  }
 
   return isMobile || isTab ? (
     <div
@@ -815,6 +824,10 @@ export function ILSBottomBar({
                   <ParticipantsBTN isMobile={isMobile} isTab={isTab} />
                 ) : icon === BottomBarButtonTypes.MEETING_ID_COPY ? (
                   <MeetingIdCopyBTN isMobile={isMobile} isTab={isTab} />
+                ) : icon === BottomBarButtonTypes.HLS ? (
+                  <HLSBTN isMobile={isMobile} isTab={isTab} />
+                ) : icon === BottomBarButtonTypes.POLL ? (
+                  <PollBTN isMobile={isMobile} isTab={isTab} />
                 ) : null}
               </Grid>
             );
@@ -827,10 +840,16 @@ export function ILSBottomBar({
       <MeetingIdCopyBTN />
 
       <div className="flex flex-1 items-center justify-center" ref={tollTipEl}>
-        <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
+        {meetingMode === meetingModes.CONFERENCE && (
+          <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
+        )}
         <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
-        <MicBTN />
-        <WebCamBTN />
+        {meetingMode === meetingModes.CONFERENCE && (
+          <>
+            <MicBTN />
+            <WebCamBTN />
+          </>
+        )}
         <LeaveBTN />
       </div>
       <div className="flex items-center justify-center">

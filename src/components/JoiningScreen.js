@@ -18,6 +18,7 @@ import { createMeeting, getToken, validateMeeting } from "../api";
 import { CheckCircleIcon } from "@heroicons/react/outline";
 import SettingDialogueBox from "./SettingDialogueBox";
 import ConfirmBox from "./ConfirmBox";
+import { meetingModes } from "../App";
 
 const useStyles = makeStyles((theme) => ({
   video: {
@@ -58,6 +59,7 @@ export function JoiningScreen({
   meetingType,
   setMeetingType,
   setMeetingMode,
+  meetingMode,
 }) {
   const theme = useTheme();
   const classes = useStyles();
@@ -306,6 +308,13 @@ export function JoiningScreen({
   }, [audioTrack]);
 
   useEffect(() => {
+    if (meetingMode === meetingModes.VIEWER) {
+      _handleTurnOffMic();
+      _handleTurnOffWebcam();
+    }
+  }, [meetingMode]);
+
+  useEffect(() => {
     videoTrackRef.current = videoTrack;
 
     if (videoTrack) {
@@ -427,8 +436,10 @@ export function JoiningScreen({
                             }}
                           >
                             {!webcamOn ? (
-                              <Typography variant={isXLOnly ? "h4" : "h6"}>
-                                The camera is off
+                              <Typography variant={isXLOnly ? "h5" : "h6"}>
+                                {meetingMode === meetingModes.VIEWER
+                                  ? "You are not permitted to use your microphone and camera."
+                                  : "The camera is off"}
                               </Typography>
                             ) : null}
                           </Box>
@@ -484,6 +495,7 @@ export function JoiningScreen({
                                       }
                                 }
                                 className={classes.toggleButton}
+                                disabled={meetingMode === meetingModes.VIEWER}
                               >
                                 {micOn ? <Mic /> : <MicOff />}
                               </Button>
@@ -510,6 +522,7 @@ export function JoiningScreen({
                                       }
                                 }
                                 className={classes.toggleButton}
+                                disabled={meetingMode === meetingModes.VIEWER}
                               >
                                 {webcamOn ? <Videocam /> : <VideocamOff />}
                               </Button>

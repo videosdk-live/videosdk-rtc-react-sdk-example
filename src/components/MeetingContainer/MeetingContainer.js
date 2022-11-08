@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import { BottomBar } from "../../meeting/pages/BottomBar";
 import { SidebarConatiner } from "../SidebarContainer/SidebarContainer";
 import { ParticipantsViewer } from "./ParticipantView";
@@ -9,11 +9,13 @@ import { nameTructed, trimSnackBarText } from "../../utils/helper";
 import useResponsiveSize from "../../hooks/useResponsiveSize";
 import WaitingToJoin from "../WaitingToJoin";
 import useWindowSize from "../../hooks/useWindowSize";
-import { meetingTypes } from "../../App";
+import { meetingModes, meetingTypes } from "../../App";
 import { ILSBottomBar } from "../../interactive-live-streaming/pages/ILSBottomBar";
 import { TopBar } from "../../interactive-live-streaming/pages/TopBar";
 import useIsTab from "../../hooks/useIsTab";
 import PollsListner from "../../interactive-live-streaming/pages/pollContainer/PollListner";
+import HLSContainer from "../../interactive-live-streaming/pages/hlsViewContainer/HLSContainer";
+import ModeListner from "../../interactive-live-streaming/pages/ModeListner";
 
 export const sideBarModes = {
   PARTICIPANTS: "PARTICIPANTS",
@@ -37,11 +39,16 @@ export function MeetingContainer({
   webcamEnabled,
   meetingType,
   meetingMode,
+  setMeetingMode,
   polls,
   draftPolls,
   setDraftPolls,
   setCreatedPolls,
   setEndedPolls,
+  downstreamUrl,
+  setDownstreamUrl,
+  afterMeetingJoinedHLSState,
+  setAfterMeetingJoinedHLSState,
 }) {
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -49,14 +56,15 @@ export function MeetingContainer({
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
   const containerRef = useRef();
+  const meetingModeRef = useRef(meetingMode);
   const { enqueueSnackbar } = useSnackbar();
 
-  const presentingSideBarWidth = useResponsiveSize({
-    xl: 320,
-    lg: 280,
-    md: 260,
-    sm: 240,
-    xs: 200,
+  const sideBarContainerWidth = useResponsiveSize({
+    xl: 400,
+    lg: 360,
+    md: 320,
+    sm: 280,
+    xs: 240,
   });
 
   useEffect(() => {
@@ -77,6 +85,56 @@ export function MeetingContainer({
 
   const _handleMeetingLeft = () => {
     setIsMeetingLeft(true);
+  };
+
+  const _handleOnRecordingStateChanged = ({ status }) => {
+    if (
+      meetingModeRef.current === meetingModes.CONFERENCE &&
+      (status === Constants.recordingEvents.RECORDING_STARTED ||
+        status === Constants.recordingEvents.RECORDING_STOPPED)
+    ) {
+      enqueueSnackbar(
+        status === Constants.recordingEvents.RECORDING_STARTED
+          ? "Meeting recording is started."
+          : "Meeting recording is stopped."
+      );
+    }
+  };
+
+  const _handleOnHlsStateChanged = (data) => {
+    //
+    if (
+      meetingModeRef.current === meetingModes.CONFERENCE && // trigger on conference mode only
+      (data.status === Constants.hlsEvents.HLS_STARTED ||
+        data.status === Constants.hlsEvents.HLS_STOPPED)
+    ) {
+      enqueueSnackbar(
+        data.status === Constants.hlsEvents.HLS_STARTED
+          ? "Meeting HLS is started."
+          : "Meeting HLS is stopped."
+      );
+    }
+
+    if (
+      data.status === Constants.hlsEvents.HLS_STARTED ||
+      data.status === Constants.hlsEvents.HLS_STOPPED
+    ) {
+      setDownstreamUrl(
+        data.status === Constants.hlsEvents.HLS_STARTED
+          ? data.downstreamUrl
+          : null
+      );
+    }
+
+    if (data.status === Constants.hlsEvents.HLS_STARTED) {
+      setAfterMeetingJoinedHLSState("STARTED");
+    }
+
+    if (data.status === Constants.hlsEvents.HLS_STOPPED) {
+      setAfterMeetingJoinedHLSState("STOPPED");
+    }
+
+    //set downstream url on basis of started or stopped
   };
 
   function onParticipantJoined(participant) {
@@ -157,6 +215,10 @@ export function MeetingContainer({
     // console.log("onLiveStreamStopped example", data);
   };
 
+  const _handleOnHlsStarted = (data) => {};
+
+  const _handleOnHlsStopped = () => {};
+
   const onVideoStateChanged = (data) => {
     // console.log("onVideoStateChanged", data);
   };
@@ -194,6 +256,10 @@ export function MeetingContainer({
     onWebcamRequested,
     onMicRequested,
     onPinStateChanged,
+    onRecordingStateChanged: _handleOnRecordingStateChanged,
+    onHlsStateChanged: _handleOnHlsStateChanged,
+    onHlsStarted: _handleOnHlsStarted,
+    onHlsStopped: _handleOnHlsStopped,
   });
 
   useEffect(() => {
@@ -260,6 +326,11 @@ export function MeetingContainer({
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
+            <ModeListner
+              meetingMode={meetingMode}
+              setMeetingMode={setMeetingMode}
+              setSideBarMode={setSideBarMode}
+            />
             <PollsListner
               polls={polls}
               setDraftPolls={setDraftPolls}
@@ -267,41 +338,61 @@ export function MeetingContainer({
               setEndedPolls={setEndedPolls}
               setSideBarMode={setSideBarMode}
             />
-            {meetingType === meetingTypes.ILS && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: isTab || isMobile ? "" : "column",
-                  height: topBarHeight,
-                }}
-              >
-                <TopBar topBarHeight={topBarHeight} />
-              </div>
-            )}
+
+            {meetingType === meetingTypes.ILS &&
+              meetingMode === meetingModes.CONFERENCE && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: isTab || isMobile ? "" : "column",
+                    height: topBarHeight,
+                  }}
+                >
+                  <TopBar topBarHeight={topBarHeight} />
+                </div>
+              )}
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
-              <div className={`flex flex-1 `}>
-                {isPresenting ? (
-                  <PresenterView
-                    height={
-                      meetingType === meetingTypes.MEETING
-                        ? containerHeight - bottomBarHeight
-                        : containerHeight - topBarHeight - bottomBarHeight
-                    }
-                  />
-                ) : null}
-                {isPresenting && isMobile ? null : (
-                  <ParticipantsViewer
-                    isPresenting={isPresenting}
-                    sideBarMode={sideBarMode}
-                  />
-                )}
-              </div>
+              {meetingMode === meetingModes.CONFERENCE ? (
+                <div className={`flex flex-1 `}>
+                  {isPresenting ? (
+                    <PresenterView
+                      height={
+                        meetingType === meetingTypes.MEETING
+                          ? containerHeight - bottomBarHeight
+                          : containerHeight - topBarHeight - bottomBarHeight
+                      }
+                    />
+                  ) : null}
+                  {isPresenting && isMobile ? null : (
+                    <ParticipantsViewer
+                      isPresenting={isPresenting}
+                      sideBarMode={sideBarMode}
+                    />
+                  )}
+                </div>
+              ) : (
+                <HLSContainer
+                  {...{
+                    downstreamUrl,
+                    afterMeetingJoinedHLSState,
+                    width:
+                      containerWidth -
+                      (isTab || isMobile
+                        ? 0
+                        : typeof sideBarMode === "string"
+                        ? sideBarContainerWidth
+                        : 0),
+                  }}
+                />
+              )}
               <SidebarConatiner
                 height={
-                  meetingType === meetingTypes.MEETING
+                  meetingType === meetingTypes.MEETING ||
+                  meetingMode === meetingModes.VIEWER
                     ? containerHeight - bottomBarHeight
                     : containerHeight - topBarHeight - bottomBarHeight
                 }
+                sideBarContainerWidth={sideBarContainerWidth}
                 setSideBarMode={setSideBarMode}
                 sideBarMode={sideBarMode}
                 raisedHandsParticipants={raisedHandsParticipants}
@@ -310,6 +401,7 @@ export function MeetingContainer({
                 draftPolls={draftPolls}
               />
             </div>
+
             {meetingType === meetingTypes.MEETING ? (
               <BottomBar
                 bottomBarHeight={bottomBarHeight}
@@ -331,6 +423,7 @@ export function MeetingContainer({
                 setSelectWebcamDeviceId={setSelectWebcamDeviceId}
                 selectMicDeviceId={selectMicDeviceId}
                 setSelectMicDeviceId={setSelectMicDeviceId}
+                meetingMode={meetingMode}
               />
             )}
           </>

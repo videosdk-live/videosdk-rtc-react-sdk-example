@@ -97,6 +97,7 @@ const SideBarTabView = ({
               <ParticipantSidePanel
                 panelHeight={panelHeight}
                 raisedHandsParticipants={raisedHandsParticipants}
+                meetingMode={meetingMode}
               />
             ) : sideBarMode === "CHAT" ? (
               <ChatSidePanel panelHeight={panelHeight} />
@@ -125,6 +126,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 export function SidebarConatiner({
   height,
+  sideBarContainerWidth,
   sideBarMode,
   setSideBarMode,
   raisedHandsParticipants,
@@ -135,14 +137,6 @@ export function SidebarConatiner({
   const panelPadding = 8;
 
   const paddedHeight = height - panelPadding * 3.5;
-
-  const sideBarContainerWidth = useResponsiveSize({
-    xl: 400,
-    lg: 360,
-    md: 320,
-    sm: 280,
-    xs: 240,
-  });
 
   const panelHeaderHeight = useResponsiveSize({
     xl: 52,

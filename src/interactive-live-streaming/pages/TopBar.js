@@ -78,11 +78,7 @@ export function TopBar({ topBarHeight }) {
   };
 
   const HLSBTN = ({ isMobile, isTab }) => {
-    const mMeeting = useMeeting({});
-
-    const startHls = mMeeting?.startHls;
-    const stopHls = mMeeting?.stopHls;
-    const hlsState = mMeeting?.hlsState;
+    const { startHls, stopHls, hlsState } = useMeeting({});
 
     const isHls = useIsHls();
 
@@ -97,9 +93,9 @@ export function TopBar({ topBarHeight }) {
 
     const { type, priority, gridSize } = useMemo(
       () => ({
-        type: "",
-        priority: "",
-        gridSize: "",
+        type: "GRID",
+        priority: "SPEAKER",
+        gridSize: "12",
       }),
       []
     );
@@ -143,7 +139,7 @@ export function TopBar({ topBarHeight }) {
 
       const layout = { type, priority, gridSize };
 
-      startHls({ layout, theme: "hlsTheme" });
+      startHls({ layout, theme: "DARK" });
     };
 
     const _handleClick = () => {

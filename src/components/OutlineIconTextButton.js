@@ -60,7 +60,7 @@ const OutlineIconTextButton = ({
 
   return (
     <Tooltip placement="bottom" title={tooltipTitle || ""}>
-      <div
+      <button
         className={`flex items-center justify-center  rounded-lg ${
           bgColor ? `${bgColor}` : isFocused ? "bg-white" : "bg-gray-750"
         } ${
@@ -133,7 +133,7 @@ const OutlineIconTextButton = ({
         </div>
 
         {typeof renderRightComponent === "function" && renderRightComponent()}
-      </div>
+      </button>
     </Tooltip>
   );
 };

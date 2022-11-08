@@ -82,7 +82,7 @@ export const OutlinedButton = ({
           opacity: blinkingState,
         }}
       >
-        <div
+        <button
           className="cursor-pointer flex items-center justify-center"
           id={btnID}
           onMouseEnter={() => {
@@ -160,7 +160,7 @@ export const OutlinedButton = ({
               {buttonText}
             </p>
           ) : null}
-        </div>
+        </button>
         {typeof renderRightComponent === "function" && renderRightComponent()}
       </div>
     </Tooltip>
