@@ -48,6 +48,23 @@ export const appEvents = {
   "participant-invisible": "participant-invisible",
 };
 
+export const meetingTypes = {
+  MEETING: "MEETING",
+  ILS: "ILS",
+};
+
+export const meetingLayoutTopics = {
+  MEETING_LAYOUT: "MEETING_LAYOUT",
+  RECORDING_LAYOUT: "RECORDING_LAYOUT",
+  LIVE_STREAM_LAYOUT: "LIVE_STREAM_LAYOUT",
+  HLS_LAYOUT: "HLS_LAYOUT",
+};
+
+export const meetingModes = {
+  VIEWER: "VIEWER",
+  CONFERENCE: "CONFERENCE",
+};
+
 export function debounce(func, wait, immediate) {
   var timeout;
 

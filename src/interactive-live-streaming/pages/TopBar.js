@@ -1,13 +1,13 @@
-import { OutlinedButton } from "../../components/OutlinedButton";
+import { OutlinedButton } from "../../components/buttons/OutlinedButton";
 import RecordingIcon from "../../icons/Bottombar/RecordingIcon";
 import recordingBlink from "../../animations/recording-blink.json";
 import liveHLS from "../../animations/live-hls.json";
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
-import useIsRecording from "../../components/MeetingContainer/useIsRecording";
+import useIsRecording from "../../hooks/useIsRecording";
 import { useEffect, useMemo, useRef } from "react";
-import { MobileIconButton } from "../../components/MobileIconButton";
-import OutlineIconTextButton from "../../components/OutlineIconTextButton";
-import useIsHls from "../../components/MeetingContainer/useIsHls";
+import { MobileIconButton } from "../../components/buttons/MobileIconButton";
+import OutlineIconTextButton from "../../components/buttons/OutlineIconTextButton";
+import useIsHls from "../../hooks/useIsHls";
 import LiveIcon from "../../icons/LiveIcon";
 
 export function TopBar({ topBarHeight }) {

@@ -12,8 +12,8 @@ import {
   usePubSub,
 } from "@videosdk.live/react-sdk";
 import React, { useEffect, useRef, useState } from "react";
-import { meetingModes } from "../../App";
 import ParticipantAddHostIcon from "../../icons/ParticipantTabPanel/ParticipantAddHostIcon";
+import { meetingModes } from "../../utils/common";
 
 const useStyles = makeStyles(() => ({
   popoverHover: {

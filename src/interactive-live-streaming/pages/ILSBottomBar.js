@@ -4,7 +4,7 @@ import { sideBarModes } from "../../components/MeetingContainer/MeetingContainer
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
 import recordingBlink from "../../animations/recording-blink.json";
 import liveHLS from "../../animations/live-hls.json";
-import useIsRecording from "../../components/MeetingContainer/useIsRecording";
+import useIsRecording from "../../hooks/useIsRecording";
 import RecordingIcon from "../../icons/Bottombar/RecordingIcon";
 import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
 import MicOffIcon from "../../icons/Bottombar/MicOffIcon";
@@ -15,7 +15,7 @@ import ChatIcon from "../../icons/Bottombar/ChatIcon";
 import ParticipantsIcon from "../../icons/Bottombar/ParticipantsIcon";
 import EndIcon from "../../icons/Bottombar/EndIcon";
 import RaiseHandIcon from "../../icons/Bottombar/RaiseHandIcon";
-import { OutlinedButton } from "../../components/OutlinedButton";
+import { OutlinedButton } from "../../components/buttons/OutlinedButton";
 import {
   Box,
   Grid,
@@ -35,12 +35,12 @@ import {
 } from "@material-ui/icons";
 import useIsTab from "../../hooks/useIsTab";
 import useIsMobile from "../../hooks/useIsMobile";
-import { MobileIconButton } from "../../components/MobileIconButton";
+import { MobileIconButton } from "../../components/buttons/MobileIconButton";
 import PollIcon from "../../icons/Bottombar/PollIcon";
-import useIsHls from "../../components/MeetingContainer/useIsHls";
-import { meetingModes } from "../../App";
+import useIsHls from "../../hooks/useIsHls";
 import LiveIcon from "../../icons/LiveIcon";
 import ReactionIcon from "../../icons/Bottombar/ReactionIcon";
+import { meetingModes } from "../../utils/common";
 
 const useStyles = makeStyles({
   popoverHoverDark: {

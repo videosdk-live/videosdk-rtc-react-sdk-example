@@ -1,8 +1,7 @@
-import { Tooltip, Typography } from "@material-ui/core";
+import { Tooltip } from "@material-ui/core";
 import React, { useState, useRef, useEffect } from "react";
-
 import Lottie from "react-lottie";
-import useResponsiveSize from "../hooks/useResponsiveSize";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
 
 const OutlineIconTextButton = ({
   onClick,

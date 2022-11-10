@@ -11,13 +11,13 @@ import {
 import { Close } from "@material-ui/icons";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import React from "react";
-import { meetingModes } from "../../App";
 import useIsMobile from "../../hooks/useIsMobile";
 import useIsTab from "../../hooks/useIsTab";
 import useResponsiveSize from "../../hooks/useResponsiveSize";
 import CreatePoll from "../../interactive-live-streaming/pages/pollContainer/CreatePoll";
 import PollList from "../../interactive-live-streaming/pages/pollContainer/PollList";
 import SubmitPollList from "../../interactive-live-streaming/pages/pollContainer/SubmitPollList";
+import { meetingModes } from "../../utils/common";
 import { sideBarModes } from "../MeetingContainer/MeetingContainer";
 import { ChatSidePanel } from "./ChatSidePanel";
 import { ParticipantSidePanel } from "./ParticipantSidePanel";

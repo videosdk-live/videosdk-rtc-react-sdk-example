@@ -1,28 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MeetingProvider } from "@videosdk.live/react-sdk";
-import { JoiningScreen } from "./components/JoiningScreen";
 import { MeetingContainer } from "./components/MeetingContainer/MeetingContainer";
 import { SnackbarProvider } from "notistack";
-import { LeaveScreen } from "./components/LeaveScreen";
+import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
-
-export const meetingTypes = {
-  MEETING: "MEETING",
-  ILS: "ILS",
-};
-
-export const meetingLayoutTopics = {
-  MEETING_LAYOUT: "MEETING_LAYOUT",
-  RECORDING_LAYOUT: "RECORDING_LAYOUT",
-  LIVE_STREAM_LAYOUT: "LIVE_STREAM_LAYOUT",
-  HLS_LAYOUT: "HLS_LAYOUT",
-};
-
-export const meetingModes = {
-  VIEWER: "VIEWER",
-  CONFERENCE: "CONFERENCE",
-};
+import { JoiningScreen } from "./components/screens/JoiningScreen";
+import { meetingModes, meetingTypes } from "./utils/common";
 
 const App = () => {
   const [token, setToken] = useState("");

@@ -2,14 +2,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import { BottomBar } from "../../meeting/pages/BottomBar";
 import { SidebarConatiner } from "../SidebarContainer/SidebarContainer";
-import { ParticipantsViewer } from "./ParticipantView";
+import { ParticipantsViewer } from "../../meeting/pages/ParticipantView";
 import { PresenterView } from "./PresenterView";
 import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../../utils/helper";
 import useResponsiveSize from "../../hooks/useResponsiveSize";
-import WaitingToJoin from "../WaitingToJoin";
 import useWindowSize from "../../hooks/useWindowSize";
-import { meetingModes, meetingTypes } from "../../App";
 import { ILSBottomBar } from "../../interactive-live-streaming/pages/ILSBottomBar";
 import { TopBar } from "../../interactive-live-streaming/pages/TopBar";
 import useIsTab from "../../hooks/useIsTab";
@@ -18,6 +16,8 @@ import HLSContainer from "../../interactive-live-streaming/pages/hlsViewContaine
 import ModeListner from "../../interactive-live-streaming/pages/ModeListner";
 import FlyingEmojisOverlay from "../../interactive-live-streaming/pages/FlyingEmojisOverlay";
 import { ILSParticipantView } from "../../interactive-live-streaming/pages/ILSParticipantView";
+import WaitingToJoinScreen from "../screens/WaitingToJoinScreen";
+import { meetingModes, meetingTypes } from "../../utils/common";
 
 export const sideBarModes = {
   PARTICIPANTS: "PARTICIPANTS",
@@ -441,7 +441,7 @@ export function MeetingContainer({
           <></>
         )
       ) : (
-        !mMeeting.isMeetingJoined && <WaitingToJoin />
+        !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
       )}
     </div>
   );

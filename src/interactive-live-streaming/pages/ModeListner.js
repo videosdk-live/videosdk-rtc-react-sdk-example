@@ -5,8 +5,8 @@ import {
 } from "@videosdk.live/react-sdk";
 import { useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
-import { meetingModes } from "../../App";
 import ConfirmBox from "../../components/ConfirmBox";
+import { meetingModes } from "../../utils/common";
 
 const reqInfoDefaultState = {
   enabled: false,

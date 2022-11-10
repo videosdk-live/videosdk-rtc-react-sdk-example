@@ -5,7 +5,6 @@ import {
   usePubSub,
 } from "@videosdk.live/react-sdk";
 import React, { useMemo, useState } from "react";
-import { meetingModes } from "../../App";
 import MicOffIcon from "../../icons/ParticipantTabPanel/MicOffIcon";
 import MicOnIcon from "../../icons/ParticipantTabPanel/MicOnIcon";
 import RaiseHand from "../../icons/ParticipantTabPanel/RaiseHand";
@@ -13,7 +12,7 @@ import VideoCamOffIcon from "../../icons/ParticipantTabPanel/VideoCamOffIcon";
 import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
 import ToggleModeContainer from "../../interactive-live-streaming/pages/ToggleModeContainer";
 import { nameTructed } from "../../utils/helper";
-import useIsHls from "../MeetingContainer/useIsHls";
+import useIsHls from "../../hooks/useIsHls";
 
 function ParticipantListItem({ participantId, raisedHand, pId, meetingMode }) {
   const [participantMode, setParticipantMode] = useState(null);

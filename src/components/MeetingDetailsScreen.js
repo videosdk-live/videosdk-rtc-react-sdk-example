@@ -1,7 +1,7 @@
 import { CheckIcon, ClipboardIcon } from "@heroicons/react/outline";
 import React, { useState } from "react";
-import { meetingModes, meetingTypes } from "../App";
 import useResponsiveSize from "../hooks/useResponsiveSize";
+import { meetingModes, meetingTypes } from "../utils/common";
 
 export function MeetingDetailsScreen({
   onClickJoin,

@@ -1,4 +1,4 @@
-import useResponsiveSize from "../hooks/useResponsiveSize";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
 import Lottie from "react-lottie";
 import { Tooltip } from "@material-ui/core";
 import { useEffect, useRef, useState } from "react";
