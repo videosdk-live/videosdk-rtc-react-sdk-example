@@ -5,7 +5,7 @@ import { nameTructed } from "../../utils/helper";
 import { MicOff } from "@material-ui/icons";
 import ReactPlayer from "react-player";
 
-function ILSParticipantView({ participantId }) {
+function ParticipantView({ participantId }) {
   const {
     displayName,
     webcamStream,
@@ -194,7 +194,7 @@ export function ILSParticipantView({ isPresenting, sideBarMode }) {
                             : "md:max-w-lg 2xl:max-w-2xl"
                         } overflow-clip overflow-hidden  p-1`}
                       >
-                        <ILSParticipantView participantId={participantId} />
+                        <ParticipantView participantId={participantId} />
                       </div>
                     );
                   })}
