@@ -40,6 +40,7 @@ import PollIcon from "../../icons/Bottombar/PollIcon";
 import useIsHls from "../../components/MeetingContainer/useIsHls";
 import { meetingModes } from "../../App";
 import LiveIcon from "../../icons/LiveIcon";
+import ReactionIcon from "../../icons/Bottombar/ReactionIcon";
 
 const useStyles = makeStyles({
   popoverHoverDark: {
@@ -440,10 +441,7 @@ export function ILSBottomBar({
   };
 
   const ScreenShareBTN = ({ isMobile, isTab }) => {
-    const mMeeting = useMeeting();
-    const localScreenShareOn = mMeeting?.localScreenShareOn;
-    const toggleScreenShare = mMeeting?.toggleScreenShare;
-    const presenterId = mMeeting?.presenterId;
+    const { localScreenShareOn, toggleScreenShare, presenterId } = useMeeting();
 
     return isMobile || isTab ? (
       <MobileIconButton
@@ -497,14 +495,14 @@ export function ILSBottomBar({
   };
 
   const LeaveBTN = () => {
-    const mMeeting = useMeeting();
+    const { leave } = useMeeting();
 
     return (
       <OutlinedButton
         Icon={EndIcon}
         bgColor="bg-red-150"
         onClick={() => {
-          mMeeting.leave();
+          leave();
           setIsMeetingLeft(true);
         }}
         tooltip="Leave Meeting"
@@ -573,8 +571,6 @@ export function ILSBottomBar({
   };
 
   const PollBTN = ({ isMobile, isTab }) => {
-    const mMeeting = useMeeting();
-
     return isMobile || isTab ? (
       <MobileIconButton
         id="poll-btn"
@@ -710,6 +706,76 @@ export function ILSBottomBar({
     ) : null;
   };
 
+  const ReactionBTN = ({ isMobile, isTab }) => {
+    const [btnClicked, setBtnClicked] = useState(false);
+    const { publish } = usePubSub("REACTION");
+
+    const handleOpenMenu = (event) => {
+      setBtnClicked(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+      setBtnClicked(null);
+    };
+
+    function sendEmoji(emoji) {
+      // Dispatch custom event here so the local user can see their own emoji
+      window.dispatchEvent(
+        new CustomEvent("reaction_added", { detail: { emoji } })
+      );
+      handleCloseMenu();
+    }
+
+    const emojiArray = [
+      { emoji: "😍", emojiName: "heartEye" },
+      { emoji: "😂", emojiName: "laugh" },
+      { emoji: "👍", emojiName: "thumbsup" },
+      { emoji: "🎉", emojiName: "confetti" },
+      { emoji: "👏", emojiName: "clap" },
+    ];
+
+    return (
+      <>
+        <OutlinedButton
+          Icon={ReactionIcon}
+          onClick={(e) => {
+            handleOpenMenu(e);
+          }}
+          isFocused={btnClicked}
+          tooltip={"Reactions"}
+        />
+        <Popover
+          container={tollTipEl.current}
+          anchorOrigin={{
+            vertical: isMobile || isTab ? "bottom" : "top",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: isMobile || isTab ? "top" : "bottom",
+            horizontal: "center",
+          }}
+          anchorEl={tollTipEl.current}
+          open={Boolean(btnClicked)}
+          onClose={handleCloseMenu}
+        >
+          <div className="px-1 py-2 bg-white rounded-md">
+            {emojiArray.map(({ emoji, emojiName }) => (
+              <button
+                className="mx-2"
+                onClick={() => {
+                  sendEmoji(emojiName);
+                  publish(emojiName);
+                }}
+              >
+                <p className="text-3xl">{emoji}</p>
+              </button>
+            ))}
+          </div>
+        </Popover>
+      </>
+    );
+  };
+
   const MeetingIdCopyBTN = () => {
     const mMeeting = useMeeting();
     const [isCopied, setIsCopied] = useState(false);
@@ -770,6 +836,7 @@ export function ILSBottomBar({
       MEETING_ID_COPY: "MEETING_ID_COPY",
       HLS: "HLS",
       POLL: "POLL",
+      REACTION: "REACTION",
     }),
     []
   );
@@ -780,6 +847,7 @@ export function ILSBottomBar({
     { icon: BottomBarButtonTypes.PARTICIPANTS },
     { icon: BottomBarButtonTypes.MEETING_ID_COPY },
     { icon: BottomBarButtonTypes.POLL },
+    { icon: BottomBarButtonTypes.REACTION },
   ];
 
   if (meetingMode === meetingModes.CONFERENCE) {
@@ -828,6 +896,8 @@ export function ILSBottomBar({
                   <HLSBTN isMobile={isMobile} isTab={isTab} />
                 ) : icon === BottomBarButtonTypes.POLL ? (
                   <PollBTN isMobile={isMobile} isTab={isTab} />
+                ) : icon === BottomBarButtonTypes.REACTION ? (
+                  <ReactionBTN isMobile={isMobile} isTab={isTab} />
                 ) : null}
               </Grid>
             );
@@ -844,6 +914,7 @@ export function ILSBottomBar({
           <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
         )}
         <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
+        <ReactionBTN isMobile={isMobile} isTab={isTab} />
         {meetingMode === meetingModes.CONFERENCE && (
           <>
             <MicBTN />

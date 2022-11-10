@@ -59,12 +59,12 @@ function ParticipantListItem({ participantId, raisedHand, pId, meetingMode }) {
             <RaiseHand fillColor={theme.palette.common.white} />
           </div>
         )}
-        {meetingMode === meetingModes.CONFERENCE && isHls && (
+        {/* {meetingMode === meetingModes.CONFERENCE && isHls && (
           <ToggleModeContainer
             participantId={participantId}
             participantMode={participantMode}
           />
-        )}
+        )} */}
         <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
         <div className="m-1 p-1">
           {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}

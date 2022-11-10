@@ -12,7 +12,7 @@ import LiveIcon from "../../icons/LiveIcon";
 
 export function TopBar({ topBarHeight }) {
   const RecordingBTN = () => {
-    const mMeeting = useMeeting();
+    const { startRecording, stopRecording, recordingState } = useMeeting();
     const defaultOptions = {
       loop: true,
       autoplay: true,
@@ -23,9 +23,6 @@ export function TopBar({ topBarHeight }) {
       height: 64,
       width: 160,
     };
-    const startRecording = mMeeting?.startRecording;
-    const stopRecording = mMeeting?.stopRecording;
-    const recordingState = mMeeting?.recordingState;
 
     const isRecording = useIsRecording();
 

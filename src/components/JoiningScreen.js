@@ -18,7 +18,7 @@ import { createMeeting, getToken, validateMeeting } from "../api";
 import { CheckCircleIcon } from "@heroicons/react/outline";
 import SettingDialogueBox from "./SettingDialogueBox";
 import ConfirmBox from "./ConfirmBox";
-import { meetingModes } from "../App";
+import { meetingModes, meetingTypes } from "../App";
 
 const useStyles = makeStyles((theme) => ({
   video: {
@@ -532,53 +532,44 @@ export function JoiningScreen({
                       </Box>
                     </Box>
                   </Box>
-                  {!isXSOnly && (
-                    <Box
-                      className="absolute md:left-52 lg:left-24 xl:left-44 md:right-52 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
-                      // style={{
-                      //   position: "absolute",
-                      //   display: "flex",
-                      //   alignItems: "center",
-                      //   justifyContent: "center",
-                      //   left: spacingSettingChip,
-                      //   right: spacingSettingChip,
-                      //   backgroundColor: theme.palette.darkTheme.seven,
-                      //   borderRadius: 4,
-                      //   cursor: "pointer",
-                      // }}
-                      m={2}
-                      onClick={(e) => {
-                        handleClickOpen();
-                      }}
-                    >
+                  {!isXSOnly &&
+                    (meetingMode === meetingModes.CONFERENCE ||
+                      meetingType === meetingTypes.MEETING) && (
                       <Box
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "center",
+                        className="absolute md:left-52 lg:left-24 xl:left-44 md:right-52 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
+                        m={2}
+                        onClick={(e) => {
+                          handleClickOpen();
                         }}
-                        m={0.5}
                       >
-                        <IconButton
+                        <Box
                           style={{
-                            margin: 0,
-                            padding: 0,
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
                           }}
+                          m={0.5}
                         >
-                          <CheckCircleIcon className="h-5 w-5" />
-                        </IconButton>
-                        <Typography
-                          variant="subtitle1"
-                          style={{
-                            marginLeft: 4,
-                          }}
-                        >
-                          Check your audio and video
-                        </Typography>
+                          <IconButton
+                            style={{
+                              margin: 0,
+                              padding: 0,
+                            }}
+                          >
+                            <CheckCircleIcon className="h-5 w-5" />
+                          </IconButton>
+                          <Typography
+                            variant="subtitle1"
+                            style={{
+                              marginLeft: 4,
+                            }}
+                          >
+                            Check your audio and video
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                  )}
+                    )}
                 </Box>
               </Box>
             </Grid>

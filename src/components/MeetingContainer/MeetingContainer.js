@@ -16,6 +16,8 @@ import useIsTab from "../../hooks/useIsTab";
 import PollsListner from "../../interactive-live-streaming/pages/pollContainer/PollListner";
 import HLSContainer from "../../interactive-live-streaming/pages/hlsViewContainer/HLSContainer";
 import ModeListner from "../../interactive-live-streaming/pages/ModeListner";
+import FlyingEmojisOverlay from "../../interactive-live-streaming/pages/FlyingEmojisOverlay";
+import { ILSParticipantView } from "../../interactive-live-streaming/pages/ILSParticipantView";
 
 export const sideBarModes = {
   PARTICIPANTS: "PARTICIPANTS",
@@ -311,6 +313,7 @@ export function MeetingContainer({
       }
     },
   });
+
   const { width: windowWidth, height: windowHeight } = useWindowSize();
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
@@ -323,6 +326,7 @@ export function MeetingContainer({
       ref={containerRef}
       className="h-screen flex flex-col bg-gray-800"
     >
+      <FlyingEmojisOverlay />
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
@@ -363,7 +367,13 @@ export function MeetingContainer({
                       }
                     />
                   ) : null}
-                  {isPresenting && isMobile ? null : (
+                  {isPresenting && isMobile ? null : meetingType ===
+                    meetingTypes.ILS ? (
+                    <ILSParticipantView
+                      isPresenting={isPresenting}
+                      sideBarMode={sideBarMode}
+                    />
+                  ) : (
                     <ParticipantsViewer
                       isPresenting={isPresenting}
                       sideBarMode={sideBarMode}
