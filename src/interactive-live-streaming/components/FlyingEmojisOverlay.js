@@ -7,6 +7,7 @@ const EMOJI_MAP = {
   thumbsup: "👍",
   confetti: "🎉",
   clap: "👏",
+  heart: "❤️",
 };
 
 const FlyingEmojisOverlay = ({}) => {

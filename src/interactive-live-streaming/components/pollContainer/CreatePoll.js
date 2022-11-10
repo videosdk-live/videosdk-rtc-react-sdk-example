@@ -7,14 +7,12 @@ import {
   styled,
   useTheme,
 } from "@material-ui/core";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import useResponsiveSize from "../../../hooks/useResponsiveSize";
 import { usePubSub } from "@videosdk.live/react-sdk";
 import CloseIcon from "@material-ui/icons/Close";
-import { Popover, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/outline";
-import { sideBarModes } from "../../../components/MeetingContainer/MeetingContainer";
+import { sideBarModes } from "../../../utils/common";
 
 const useStyles = makeStyles(() => ({
   icon: {

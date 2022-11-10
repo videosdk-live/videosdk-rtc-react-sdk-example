@@ -14,13 +14,13 @@ import React from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 import useIsTab from "../../hooks/useIsTab";
 import useResponsiveSize from "../../hooks/useResponsiveSize";
-import CreatePoll from "../../interactive-live-streaming/pages/pollContainer/CreatePoll";
-import PollList from "../../interactive-live-streaming/pages/pollContainer/PollList";
-import SubmitPollList from "../../interactive-live-streaming/pages/pollContainer/SubmitPollList";
-import { meetingModes } from "../../utils/common";
-import { sideBarModes } from "../MeetingContainer/MeetingContainer";
-import { ChatSidePanel } from "./ChatSidePanel";
-import { ParticipantSidePanel } from "./ParticipantSidePanel";
+import CreatePoll from "../../interactive-live-streaming/components/pollContainer/CreatePoll";
+import PollList from "../../interactive-live-streaming/components/pollContainer/PollList";
+import SubmitPollList from "../../interactive-live-streaming/components/pollContainer/SubmitPollList";
+import { meetingModes, sideBarModes } from "../../utils/common";
+
+import { ChatSidePanel } from "./ChatPanel";
+import { ParticipantSidePanel } from "./ParticipantPanel";
 
 const SideBarTabView = ({
   height,
@@ -78,11 +78,18 @@ const SideBarTabView = ({
                     ? `${capitalize(
                         String(sideBarMode || "").toLowerCase()
                       )} (${new Map(participants)?.size})`
-                    : sideBarMode === sideBarModes.POLLS ||
-                      sideBarMode === sideBarModes.CREATE_POLL
-                    ? meetingMode === meetingModes.CONFERENCE
-                      ? "Create a poll"
-                      : "Polls"
+                    : sideBarMode === sideBarModes.CREATE_POLL
+                    ? "Create a poll"
+                    : sideBarMode === sideBarModes.POLLS
+                    ? polls?.length >= 1 || draftPolls?.length >= 1
+                      ? `Polls ${
+                          polls?.length || draftPolls?.length
+                            ? `(${polls?.length || draftPolls?.length})`
+                            : ""
+                        }`
+                      : meetingMode === meetingModes.VIEWER
+                      ? `Polls ${polls?.length ? `(${polls?.length})` : ""}`
+                      : "Create a poll"
                     : capitalize(String(sideBarMode || "").toLowerCase())}
                 </Typography>
                 <IconButton

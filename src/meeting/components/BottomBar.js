@@ -1,6 +1,5 @@
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { sideBarModes } from "../../components/MeetingContainer/MeetingContainer";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
 import recordingBlink from "../../animations/recording-blink.json";
 import useIsRecording from "../../hooks/useIsRecording";
@@ -35,6 +34,7 @@ import {
 import useIsTab from "../../hooks/useIsTab";
 import useIsMobile from "../../hooks/useIsMobile";
 import { MobileIconButton } from "../../components/buttons/MobileIconButton";
+import { sideBarModes } from "../../utils/common";
 
 const useStyles = makeStyles({
   popoverHoverDark: {
@@ -86,7 +86,7 @@ export function BottomBar({
   };
 
   const RecordingBTN = () => {
-    const mMeeting = useMeeting();
+    const { startRecording, stopRecording, recordingState } = useMeeting();
     const defaultOptions = {
       loop: true,
       autoplay: true,
@@ -97,12 +97,8 @@ export function BottomBar({
       height: 64,
       width: 160,
     };
-    const startRecording = mMeeting?.startRecording;
-    const stopRecording = mMeeting?.stopRecording;
-    const recordingState = mMeeting?.recordingState;
 
     const isRecording = useIsRecording();
-
     const isRecordingRef = useRef(isRecording);
 
     useEffect(() => {
@@ -434,10 +430,7 @@ export function BottomBar({
   };
 
   const ScreenShareBTN = ({ isMobile, isTab }) => {
-    const mMeeting = useMeeting();
-    const localScreenShareOn = mMeeting?.localScreenShareOn;
-    const toggleScreenShare = mMeeting?.toggleScreenShare;
-    const presenterId = mMeeting?.presenterId;
+    const { localScreenShareOn, toggleScreenShare, presenterId } = useMeeting();
 
     return isMobile || isTab ? (
       <MobileIconButton
@@ -491,14 +484,14 @@ export function BottomBar({
   };
 
   const LeaveBTN = () => {
-    const mMeeting = useMeeting();
+    const { leave } = useMeeting();
 
     return (
       <OutlinedButton
         Icon={EndIcon}
         bgColor="bg-red-150"
         onClick={() => {
-          mMeeting.leave();
+          leave();
           setIsMeetingLeft(true);
         }}
         tooltip="Leave Meeting"
@@ -565,16 +558,16 @@ export function BottomBar({
   };
 
   const MeetingIdCopyBTN = () => {
-    const mMeeting = useMeeting();
+    const { meetingId } = useMeeting();
     const [isCopied, setIsCopied] = useState(false);
     return (
       <div className="flex items-center justify-center lg:ml-0 ml-4 mt-4 xl:mt-0">
         <div className="flex border-2 border-gray-850 p-2 rounded-md items-center justify-center">
-          <h1 className="text-white text-base ">{mMeeting.meetingId}</h1>
+          <h1 className="text-white text-base ">{meetingId}</h1>
           <button
             className="ml-2"
             onClick={() => {
-              navigator.clipboard.writeText(mMeeting.meetingId);
+              navigator.clipboard.writeText(meetingId);
               setIsCopied(true);
               setTimeout(() => {
                 setIsCopied(false);
@@ -588,19 +581,13 @@ export function BottomBar({
             )}
           </button>
         </div>
-
-        {/* <div className="flex border-2 border-gray-850 p-2 ml-4 rounded-md items-center justify-center">
-          <h1 className="text-white">00:30</h1>
-        </div> */}
       </div>
     );
   };
 
   const tollTipEl = useRef();
-
   const isMobile = useIsMobile();
   const isTab = useIsTab();
-
   const [open, setOpen] = useState(false);
 
   const handleClickFAB = () => {

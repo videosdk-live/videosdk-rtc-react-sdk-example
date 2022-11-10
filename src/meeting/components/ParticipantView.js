@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Grid, useTheme } from "@material-ui/core";
+import { useTheme } from "@material-ui/core";
 import { useParticipant, useMeeting } from "@videosdk.live/react-sdk";
 import { nameTructed } from "../../utils/helper";
 import { MicOff } from "@material-ui/icons";

@@ -291,12 +291,6 @@ export function JoiningScreen({
     xs: 32,
   };
 
-  const spacingSettingChip = useResponsiveSize({
-    xl: 190,
-    lg: 175,
-    md: 80,
-    sm: 160,
-  });
   const spacingHorizontalTopics = useResponsiveSize(
     spacingHorizontalTopicsObject
   );

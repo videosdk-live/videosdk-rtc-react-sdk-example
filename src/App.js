@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MeetingProvider } from "@videosdk.live/react-sdk";
-import { MeetingContainer } from "./components/MeetingContainer/MeetingContainer";
 import { SnackbarProvider } from "notistack";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
 import { JoiningScreen } from "./components/screens/JoiningScreen";
 import { meetingModes, meetingTypes } from "./utils/common";
+import { MeetingContainer } from "./meeting/MeetingContainer";
+import { ILSContainer } from "./interactive-live-streaming/ILSContainer";
 
 const App = () => {
   const [token, setToken] = useState("");
@@ -29,7 +30,6 @@ const App = () => {
   const [draftPolls, setDraftPolls] = useState([]);
   const [createdPolls, setCreatedPolls] = useState([]);
   const [endedPolls, setEndedPolls] = useState([]);
-
   const [downstreamUrl, setDownstreamUrl] = useState(null);
   const [afterMeetingJoinedHLSState, setAfterMeetingJoinedHLSState] =
     useState(null);
@@ -128,38 +128,60 @@ const App = () => {
             reinitialiseMeetingOnConfigChange={true}
             joinWithoutUserInteraction={true}
           >
-            <MeetingContainer
-              onMeetingLeave={() => {
-                setToken("");
-                setMeetingId("");
-                setWebcamOn(false);
-                setMicOn(false);
-                setMeetingStarted(false);
-              }}
-              setIsMeetingLeft={setIsMeetingLeft}
-              selectedMic={selectedMic}
-              selectedWebcam={selectedWebcam}
-              selectWebcamDeviceId={selectWebcamDeviceId}
-              setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-              selectMicDeviceId={selectMicDeviceId}
-              setSelectMicDeviceId={setSelectMicDeviceId}
-              useRaisedHandParticipants={useRaisedHandParticipants}
-              raisedHandsParticipants={raisedHandsParticipants}
-              micEnabled={micOn}
-              webcamEnabled={webcamOn}
-              meetingType={meetingType}
-              meetingMode={meetingMode}
-              setMeetingMode={setMeetingMode}
-              polls={polls}
-              draftPolls={draftPolls}
-              setDraftPolls={setDraftPolls}
-              setCreatedPolls={setCreatedPolls}
-              setEndedPolls={setEndedPolls}
-              downstreamUrl={downstreamUrl}
-              setDownstreamUrl={setDownstreamUrl}
-              afterMeetingJoinedHLSState={afterMeetingJoinedHLSState}
-              setAfterMeetingJoinedHLSState={setAfterMeetingJoinedHLSState}
-            />
+            {meetingType === meetingTypes.MEETING ? (
+              <MeetingContainer
+                onMeetingLeave={() => {
+                  setToken("");
+                  setMeetingId("");
+                  setWebcamOn(false);
+                  setMicOn(false);
+                  setMeetingStarted(false);
+                }}
+                setIsMeetingLeft={setIsMeetingLeft}
+                selectedMic={selectedMic}
+                selectedWebcam={selectedWebcam}
+                selectWebcamDeviceId={selectWebcamDeviceId}
+                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                selectMicDeviceId={selectMicDeviceId}
+                setSelectMicDeviceId={setSelectMicDeviceId}
+                useRaisedHandParticipants={useRaisedHandParticipants}
+                raisedHandsParticipants={raisedHandsParticipants}
+                micEnabled={micOn}
+                webcamEnabled={webcamOn}
+              />
+            ) : (
+              <ILSContainer
+                onMeetingLeave={() => {
+                  setToken("");
+                  setMeetingId("");
+                  setWebcamOn(false);
+                  setMicOn(false);
+                  setMeetingStarted(false);
+                }}
+                setIsMeetingLeft={setIsMeetingLeft}
+                selectedMic={selectedMic}
+                selectedWebcam={selectedWebcam}
+                selectWebcamDeviceId={selectWebcamDeviceId}
+                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                selectMicDeviceId={selectMicDeviceId}
+                setSelectMicDeviceId={setSelectMicDeviceId}
+                useRaisedHandParticipants={useRaisedHandParticipants}
+                raisedHandsParticipants={raisedHandsParticipants}
+                micEnabled={micOn}
+                webcamEnabled={webcamOn}
+                meetingMode={meetingMode}
+                setMeetingMode={setMeetingMode}
+                polls={polls}
+                draftPolls={draftPolls}
+                setDraftPolls={setDraftPolls}
+                setCreatedPolls={setCreatedPolls}
+                setEndedPolls={setEndedPolls}
+                downstreamUrl={downstreamUrl}
+                setDownstreamUrl={setDownstreamUrl}
+                afterMeetingJoinedHLSState={afterMeetingJoinedHLSState}
+                setAfterMeetingJoinedHLSState={setAfterMeetingJoinedHLSState}
+              />
+            )}
           </MeetingProvider>
         </SnackbarProvider>
       ) : isMeetingLeft ? (

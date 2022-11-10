@@ -10,7 +10,6 @@ import MicOnIcon from "../../icons/ParticipantTabPanel/MicOnIcon";
 import RaiseHand from "../../icons/ParticipantTabPanel/RaiseHand";
 import VideoCamOffIcon from "../../icons/ParticipantTabPanel/VideoCamOffIcon";
 import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
-import ToggleModeContainer from "../../interactive-live-streaming/pages/ToggleModeContainer";
 import { nameTructed } from "../../utils/helper";
 import useIsHls from "../../hooks/useIsHls";
 
@@ -58,12 +57,6 @@ function ParticipantListItem({ participantId, raisedHand, pId, meetingMode }) {
             <RaiseHand fillColor={theme.palette.common.white} />
           </div>
         )}
-        {/* {meetingMode === meetingModes.CONFERENCE && isHls && (
-          <ToggleModeContainer
-            participantId={participantId}
-            participantMode={participantMode}
-          />
-        )} */}
         <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
         <div className="m-1 p-1">
           {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}

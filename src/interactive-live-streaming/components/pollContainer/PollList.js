@@ -1,8 +1,8 @@
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
-import { sideBarModes } from "../../../components/MeetingContainer/MeetingContainer";
 import useResponsiveSize from "../../../hooks/useResponsiveSize";
+import { sideBarModes } from "../../../utils/common";
 
 export const secondsToMinutes = (time) => {
   var minutes = Math.floor((time % 3600) / 60)
@@ -327,7 +327,6 @@ const PollList = ({ panelHeight, polls, draftPolls, setSideBarMode }) => {
                         id: uuid(),
                         question: poll.question,
                         options: poll.options,
-                        // createdAt: new Date(),
                         timeout: poll.timeout,
                         hasTimer: poll.hasTimer,
                         hasCorrectAnswer: poll.hasCorrectAnswer,
@@ -337,8 +336,6 @@ const PollList = ({ panelHeight, polls, draftPolls, setSideBarMode }) => {
                       { persist: true }
                     );
                     setSideBarMode(sideBarModes.POLLS);
-                    //
-                    // setSideBarNestedMode(sideBarNestedModes.POLLS);
                   }}
                 />
               );

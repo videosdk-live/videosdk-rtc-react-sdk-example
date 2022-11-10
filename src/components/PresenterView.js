@@ -9,8 +9,8 @@ import { MicOff, ScreenShare } from "@material-ui/icons";
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
-import { nameTructed } from "../../utils/helper";
-import useResponsiveSize from "../../hooks/useResponsiveSize";
+import { nameTructed } from "../utils/helper";
+import useResponsiveSize from "../hooks/useResponsiveSize";
 
 export function PresenterView({ height }) {
   const mMeeting = useMeeting();
@@ -25,10 +25,6 @@ export function PresenterView({ height }) {
     lg: 52,
     xl: 24,
   });
-
-  // const isPortrait = useMediaQuery({ query: "(orientation: portrait)" });
-
-  const mobilePortrait = isMobile;
 
   const videoPlayer = useRef();
 
@@ -88,7 +84,6 @@ export function PresenterView({ height }) {
         margin: theme.spacing(1),
       }}
       className={"video-cover"}
-      // className="mt-1 h-full w-full relative flex items-center justify-center bg-gray-750 rounded-lg "
     >
       <audio autoPlay playsInline controls={false} ref={audioPlayer} />
       <div

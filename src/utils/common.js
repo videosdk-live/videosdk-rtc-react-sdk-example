@@ -48,6 +48,14 @@ export const appEvents = {
   "participant-invisible": "participant-invisible",
 };
 
+export const sideBarModes = {
+  PARTICIPANTS: "PARTICIPANTS",
+  CHAT: "CHAT",
+  LAYOUT: "LAYOUT",
+  POLLS: "POLLS",
+  CREATE_POLL: "CREATE_POLL",
+};
+
 export const meetingTypes = {
   MEETING: "MEETING",
   ILS: "ILS",

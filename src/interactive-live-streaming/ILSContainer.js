@@ -1,25 +1,22 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
-import { BottomBar } from "../../meeting/components/BottomBar";
-import { SidebarConatiner } from "../sidebar/SidebarContainer";
-import { ParticipantsViewer } from "../../meeting/components/ParticipantView";
-import { PresenterView } from "../PresenterView";
+import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
+import { PresenterView } from "../components/PresenterView";
 import { useSnackbar } from "notistack";
-import { nameTructed, trimSnackBarText } from "../../utils/helper";
-import useResponsiveSize from "../../hooks/useResponsiveSize";
-import useWindowSize from "../../hooks/useWindowSize";
-import { ILSBottomBar } from "../../interactive-live-streaming/components/ILSBottomBar";
-import { TopBar } from "../../interactive-live-streaming/components/TopBar";
-import useIsTab from "../../hooks/useIsTab";
-import PollsListner from "../../interactive-live-streaming/components/pollContainer/PollListner";
-import HLSContainer from "../../interactive-live-streaming/components/hlsViewContainer/HLSContainer";
-import ModeListner from "../../interactive-live-streaming/components/ModeListner";
-import FlyingEmojisOverlay from "../../interactive-live-streaming/components/FlyingEmojisOverlay";
-import { ILSParticipantView } from "../../interactive-live-streaming/components/ILSParticipantView";
-import WaitingToJoinScreen from "../screens/WaitingToJoinScreen";
-import { meetingModes, meetingTypes } from "../../utils/common";
+import { nameTructed, trimSnackBarText } from "../utils/helper";
+import useResponsiveSize from "../hooks/useResponsiveSize";
+import useWindowSize from "../hooks/useWindowSize";
+import { ILSBottomBar } from "./components/ILSBottomBar";
+import { TopBar } from "./components/TopBar";
+import useIsTab from "../hooks/useIsTab";
+import PollsListner from "./components/pollContainer/PollListner";
+import HLSContainer from "./components/hlsViewContainer/HLSContainer";
+import FlyingEmojisOverlay from "./components/FlyingEmojisOverlay";
+import { ILSParticipantView } from "./components/ILSParticipantView";
+import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
+import { meetingModes } from "../utils/common";
 
-export function MeetingContainer({
+export function ILSContainer({
   onMeetingLeave,
   setIsMeetingLeft,
   selectedMic,
@@ -32,7 +29,6 @@ export function MeetingContainer({
   raisedHandsParticipants,
   micEnabled,
   webcamEnabled,
-  meetingType,
   meetingMode,
   setMeetingMode,
   polls,
@@ -45,11 +41,16 @@ export function MeetingContainer({
   afterMeetingJoinedHLSState,
   setAfterMeetingJoinedHLSState,
 }) {
+  const bottomBarHeight = 60;
+  const topBarHeight = 60;
+
+  const [sideBarMode, setSideBarMode] = useState(null);
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const mMeetingRef = useRef();
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
+
   const containerRef = useRef();
   const meetingModeRef = useRef(meetingMode);
   const { enqueueSnackbar } = useSnackbar();
@@ -135,23 +136,9 @@ export function MeetingContainer({
   function onParticipantJoined(participant) {
     // Change quality to low, med or high based on resolution
     participant && participant.setQuality("high");
-    console.log(" onParticipantJoined", participant);
+    // console.log(" onParticipantJoined", participant);
   }
-  function onParticipantLeft(participant) {
-    // console.log(" onParticipantLeft", participant);
-  }
-  const onSpeakerChanged = (activeSpeakerId) => {
-    // console.log(" onSpeakerChanged", activeSpeakerId);
-  };
-  function onPresenterChanged(presenterId) {
-    // console.log(" onPresenterChanged", presenterId);
-  }
-  function onMainParticipantChanged(participant) {
-    // console.log(" onMainParticipantChanged", participant);
-  }
-  function onEntryRequested(participantId, name) {
-    // console.log(" onEntryRequested", participantId, name);
-  }
+
   function onEntryResponded(participantId, name) {
     // console.log(" onEntryResponded", participantId, name);
     if (mMeetingRef.current?.localParticipant?.id === participantId) {
@@ -165,15 +152,7 @@ export function MeetingContainer({
       }
     }
   }
-  function onRecordingStarted() {
-    // console.log(" onRecordingStarted");
-  }
-  function onRecordingStopped() {
-    // console.log(" onRecordingStopped");
-  }
-  function onChatMessage(data) {
-    // console.log(" onChatMessage", data);
-  }
+
   async function onMeetingJoined() {
     // console.log("onMeetingJoined");
     const { changeWebcam, changeMic, muteMic, disableWebcam } =
@@ -203,58 +182,14 @@ export function MeetingContainer({
     // console.log("onMeetingLeft");
     onMeetingLeave();
   }
-  const onLiveStreamStarted = (data) => {
-    // console.log("onLiveStreamStarted example", data);
-  };
-  const onLiveStreamStopped = (data) => {
-    // console.log("onLiveStreamStopped example", data);
-  };
-
-  const _handleOnHlsStarted = (data) => {};
-
-  const _handleOnHlsStopped = () => {};
-
-  const onVideoStateChanged = (data) => {
-    // console.log("onVideoStateChanged", data);
-  };
-  const onVideoSeeked = (data) => {
-    // console.log("onVideoSeeked", data);
-  };
-
-  const onWebcamRequested = (data) => {
-    // console.log("onWebcamRequested", data);
-  };
-  const onMicRequested = (data) => {
-    // console.log("onMicRequested", data);
-  };
-  const onPinStateChanged = (data) => {
-    // console.log("onPinStateChanged", data);
-  };
 
   const mMeeting = useMeeting({
     onParticipantJoined,
-    onParticipantLeft,
-    onSpeakerChanged,
-    onPresenterChanged,
-    onMainParticipantChanged,
-    onEntryRequested,
     onEntryResponded,
-    onRecordingStarted,
-    onRecordingStopped,
-    onChatMessage,
     onMeetingJoined,
     onMeetingLeft,
-    onLiveStreamStarted,
-    onLiveStreamStopped,
-    onVideoStateChanged,
-    onVideoSeeked,
-    onWebcamRequested,
-    onMicRequested,
-    onPinStateChanged,
     onRecordingStateChanged: _handleOnRecordingStateChanged,
     onHlsStateChanged: _handleOnHlsStateChanged,
-    onHlsStarted: _handleOnHlsStarted,
-    onHlsStopped: _handleOnHlsStopped,
   });
 
   useEffect(() => {
@@ -262,10 +197,6 @@ export function MeetingContainer({
   }, [mMeeting]);
 
   const isPresenting = mMeeting.presenterId ? true : false;
-
-  const bottomBarHeight = 60;
-  const topBarHeight = 60;
-  const [sideBarMode, setSideBarMode] = useState(null);
 
   usePubSub("RAISE_HAND", {
     onMessageReceived: (data) => {
@@ -323,11 +254,6 @@ export function MeetingContainer({
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
-            <ModeListner
-              meetingMode={meetingMode}
-              setMeetingMode={setMeetingMode}
-              setSideBarMode={setSideBarMode}
-            />
             <PollsListner
               polls={polls}
               setDraftPolls={setDraftPolls}
@@ -336,38 +262,28 @@ export function MeetingContainer({
               setSideBarMode={setSideBarMode}
             />
 
-            {meetingType === meetingTypes.ILS &&
-              meetingMode === meetingModes.CONFERENCE && (
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: isTab || isMobile ? "" : "column",
-                    height: topBarHeight,
-                  }}
-                >
-                  <TopBar topBarHeight={topBarHeight} />
-                </div>
-              )}
+            {meetingMode === meetingModes.CONFERENCE && (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: isTab || isMobile ? "" : "column",
+                  height: topBarHeight,
+                }}
+              >
+                <TopBar topBarHeight={topBarHeight} />
+              </div>
+            )}
+
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
               {meetingMode === meetingModes.CONFERENCE ? (
                 <div className={`flex flex-1 `}>
                   {isPresenting ? (
                     <PresenterView
-                      height={
-                        meetingType === meetingTypes.MEETING
-                          ? containerHeight - bottomBarHeight
-                          : containerHeight - topBarHeight - bottomBarHeight
-                      }
+                      height={containerHeight - topBarHeight - bottomBarHeight}
                     />
                   ) : null}
-                  {isPresenting && isMobile ? null : meetingType ===
-                    meetingTypes.ILS ? (
+                  {isPresenting && isMobile ? null : (
                     <ILSParticipantView
-                      isPresenting={isPresenting}
-                      sideBarMode={sideBarMode}
-                    />
-                  ) : (
-                    <ParticipantsViewer
                       isPresenting={isPresenting}
                       sideBarMode={sideBarMode}
                     />
@@ -390,7 +306,6 @@ export function MeetingContainer({
               )}
               <SidebarConatiner
                 height={
-                  meetingType === meetingTypes.MEETING ||
                   meetingMode === meetingModes.VIEWER
                     ? containerHeight - bottomBarHeight
                     : containerHeight - topBarHeight - bottomBarHeight
@@ -405,30 +320,17 @@ export function MeetingContainer({
               />
             </div>
 
-            {meetingType === meetingTypes.MEETING ? (
-              <BottomBar
-                bottomBarHeight={bottomBarHeight}
-                sideBarMode={sideBarMode}
-                setSideBarMode={setSideBarMode}
-                setIsMeetingLeft={setIsMeetingLeft}
-                selectWebcamDeviceId={selectWebcamDeviceId}
-                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-                selectMicDeviceId={selectMicDeviceId}
-                setSelectMicDeviceId={setSelectMicDeviceId}
-              />
-            ) : (
-              <ILSBottomBar
-                bottomBarHeight={bottomBarHeight}
-                sideBarMode={sideBarMode}
-                setSideBarMode={setSideBarMode}
-                setIsMeetingLeft={setIsMeetingLeft}
-                selectWebcamDeviceId={selectWebcamDeviceId}
-                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-                selectMicDeviceId={selectMicDeviceId}
-                setSelectMicDeviceId={setSelectMicDeviceId}
-                meetingMode={meetingMode}
-              />
-            )}
+            <ILSBottomBar
+              bottomBarHeight={bottomBarHeight}
+              sideBarMode={sideBarMode}
+              setSideBarMode={setSideBarMode}
+              setIsMeetingLeft={setIsMeetingLeft}
+              selectWebcamDeviceId={selectWebcamDeviceId}
+              setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+              selectMicDeviceId={selectMicDeviceId}
+              setSelectMicDeviceId={setSelectMicDeviceId}
+              meetingMode={meetingMode}
+            />
           </>
         ) : (
           <></>

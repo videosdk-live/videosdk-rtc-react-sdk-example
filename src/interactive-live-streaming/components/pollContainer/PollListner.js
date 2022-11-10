@@ -1,6 +1,6 @@
 import { usePubSub } from "@videosdk.live/react-sdk";
 import { useSnackbar } from "notistack";
-import { sideBarModes } from "../../../components/MeetingContainer/MeetingContainer";
+import { sideBarModes } from "../../../utils/common";
 
 const PollListner = ({ pollId, setCreatedPolls }) => {
   usePubSub(`SUBMIT_A_POLL_${pollId}`, {

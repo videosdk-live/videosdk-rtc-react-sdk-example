@@ -1,6 +1,5 @@
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { sideBarModes } from "../../components/MeetingContainer/MeetingContainer";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
 import recordingBlink from "../../animations/recording-blink.json";
 import liveHLS from "../../animations/live-hls.json";
@@ -40,7 +39,7 @@ import PollIcon from "../../icons/Bottombar/PollIcon";
 import useIsHls from "../../hooks/useIsHls";
 import LiveIcon from "../../icons/LiveIcon";
 import ReactionIcon from "../../icons/Bottombar/ReactionIcon";
-import { meetingModes } from "../../utils/common";
+import { meetingModes, sideBarModes } from "../../utils/common";
 
 const useStyles = makeStyles({
   popoverHoverDark: {
@@ -93,7 +92,7 @@ export function ILSBottomBar({
   };
 
   const RecordingBTN = () => {
-    const mMeeting = useMeeting();
+    const { startRecording, stopRecording, recordingState } = useMeeting();
     const defaultOptions = {
       loop: true,
       autoplay: true,
@@ -104,12 +103,8 @@ export function ILSBottomBar({
       height: 64,
       width: 160,
     };
-    const startRecording = mMeeting?.startRecording;
-    const stopRecording = mMeeting?.stopRecording;
-    const recordingState = mMeeting?.recordingState;
 
     const isRecording = useIsRecording();
-
     const isRecordingRef = useRef(isRecording);
 
     useEffect(() => {
@@ -732,6 +727,7 @@ export function ILSBottomBar({
       { emoji: "👍", emojiName: "thumbsup" },
       { emoji: "🎉", emojiName: "confetti" },
       { emoji: "👏", emojiName: "clap" },
+      { emoji: "❤️", emojiName: "heart" },
     ];
 
     return (
@@ -777,16 +773,16 @@ export function ILSBottomBar({
   };
 
   const MeetingIdCopyBTN = () => {
-    const mMeeting = useMeeting();
+    const { meetingId } = useMeeting();
     const [isCopied, setIsCopied] = useState(false);
     return (
       <div className="flex items-center justify-center lg:ml-0 ml-4 mt-4 xl:mt-0">
         <div className="flex border-2 border-gray-850 p-2 rounded-md items-center justify-center">
-          <h1 className="text-white text-base ">{mMeeting.meetingId}</h1>
+          <h1 className="text-white text-base ">{meetingId}</h1>
           <button
             className="ml-2"
             onClick={() => {
-              navigator.clipboard.writeText(mMeeting.meetingId);
+              navigator.clipboard.writeText(meetingId);
               setIsCopied(true);
               setTimeout(() => {
                 setIsCopied(false);
@@ -800,16 +796,11 @@ export function ILSBottomBar({
             )}
           </button>
         </div>
-
-        {/* <div className="flex border-2 border-gray-850 p-2 ml-4 rounded-md items-center justify-center">
-          <h1 className="text-white">00:30</h1>
-        </div> */}
       </div>
     );
   };
 
   const tollTipEl = useRef();
-
   const isMobile = useIsMobile();
   const isTab = useIsTab();
 
