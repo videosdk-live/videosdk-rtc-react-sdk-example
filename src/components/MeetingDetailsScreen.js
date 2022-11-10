@@ -27,6 +27,10 @@ export function MeetingDetailsScreen({
     sm: 4,
     xs: 1.5,
   });
+  const selectType = [
+    { label: "Meeting", value: meetingTypes.MEETING },
+    { label: "Interactive Live Streaming", value: meetingTypes.ILS },
+  ];
 
   return (
     <div
@@ -124,47 +128,33 @@ export function MeetingDetailsScreen({
       {!iscreateMeetingClicked && !isJoinMeetingClicked && (
         <div className="w-full md:mt-0 mt-4 flex flex-col">
           <p className="text-white text-base">Select Type</p>
-          <div className="flex justify-between w-full mb-4">
-            <div class="flex w-28 items-center mr-2 mb-4 mt-2 bg-gray-650 px-2.5 py-2 rounded-lg">
-              <input
-                id="radio1"
-                type="radio"
-                name="radio"
-                class="hidden"
-                value={meetingTypes.MEETING}
-                onClick={(e) => {
-                  setMeetingType(e.target.value);
-                }}
-                checked={meetingType === meetingTypes.MEETING}
-              />
-              <label
-                for="radio1"
-                class="flex items-center cursor-pointer text-white"
+          <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row justify-between w-full mb-4">
+            {selectType.map((item, index) => (
+              <div
+                class={`flex  ${
+                  index === 1 ? "flex-1 md:ml-2 lg:ml-0 xl:ml-2" : ""
+                } items-center mb-2 md:mb-4 mt-2 lg:mb-2 xl:mb-4 bg-gray-650 rounded-lg`}
               >
-                <span class="w-4 h-4 inline-block mr-2 rounded-full border border-grey"></span>
-                Meeting
-              </label>
-            </div>
-
-            <div class="flex flex-1 items-center mb-4 mt-2 bg-gray-650 px-2.5 py-2 rounded-lg">
-              <input
-                id="radio2"
-                type="radio"
-                name="radio"
-                class="hidden"
-                value={meetingTypes.ILS}
-                onClick={(e) => {
-                  setMeetingType(e.target.value);
-                }}
-              />
-              <label
-                for="radio2"
-                class="flex items-center cursor-pointer text-white"
-              >
-                <span class="w-4 h-4 inline-block mr-2 rounded-full border border-grey"></span>
-                Interactive Live Streaming
-              </label>
-            </div>
+                <input
+                  id={`radio${index}`}
+                  type="radio"
+                  name="radio"
+                  class="hidden"
+                  value={item.value}
+                  onClick={(e) => {
+                    setMeetingType(e.target.value);
+                  }}
+                  checked={meetingType === item.value}
+                />
+                <label
+                  for={`radio${index}`}
+                  class="flex items-center cursor-pointer text-white w-full px-2 py-2 lg:w-full xl:px-2 xl:py-2"
+                >
+                  <span class="w-4 h-4 inline-block mr-2 rounded-full border border-grey"></span>
+                  {item.label}
+                </label>
+              </div>
+            ))}
           </div>
 
           <div className="flex items-center justify-center flex-col w-full mt-2">

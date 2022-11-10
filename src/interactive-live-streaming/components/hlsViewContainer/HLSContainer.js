@@ -50,12 +50,7 @@ const MotionPlayer = ({
             transform: `scale(${scale})`,
           }}
         >
-          <div
-            style={{
-              height: `calc(100% - ${2 * gutter}px)`,
-              width: `calc(100% - ${2 * gutter}px)`,
-            }}
-          >
+          <div style={{ height: `100%`, width: `100%` }}>
             <PlayerViewer
               downstreamUrl={downstreamUrl}
               afterMeetingJoinedHLSState={afterMeetingJoinedHLSState}

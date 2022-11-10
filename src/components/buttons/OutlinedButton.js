@@ -83,7 +83,9 @@ export const OutlinedButton = ({
         }}
       >
         <button
-          className="cursor-pointer flex items-center justify-center"
+          className={`${
+            disabled ? "cursor-default" : "cursor-pointer"
+          } flex items-center justify-center`}
           id={btnID}
           onMouseEnter={() => {
             setMouseOver(true);

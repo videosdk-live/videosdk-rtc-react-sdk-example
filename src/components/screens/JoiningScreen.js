@@ -572,12 +572,8 @@ export function JoiningScreen({
               xs={12}
               md={isXStoSM ? 5 : gtThenXL ? 6 : 5}
               style={{
-                width: "100%",
                 display: "flex",
                 flex: 1,
-                height: "100%",
-                alignItems: "center",
-                justifyContent: "center",
               }}
             >
               <div className="w-full flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mx-44 md:mt-11 lg:mt-4">
