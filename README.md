@@ -148,6 +148,8 @@ Token is used to create and validate a meeting using API and also initialise a m
       message: "Meeting is running.",
     },
     participantId: "xyz",
+    // For Interactive Live Streaming we can provide mode, `CONFERENCE` for Host and  `VIEWER` for remote participant.
+    mode: "CONFERENCE", // "CONFERENCE" || "VIEWER"
   }}
   token={"token"}
   joinWithoutUserInteraction // Boolean
@@ -429,7 +431,7 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 - **Meeting** - In `Meeting` you can enable mic and webcam, record the meeting, raise hand, chat, share your screen.
 
 - **Interactive Live Streaming** - In `Interactive Live Streaming` you can join as a host or viewer.
-  - As a host, you can start and stop live streaming, create and launch a poll and also use same features that are available in the meeting.
+  - As a host, you can start and stop live streaming, create and launch a poll and also use features that are available in the `Meeting` use case.
   - As a viewer, you can watch live streaming, give reaction, raise hand, chat and submit a poll.
 
 <br/>
@@ -438,8 +440,8 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 There are 2 folders :
 
-1. [`meeting`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/tree/featute/ILS/src/meeting) - `meeting` folder includes components/pages related to meeting.
-2. [`interactive-live-streaming`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/tree/featute/ILS/src/interactive-live-streaming) - `interactive-live-streaming` folder includes all components/pages related to Interactive Live Streaming.
+1. [`meeting`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/tree/featute/ILS/src/meeting) - This folder includes components or file related to meeting.
+2. [`interactive-live-streaming`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/tree/featute/ILS/src/interactive-live-streaming) - This folder includes all components or file related to Interactive Live Streaming.
 
 <br/>
 
@@ -447,7 +449,7 @@ There are 2 folders :
 
 **1. Create or join Meeting**
 
-- `components/screens/JoiningScreen.js`: It shows the user with the option to meeting type and create or join a meeting and to initiate webcam and mic status.
+- [`components/screens/JoiningScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/components/screens/JoiningScreen.js) : It shows the user with the option to meeting type and create or join a meeting and to initiate webcam and mic status.
 
 - `api.js` : It includes all the API calls for create and validate meeting.
 
@@ -493,7 +495,7 @@ There are 2 folders :
 
   **2. PresenterView**
 
-`components/PresenterView.js` - It contains the view when participant share their screen.
+[`components/PresenterView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/components/PresenterView.js) - It contains the view when participant share their screen.
 
 <p align="center">
 <img width="600" height="338" src="public/presenter-view.gif"/>
@@ -501,7 +503,7 @@ There are 2 folders :
 
 **3. ParticipantList**
 
-`sidebar/ParticipantPanel.js` - This file is used to show the list of participants present in the meeting.
+[`sidebar/ParticipantPanel.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/components/sidebar/ParticipantPanel.js) - This file is used to show the list of participants present in the meeting.
 
 <p align="center">
 <img width="600" height="338" src="public/participant_list.gif"/>
@@ -509,7 +511,7 @@ There are 2 folders :
 
 **4. Chat**
 
-`sidebar/ChatPanel.js` - It contains the chat side panel with chat input and chat messages list.
+[`sidebar/ChatPanel.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/components/sidebar/ChatPanel.js) - It contains the chat side panel with chat input and chat messages list.
 
 <p align="center">
 <img width="600" height="338" src="public/chat.gif"/>
@@ -517,7 +519,7 @@ There are 2 folders :
 
 **5. Waiting Screen**
 
-`components/screens/WaitingToJoin.js` - It contains the lottie animation with messages. Untill you receive `isMeetingJoined` true from `meeting` that you intialize using `useMeeting()` from `@videosdk.live/react-sdk`, this screen will be displayed.
+[`components/screens/WaitingToJoin.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/components/screens/WaitingToJoinScreen.js) - It contains the lottie animation with messages. Untill you receive `isMeetingJoined` true from `meeting` that you intialize using `useMeeting()` from `@videosdk.live/react-sdk`, this screen will be displayed.
 
 <p align="center">
 <img width="600" height="338" src="public/waiting-screen.gif"/>
@@ -525,11 +527,15 @@ There are 2 folders :
 
 **6. Leave Screen**
 
-`components/screens/LeaveScreen.js` - This file contains the leave screen.
+[`components/screens/LeaveScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/components/screens/LeaveScreen.js) - This file contains the leave screen.
 
 <p align="center">
 <img width="600"  src="public/leave-screen.png"/>
 </p>
+
+**7. SidebarContainer**
+
+- [`components/sidebar/SidebarContainer.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/components/sidebar/SidebarContainer.js) - It containes `Participanel`, `ChatPanel`, `CreatePoll`, `PollList` and `SubmitPollList` component rendering.
 
 <br/>
 
@@ -539,7 +545,7 @@ There are 2 folders :
 
 **2. Meeting Bottom Bar**
 
-- `meeting/components/BottomBar.js`: It contains the buttons that are displayed in bottom of the screen.
+- [`meeting/components/BottomBar.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/meeting/components/BottomBar.js): It contains the buttons that are displayed in bottom of the screen.
 
   - Starting from left it shows meetingId with copy icon button.
   - In middle, it shows recording indicator, raise hand icon button, mic icon button with available mics list, webcam icon button with available webcam list, screen share and leave meeting icon button.
@@ -554,7 +560,7 @@ There are 2 folders :
 
 **3. ParticipantView**
 
-`meeting/components/ParticipantView.js` - It contains the grid of participant that are displayed in the main screen.
+- [`meeting/components/ParticipantView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/meeting/components/ParticipantView.js) - It contains the grid of participant that are displayed in the main screen.
 
 <p align="center">
 <img width="600" height="338" src="public/participant_view.png"/>
@@ -566,7 +572,7 @@ There are 2 folders :
 
 **2. ILSBottomBar**
 
-- `interactive-live-streaming/components/ILSBottomBar.js`: It contains the buttons that are displayed in bottom of the screen.
+- [`interactive-live-streaming/components/ILSBottomBar.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/ILSBottomBar.js): It contains the buttons that are displayed in bottom of the screen.
   create a poll, submit a poll, end poll , draft a poll and remove poll from draft pubsub methods.
 
   - Starting from left it shows studioCode with copy icon button.
@@ -582,7 +588,7 @@ There are 2 folders :
 
 **3. TopBar**
 
-- `interactive-live-streaming/components/TopBar.js`: It contains the buttons that are displayed at top of the screen.
+- [`interactive-live-streaming/components/TopBar.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/TopBar.js): It contains the buttons that are displayed at top of the screen.
 
   - In right most corner, it shows recording button and start HLS button.
 
@@ -592,7 +598,7 @@ There are 2 folders :
 
 **4. ILSParticipantView**
 
-- `interactive-live-streaming/components/ILSParticipantView.js` - It contains the grid of participant that join as a host are displayed in the main screen.
+- [`interactive-live-streaming/components/ILSParticipantView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/ILSParticipantView.js) - It contains the grid of participant that join as a host are displayed in the main screen.
 
 <p align="center">
 <img width="602" height="338" src="public/ILS_participant_view.png"/>
@@ -600,11 +606,11 @@ There are 2 folders :
 
 **5. HLSContainer**
 
-- `interactive-live-streaming/components/hlsViewContainer/HLSContainer.js` - It contains the `PlayerViewer` component with `react-motion`.
+- [`interactive-live-streaming/components/hlsViewContainer/HLSContainer.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/hlsViewContainer/HLSContainer.js) - It contains the `PlayerViewer` component with `react-motion`.
 
 **6. PlayerViewer**
 
-- `interactive-live-streaming/components/hlsViewContainer/PlayerViewer.js` - Untill host does not start live streaming viewer will see `Lottie`. When host start the live streaming, viewer will be able to see the live streaming.
+- [`interactive-live-streaming/components/hlsViewContainer/PlayerViewer.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/hlsViewContainer/PlayerViewer.js) - Untill host does not start live streaming viewer will see `Lottie`. When host start the live streaming, viewer will be able to see the live streaming.
 
 <p align="center">
 <img width="600" height="338" src="public/player_view.gif"/>
@@ -612,7 +618,7 @@ There are 2 folders :
 
 **7. CreatePoll**
 
-- `interactive-live-streaming/components/pollContainer/CreatePoll.js`
+- [`interactive-live-streaming/components/pollContainer/CreatePoll.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/pollContainer/CreatePoll.js)
 
   - It has a text field to ask poll question, another text field where you can add your options, a checkbox to mark correct option and option to set timer.
   - In the bottom you can see save and launch button. If you click on save then your poll will be saved as a draft in the poll list and you can launch this draft poll any time during live streaming.
@@ -624,7 +630,7 @@ There are 2 folders :
 
 **8. PollList**
 
-- `interactive-live-streaming/components/pollContainer/PollList.js` - It contains both types of polls:
+- [`interactive-live-streaming/components/pollContainer/PollList.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/pollContainer/PollList.js) - It contains both types of polls:
 
 1. Poll that are saved as a draft.
 2. Poll that are launched during live streaming.
@@ -637,7 +643,7 @@ There are 2 folders :
 
 **9. SubmitPollList**
 
-- `interactive-live-streaming/components/pollContainer/SubmitPollList.js` - It contains viewer side poll view. Viewer can submit their opnion by selecting options.
+- [`interactive-live-streaming/components/pollContainer/SubmitPollList.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/pollContainer/SubmitPollList.js) - It contains viewer side poll view. Viewer can submit their opnion by selecting options.
 
 <p align="center">
 <img width="364" height="631" src="public/submit_poll_list.png"/>
@@ -645,11 +651,11 @@ There are 2 folders :
 
 **10. PollListner**
 
-- `interactive-live-streaming/components/pollContainer/PollListner.js` - It contains create a poll, submit a poll, end poll , draft a poll and remove poll from draft pubsub methods.
+- [`interactive-live-streaming/components/pollContainer/PollListner.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/pollContainer/PollListner.js) - It contains create a poll, submit a poll, end poll , draft a poll and remove poll from draft pubsub methods.
 
 **11. Reactions**
 
-- `interactive-live-streaming/components/FlyingEmojisOverlay.js` - It contains emoji animation, functions for sending and receiving emoji using pubsub method.
+- [`interactive-live-streaming/components/FlyingEmojisOverlay.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/featute/ILS/src/interactive-live-streaming/components/FlyingEmojisOverlay.js) - It contains emoji animation, functions for sending and receiving emoji using pubsub method.
 
 <p align="center">
 <img width="454" height="136" src="public/reaction.png"/>
