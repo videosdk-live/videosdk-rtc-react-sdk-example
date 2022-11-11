@@ -29,7 +29,7 @@ Check out demo [here](https://videosdk.live/prebuilt/demo)
 - [x] Raise hand
 - [x] Screen share
 - [x] Recording
-- [x] Reaction
+- [x] Reactions
 - [x] Poll
 - [x] Interactive Live Streaming
 
@@ -424,19 +424,19 @@ If you want to learn more about the SDK, read the Complete Documentation of [Rea
 
 <br/>
 
-## Different meeting types
+## Use case types
 
 - **Meeting** - In `Meeting` you can enable mic and webcam, record the meeting, raise hand, chat, share your screen.
 
 - **Interactive Live Streaming** - In `Interactive Live Streaming` you can join as a host or viewer.
-  - As a host you can start and stop live streaming,react in a live streaming, create and launch a poll and also use same features as meeting.
-  - As a viewer you can watch live streaming, react in live streaming, raise hand, chat, submit a poll.
+  - As a host, you can start and stop live streaming, create and launch a poll and also use same features that are available in the meeting.
+  - As a viewer, you can watch live streaming, give reaction, raise hand, chat and submit a poll.
 
 <br/>
 
 ## Project Structure
 
-We have 2 folders :
+There are 2 folders :
 
 1. [`meeting`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/tree/featute/ILS/src/meeting) - `meeting` folder includes components/pages related to meeting.
 2. [`interactive-live-streaming`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/tree/featute/ILS/src/interactive-live-streaming) - `interactive-live-streaming` folder includes all components/pages related to Interactive Live Streaming.
@@ -451,9 +451,9 @@ We have 2 folders :
 
 - `api.js` : It includes all the API calls for create and validate meeting.
 
-- If you select `Meeting` type and `Create Meeting` is clicked, it will show following:
+- If you select `Meeting` type and click `Create Meeting`, it will show following:
 
-  - `Meeting code` - This meeting code you can copy and share with other participants that wants to join meeting.
+  - `MeetingId` - You can copy this meetingId and share it with other participants that wants to join the meeting.
   - `TextField for ParticipantName` - This text field will contain name of the participant.
   - `Start Meeting Button` - This button will call api to create meeting with meetingId that participant want to join.
 
@@ -461,7 +461,7 @@ We have 2 folders :
   <img width="600" height="338" src="public/create_meeting.gif"/>
   </p>
 
-- If you select `Meeting` type and `Join Meeting` is clicked, it will show following:
+- If you select `Meeting` type and click `Join Meeting`, it will show following:
 
   - `TextField for MeetingId` - This text field will contain the meeting Id that you want to join.
   - `TextField for ParticipantName` - This text field will contain name of the participant.
@@ -471,9 +471,9 @@ We have 2 folders :
   <img width="600" height="338" src="public/join_meeting.gif"/>
   </p>
 
-- If you select `Interactive Live Streaming` type and `Join as a Host` is clicked, it will show following:
+- If you select `Interactive Live Streaming` type and click `Join as a Host`, it will show following:
 
-  - `Studio code` - This studio code you can copy and share with other participants that wants to join meeting.
+  - `Studio code` - You can copy this studio code and share with other participants that wants to join the meeting.
   - `TextField for ParticipantName` - This text field will contain name of the participant.
   - `Join Studio Button` - This button will call api to create meeting with studio code that participant want to join.
 
@@ -481,7 +481,7 @@ We have 2 folders :
   <img width="600" height="338" src="public/join_studio.gif"/>
   </p>
 
-- If you select `Interactive Live Streaming` type and `Join as a Viewer` is clicked, it will show following:
+- If you select `Interactive Live Streaming` type and click `Join as a Viewer`, it will show following:
 
   - `TextField for StudioCode` - This text field will contain the studio code that you want to join.
   - `TextField for ParticipantName` - This text field will contain name of the participant.
@@ -535,7 +535,7 @@ We have 2 folders :
 
 ## Meeting Project Structure
 
-**1. MeetingContainer** : It contains the `PresenterView` , `ParticipantView`, `SidebarContainer` and `BottomBar` that display in meeting.
+**1. MeetingContainer** : It contains the `PresenterView` , `ParticipantView`, `SidebarContainer` and `BottomBar`.
 
 **2. Meeting Bottom Bar**
 
@@ -562,7 +562,7 @@ We have 2 folders :
 
 ## Interactive Live Streaming Project Structure
 
-**1. ILSContainer** : It contains the `TopBar`, `PresenterView` , `ILSParticipantView`, `HLSContainer` ,`SidebarContainer` and `ILSBottomBar` that display in interactive live streaming meeting.
+**1. ILSContainer** : It contains the `TopBar`, `PresenterView` , `ILSParticipantView`, `HLSContainer` ,`SidebarContainer` and `ILSBottomBar`.
 
 **2. ILSBottomBar**
 
@@ -570,7 +570,7 @@ We have 2 folders :
   create a poll, submit a poll, end poll , draft a poll and remove poll from draft pubsub methods.
 
   - Starting from left it shows studioCode with copy icon button.
-  - In middle, it shows screen share,raise hand icon button, reaction icon button mic icon button with available mics list, webcam icon button with available webcam list, and leave meeting icon button.
+  - In middle, it shows screen share, raise hand icon button, reaction icon button mic icon button with available mics list, webcam icon button with available webcam list, and leave meeting icon button.
   - In right most corner, it shows poll icon button, chat icon button and partcipants icon with participant count.
 
   - When screen resolution change to mobile, tab or lg screen, the order of bottom bar elements changes to leave meeting button, recording button, mic & webcam button and `more actions` button.
@@ -582,9 +582,9 @@ We have 2 folders :
 
 **3. TopBar**
 
-- `interactive-live-streaming/components/TopBar.js`: It contains the buttons that are displayed in top of the screen.
+- `interactive-live-streaming/components/TopBar.js`: It contains the buttons that are displayed at top of the screen.
 
-  - In right most corner, it shows recoding icon button and start HLS button.
+  - In right most corner, it shows recording button and start HLS button.
 
 <p align="center">
 <img width="1359" src="public/topbar.png"/>
@@ -595,7 +595,7 @@ We have 2 folders :
 - `interactive-live-streaming/components/ILSParticipantView.js` - It contains the grid of participant that join as a host are displayed in the main screen.
 
 <p align="center">
-<img width="600" height="338" src="public/participant_view.png"/>
+<img width="1366" height="768" src="public/ILS_participantView.png.png"/>
 </p>
 
 **5. HLSContainer**
@@ -604,9 +604,7 @@ We have 2 folders :
 
 **6. PlayerViewer**
 
-- `interactive-live-streaming/components/hlsViewContainer/PlayerViewer.js` - It contains the `Lottie` and `video`.
-
-  - When host does not start live streaming untill then viewer will see lottie. when host start the live streaming viewer will be able to see live streaming.
+- `interactive-live-streaming/components/hlsViewContainer/PlayerViewer.js` - Untill host does not start live streaming viewer will see `Lottie`. When host start the live streaming, viewer will be able to see the live streaming.
 
 <p align="center">
 <img width="600" height="338" src="public/player_view.gif"/>
@@ -614,11 +612,11 @@ We have 2 folders :
 
 **7. CreatePoll**
 
-- `interactive-live-streaming/components/pollContainer/CreatePoll.js` - It contains create poll view.
+- `interactive-live-streaming/components/pollContainer/CreatePoll.js`
 
-  - It has poll question textField, Add your Options textField, Mark Correct Option and Set Timer Checkbox.
-  - In the bottom you can see save and launch button.if you click on save then your poll save as a draft in poll list and you can ask any time in live streaming.
-  - In click on launch button you can ask poll immediately.
+  - It has a text field to ask poll question, another text field where you can add your options, a checkbox to mark correct option and option to set timer.
+  - In the bottom you can see save and launch button. If you click on save then your poll will be saved as a draft in the poll list and you can launch this draft poll any time during live streaming.
+  - On click of launch button, you can ask poll immediately.
 
 <p align="center">
 <img width="359" height="574" src="public/create_poll.png"/>
@@ -626,7 +624,12 @@ We have 2 folders :
 
 **8. PollList**
 
-- `interactive-live-streaming/components/pollContainer/PollList.js` - It contains draft poll list and asked poll list with create new poll button.
+- `interactive-live-streaming/components/pollContainer/PollList.js` - It contains both types of polls:
+
+1. Poll that are saved as a draft.
+2. Poll that are launched during live streaming.
+
+- You can create new polls with `create new poll` button.
 
 <p align="center">
 <img width="362" height="573" src="public/poll_list.png"/>
@@ -634,7 +637,7 @@ We have 2 folders :
 
 **9. SubmitPollList**
 
-- `interactive-live-streaming/components/pollContainer/SubmitPollList.js` - It contains viewer side poll view.Viewer can submit their opnion by selecting options.
+- `interactive-live-streaming/components/pollContainer/SubmitPollList.js` - It contains viewer side poll view. Viewer can submit their opnion by selecting options.
 
 <p align="center">
 <img width="364" height="631" src="public/submit_poll_list.png"/>
@@ -646,7 +649,7 @@ We have 2 folders :
 
 **11. Reactions**
 
-- `interactive-live-streaming/components/FlyingEmojisOverlay.js` - It contains flying emoji animation styling , functions for sending and receving emoji with pubsub method.
+- `interactive-live-streaming/components/FlyingEmojisOverlay.js` - It contains emoji animation, functions for sending and receiving emoji using pubsub method.
 
 <p align="center">
 <img width="454" height="136" src="public/reaction.png"/>
