@@ -549,7 +549,7 @@ We have 2 folders :
   - On click of `more actions` button it opens a drawer that contains other remaining buttons.
 
 <p align="center">
-<img width="600" src="public/bottombar.png"/>
+<img width="1363" src="public/bottombar.png"/>
 </p>
 
 **3. ParticipantView**
@@ -577,7 +577,7 @@ We have 2 folders :
   - On click of `more actions` button it opens a drawer that contains other remaining buttons.
 
 <p align="center">
-<img width="600" src="public/ILSBottombar.png"/>
+<img width="1352" src="public/ILSBottombar.png"/>
 </p>
 
 **3. TopBar**
@@ -587,7 +587,7 @@ We have 2 folders :
   - In right most corner, it shows recoding icon button and start HLS button.
 
 <p align="center">
-<img width="600" src="public/topbar.png"/>
+<img width="1359" src="public/topbar.png"/>
 </p>
 
 **4. ILSParticipantView**
