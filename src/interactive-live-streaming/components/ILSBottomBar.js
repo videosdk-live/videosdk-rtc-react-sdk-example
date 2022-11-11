@@ -609,7 +609,7 @@ export function ILSBottomBar({
 
     const { type, priority, gridSize } = useMemo(
       () => ({
-        type: "GRID",
+        type: "SPOTLIGHT",
         priority: "SPEAKER",
         gridSize: "12",
       }),
