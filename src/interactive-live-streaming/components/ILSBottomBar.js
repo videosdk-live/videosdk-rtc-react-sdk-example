@@ -843,6 +843,7 @@ export function ILSBottomBar({
   ];
 
   if (meetingMode === meetingModes.CONFERENCE) {
+    otherFeatures.pop({ icon: BottomBarButtonTypes.REACTION });
     otherFeatures.push({ icon: BottomBarButtonTypes.SCREEN_SHARE });
     otherFeatures.push({ icon: BottomBarButtonTypes.HLS });
   }
@@ -888,7 +889,8 @@ export function ILSBottomBar({
                   <HLSBTN isMobile={isMobile} isTab={isTab} />
                 ) : icon === BottomBarButtonTypes.POLL ? (
                   <PollBTN isMobile={isMobile} isTab={isTab} />
-                ) : icon === BottomBarButtonTypes.REACTION ? (
+                ) : icon === BottomBarButtonTypes.REACTION &&
+                  meetingMode === meetingModes.VIEWER ? (
                   <ReactionBTN isMobile={isMobile} isTab={isTab} />
                 ) : null}
               </Grid>
@@ -906,7 +908,9 @@ export function ILSBottomBar({
           <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
         )}
         <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
-        <ReactionBTN isMobile={isMobile} isTab={isTab} />
+        {meetingMode === meetingModes.VIEWER && (
+          <ReactionBTN isMobile={isMobile} isTab={isTab} />
+        )}
         {meetingMode === meetingModes.CONFERENCE && (
           <>
             <MicBTN />
