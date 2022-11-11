@@ -19,8 +19,8 @@ import PollList from "../../interactive-live-streaming/components/pollContainer/
 import SubmitPollList from "../../interactive-live-streaming/components/pollContainer/SubmitPollList";
 import { meetingModes, sideBarModes } from "../../utils/common";
 
-import { ChatSidePanel } from "./ChatPanel";
-import { ParticipantSidePanel } from "./ParticipantPanel";
+import { ChatPanel } from "./ChatPanel";
+import { ParticipantPanel } from "./ParticipantPanel";
 
 const SideBarTabView = ({
   height,
@@ -101,13 +101,13 @@ const SideBarTabView = ({
               </Box>
             )}
             {sideBarMode === "PARTICIPANTS" ? (
-              <ParticipantSidePanel
+              <ParticipantPanel
                 panelHeight={panelHeight}
                 raisedHandsParticipants={raisedHandsParticipants}
                 meetingMode={meetingMode}
               />
             ) : sideBarMode === "CHAT" ? (
-              <ChatSidePanel panelHeight={panelHeight} />
+              <ChatPanel panelHeight={panelHeight} />
             ) : sideBarMode === "POLLS" && meetingMode !== "VIEWER" ? (
               polls.length === 0 && draftPolls.length === 0 ? (
                 <CreatePoll {...{ panelHeight, polls }} />

@@ -5,7 +5,7 @@ import { meetingModes, meetingTypes } from "../utils/common";
 
 export function MeetingDetailsScreen({
   onClickJoin,
-  onClickCreateMeeting,
+  _handleOnCreateMeeting,
   participantName,
   setParticipantName,
   videoTrack,
@@ -131,26 +131,27 @@ export function MeetingDetailsScreen({
           <div className="flex flex-col md:flex-row lg:flex-col xl:flex-row justify-between w-full mb-4">
             {selectType.map((item, index) => (
               <div
-                class={`flex  ${
-                  index === 1 ? "flex-1 md:ml-2 lg:ml-0 xl:ml-2" : ""
+                key={`radio_${index}`}
+                className={`flex  ${
+                  index === 1 ? "flex-1 md:ml-2 lg:ml-0 xl:ml-2" : "2xl:flex-1"
                 } items-center mb-2 md:mb-4 mt-2 lg:mb-2 xl:mb-4 bg-gray-650 rounded-lg`}
               >
                 <input
                   id={`radio${index}`}
                   type="radio"
                   name="radio"
-                  class="hidden"
+                  className="hidden"
                   value={item.value}
-                  onClick={(e) => {
+                  onChange={(e) => {
                     setMeetingType(e.target.value);
                   }}
                   checked={meetingType === item.value}
                 />
                 <label
-                  for={`radio${index}`}
-                  class="flex items-center cursor-pointer text-white w-full px-2 py-2 lg:w-full xl:px-2 xl:py-2"
+                  htmlFor={`radio${index}`}
+                  className="flex items-center cursor-pointer text-white w-full px-2 py-2 lg:w-full xl:px-2 xl:py-2"
                 >
-                  <span class="w-4 h-4 inline-block mr-2 rounded-full border border-grey"></span>
+                  <span className="w-4 h-4 inline-block mr-2 rounded-full border border-grey"></span>
                   {item.label}
                 </label>
               </div>
@@ -161,7 +162,7 @@ export function MeetingDetailsScreen({
             <button
               className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
               onClick={async (e) => {
-                const meetingId = await onClickCreateMeeting();
+                const meetingId = await _handleOnCreateMeeting();
                 setMeetingId(meetingId);
                 setIscreateMeetingClicked(true);
                 if (meetingType === meetingTypes.ILS) {

@@ -757,6 +757,7 @@ export function ILSBottomBar({
           <div className="px-1 py-2 bg-white rounded-md">
             {emojiArray.map(({ emoji, emojiName }) => (
               <button
+                key={`reaction-${emojiName}`}
                 className="mx-2"
                 onClick={() => {
                   sendEmoji(emojiName);

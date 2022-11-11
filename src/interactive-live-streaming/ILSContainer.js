@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, createRef } from "react";
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import { PresenterView } from "../components/PresenterView";
@@ -51,9 +51,16 @@ export function ILSContainer({
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
 
-  const containerRef = useRef();
+  const containerRef = createRef();
+  const containerHeightRef = useRef();
+  const containerWidthRef = useRef();
   const meetingModeRef = useRef(meetingMode);
   const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    containerHeightRef.current = containerHeight;
+    containerWidthRef.current = containerWidth;
+  }, [containerHeight, containerWidth]);
 
   const sideBarContainerWidth = useResponsiveSize({
     xl: 400,
@@ -64,18 +71,17 @@ export function ILSContainer({
   });
 
   useEffect(() => {
-    containerRef.current?.offsetHeight &&
-      setContainerHeight(containerRef.current.offsetHeight);
-    containerRef.current?.offsetWidth &&
-      setContainerWidth(containerRef.current.offsetWidth);
+    const boundingRect = containerRef.current.getBoundingClientRect();
+    const { width, height } = boundingRect;
 
-    window.addEventListener("resize", ({ target }) => {
-      containerRef.current?.offsetHeight &&
-        setContainerHeight(containerRef.current.offsetHeight);
-      containerRef.current?.offsetWidth &&
-        setContainerWidth(containerRef.current.offsetWidth);
-    });
-  }, []);
+    if (height !== containerHeightRef.current) {
+      setContainerHeight(height);
+    }
+
+    if (width !== containerWidthRef.current) {
+      setContainerWidth(width);
+    }
+  }, [containerRef]);
 
   const { participantRaisedHand } = useRaisedHandParticipants();
 
@@ -246,7 +252,7 @@ export function ILSContainer({
 
   return (
     <div
-      style={{ height: windowHeight }}
+      // style={{ height: windowHeight }}
       ref={containerRef}
       className="h-screen flex flex-col bg-gray-800"
     >

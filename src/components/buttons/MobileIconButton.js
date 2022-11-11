@@ -88,7 +88,7 @@ export const MobileIconButton = ({
                     height: iconSize,
                     width: iconSize,
                   }}
-                  fillColor={isFocused ? focusIconColor || "#fff" : "#95959E"}
+                  fillcolor={isFocused ? focusIconColor || "#fff" : "#95959E"}
                 />
               )}
             </Badge>

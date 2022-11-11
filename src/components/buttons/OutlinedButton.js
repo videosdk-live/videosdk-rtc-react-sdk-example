@@ -137,7 +137,7 @@ export const OutlinedButton = ({
                       height: iconSize,
                       width: iconSize,
                     }}
-                    fillColor={
+                    fillcolor={
                       isFocused
                         ? focusIconColor || "#1C1F2E"
                         : color

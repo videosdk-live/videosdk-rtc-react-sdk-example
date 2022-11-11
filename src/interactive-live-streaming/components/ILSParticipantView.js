@@ -166,6 +166,7 @@ export function ILSParticipantView({ isPresenting, sideBarMode }) {
           (_, i) => {
             return (
               <div
+                key={`participant-${i}`}
                 className={`flex flex-1 ${
                   isPresenting
                     ? participants.length === 1

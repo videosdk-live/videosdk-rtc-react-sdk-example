@@ -167,7 +167,7 @@ const CreatePollPart = ({
     >
       <input
         type="text"
-        className="bg-gray-750  text-white text-sm rounded-lg  block w-full p-2.5 border border-gray-600 placeholder-gray-400 focus:ring-0 focus:border-purple-550"
+        className="bg-gray-750  text-white text-sm rounded block w-full p-2.5 border border-gray-600 placeholder-gray-400 focus:ring-0 focus:border-purple-550"
         placeholder="What you want to ask ?"
         autoFocus
         value={question}
@@ -188,7 +188,7 @@ const CreatePollPart = ({
               {options.map((item) => {
                 return (
                   <div className="flex mb-4">
-                    {isMarkAsCorrectChecked && item.option.length != 0 && (
+                    {isMarkAsCorrectChecked && item.option.length !== 0 && (
                       <MarkCorrectCheckbox
                         value={item.isCorrect}
                         checked={item.isCorrect === true}
@@ -303,7 +303,7 @@ const CreatePollPart = ({
             <input
               type={"text"}
               placeholder="Add your options"
-              inputRef={createOptionRef}
+              inputref={createOptionRef}
               className={`border-none ${
                 option.isCorrect && option.option
                   ? "bg-purple-550"
@@ -339,7 +339,7 @@ const CreatePollPart = ({
                   _handleKeyDown(e);
                   focusCreateOption();
                 }}
-                className="w-full bg-customGray-900 mt-4 focus:ring-0"
+                className="w-full bg-customGray-900 mt-4 focus:ring-0 rounded"
               />
             </div>
           )}
@@ -579,9 +579,17 @@ const PollButtonPart = ({
   };
 
   return (
-    <div className="flex" style={{ padding: padding }}>
+    <div
+      className="flex"
+      style={{
+        paddingTop: padding,
+        paddingLeft: padding,
+        paddingRight: padding,
+        paddingBottom: padding / 2,
+      }}
+    >
       <button
-        className="w-1/2 bg-gray-700 text-white p-2"
+        className="w-1/2 bg-gray-700 text-white p-2 rounded"
         onClick={() => {
           const isValid = handleValidation({
             question,
@@ -616,7 +624,7 @@ const PollButtonPart = ({
         Save
       </button>
       <button
-        className="w-1/2 ml-2 p-2 text-white bg-purple-550"
+        className="w-1/2 ml-2 p-2 text-white bg-purple-550 rounded"
         onClick={() => {
           const isValid = handleValidation({
             question,

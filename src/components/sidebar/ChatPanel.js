@@ -66,8 +66,8 @@ const ChatInput = ({ inputHeight }) => {
           paddingRight: 0,
           width: "100%",
         }}
-        rows={1}
-        rowsMax={2}
+        minRows={1}
+        maxRows={2}
         multiline
         id="outlined"
         onChange={(e) => {
@@ -161,7 +161,7 @@ const ChatMessages = ({ listHeight }) => {
   );
 };
 
-export function ChatSidePanel({ panelHeight }) {
+export function ChatPanel({ panelHeight }) {
   const inputHeight = 72;
   const listHeight = panelHeight - inputHeight;
 

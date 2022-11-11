@@ -54,7 +54,7 @@ function ParticipantListItem({ participantId, raisedHand, pId, meetingMode }) {
         </div>
         {raisedHand && (
           <div className="flex items-center justify-center m-1 p-1">
-            <RaiseHand fillColor={theme.palette.common.white} />
+            <RaiseHand fillcolor={theme.palette.common.white} />
           </div>
         )}
         <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
@@ -66,7 +66,7 @@ function ParticipantListItem({ participantId, raisedHand, pId, meetingMode }) {
   );
 }
 
-export function ParticipantSidePanel({
+export function ParticipantPanel({
   panelHeight,
   raisedHandsParticipants,
   meetingMode,

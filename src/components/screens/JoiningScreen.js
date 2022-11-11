@@ -357,8 +357,8 @@ export function JoiningScreen({
             display: "flex",
             flex: 1,
             flexDirection: isXStoSM ? "column" : "row",
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: gtThenMD ? "" : "center",
+            alignItems: gtThenMD ? "" : "center",
           }}
         >
           <Grid
@@ -376,18 +376,15 @@ export function JoiningScreen({
               item
               xs={12}
               md={gtThenXL ? 6 : 7}
-              style={{
-                display: "flex",
-                flex: 1,
-              }}
+              style={{ display: "flex", flex: 1 }}
             >
               <Box
                 style={{
                   width: isXSOnly ? "100%" : "100vw",
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  // alignItems: "center",
+                  // justifyContent: "center",
                 }}
                 p={internalPadding}
               >
@@ -468,7 +465,7 @@ export function JoiningScreen({
                         <Grid
                           container
                           alignItems="center"
-                          justify="center"
+                          justifyContent="center"
                           spacing={2}
                         >
                           <Grid item>
@@ -530,7 +527,7 @@ export function JoiningScreen({
                     (meetingMode === meetingModes.CONFERENCE ||
                       meetingType === meetingTypes.MEETING) && (
                       <Box
-                        className="absolute md:left-52 lg:left-24 xl:left-44 md:right-52 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
+                        className="absolute md:left-36 lg:left-24 xl:left-44 md:right-36 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
                         m={2}
                         onClick={(e) => {
                           handleClickOpen();
@@ -571,12 +568,9 @@ export function JoiningScreen({
               item
               xs={12}
               md={isXStoSM ? 5 : gtThenXL ? 6 : 5}
-              style={{
-                display: "flex",
-                flex: 1,
-              }}
+              style={{ display: "flex", flex: 1 }}
             >
-              <div className="w-full flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mx-44 md:mt-11 lg:mt-4">
+              <div className="w-full flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6  md:mt-11 lg:mt-4">
                 <MeetingDetailsScreen
                   participantName={participantName}
                   setParticipantName={setParticipantName}
@@ -604,7 +598,7 @@ export function JoiningScreen({
                       setParticipantName("");
                     } else alert("Invalid Meeting Id");
                   }}
-                  onClickCreateMeeting={async () => {
+                  _handleOnCreateMeeting={async () => {
                     const token = await getToken();
                     const _meetingId = await createMeeting({ token });
                     setToken(token);
