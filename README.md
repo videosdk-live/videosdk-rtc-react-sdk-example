@@ -595,7 +595,7 @@ There are 2 folders :
 - `interactive-live-streaming/components/ILSParticipantView.js` - It contains the grid of participant that join as a host are displayed in the main screen.
 
 <p align="center">
-<img width="1366" height="768" src="public/ILS_participantView.png.png"/>
+<img width="1366" height="768" src="public/ILS_participantView.png"/>
 </p>
 
 **5. HLSContainer**
