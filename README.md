@@ -22,16 +22,20 @@ Check out demo [here](https://videosdk.live/prebuilt/demo)
 
 ## Interactive Live Streaming Features
 
-- [x] Real-time video and audio conferencing
+#### Host
 - [x] Enable/disable camera
 - [x] Mute/unmute mic
+- [x] Poll
 - [x] Chat
 - [x] Raise hand
 - [x] Screen share
 - [x] Recording
+- [x] HLS
+
+#### Viewer
 - [x] Reactions
 - [x] Poll
-- [x] Interactive Live Streaming
+- [x] Raise hand
 
 <br/>
 
