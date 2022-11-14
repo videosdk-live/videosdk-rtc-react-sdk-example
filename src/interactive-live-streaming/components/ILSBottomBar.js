@@ -1,20 +1,20 @@
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { sideBarModes } from "./MeetingContainer/MeetingContainer";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
-import recordingBlink from "../animations/recording-blink.json";
-import useIsRecording from "./MeetingContainer/useIsRecording";
-import RecordingIcon from "../icons/Bottombar/RecordingIcon";
-import MicOnIcon from "../icons/Bottombar/MicOnIcon";
-import MicOffIcon from "../icons/Bottombar/MicOffIcon";
-import WebcamOnIcon from "../icons/Bottombar/WebcamOnIcon";
-import WebcamOffIcon from "../icons/Bottombar/WebcamOffIcon";
-import ScreenShareIcon from "../icons/Bottombar/ScreenShareIcon";
-import ChatIcon from "../icons/Bottombar/ChatIcon";
-import ParticipantsIcon from "../icons/Bottombar/ParticipantsIcon";
-import EndIcon from "../icons/Bottombar/EndIcon";
-import RaiseHandIcon from "../icons/Bottombar/RaiseHandIcon";
-import { OutlinedButton } from "./OutlinedButton";
+import recordingBlink from "../../animations/recording-blink.json";
+import liveHLS from "../../animations/live-hls.json";
+import useIsRecording from "../../hooks/useIsRecording";
+import RecordingIcon from "../../icons/Bottombar/RecordingIcon";
+import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
+import MicOffIcon from "../../icons/Bottombar/MicOffIcon";
+import WebcamOnIcon from "../../icons/Bottombar/WebcamOnIcon";
+import WebcamOffIcon from "../../icons/Bottombar/WebcamOffIcon";
+import ScreenShareIcon from "../../icons/Bottombar/ScreenShareIcon";
+import ChatIcon from "../../icons/Bottombar/ChatIcon";
+import ParticipantsIcon from "../../icons/Bottombar/ParticipantsIcon";
+import EndIcon from "../../icons/Bottombar/EndIcon";
+import RaiseHandIcon from "../../icons/Bottombar/RaiseHandIcon";
+import { OutlinedButton } from "../../components/buttons/OutlinedButton";
 import {
   Box,
   Grid,
@@ -32,9 +32,14 @@ import {
   ArrowDropDown as ArrowDropDownIcon,
   MoreHoriz as MoreHorizIcon,
 } from "@material-ui/icons";
-import useIsTab from "../utils/useIsTab";
-import useIsMobile from "../utils/useIsMobile";
-import { MobileIconButton } from "./MobileIconButton";
+import useIsTab from "../../hooks/useIsTab";
+import useIsMobile from "../../hooks/useIsMobile";
+import { MobileIconButton } from "../../components/buttons/MobileIconButton";
+import PollIcon from "../../icons/Bottombar/PollIcon";
+import useIsHls from "../../hooks/useIsHls";
+import LiveIcon from "../../icons/LiveIcon";
+import ReactionIcon from "../../icons/Bottombar/ReactionIcon";
+import { meetingModes, sideBarModes } from "../../utils/common";
 
 const useStyles = makeStyles({
   popoverHoverDark: {
@@ -52,7 +57,7 @@ const useStyles = makeStyles({
     padding: "6px 12px",
   },
 });
-export function BottomBar({
+export function ILSBottomBar({
   bottomBarHeight,
   sideBarMode,
   setSideBarMode,
@@ -61,6 +66,7 @@ export function BottomBar({
   setSelectWebcamDeviceId,
   selectMicDeviceId,
   setSelectMicDeviceId,
+  meetingMode,
 }) {
   const RaiseHandBTN = ({ isMobile, isTab }) => {
     const { publish } = usePubSub("RAISE_HAND");
@@ -86,7 +92,7 @@ export function BottomBar({
   };
 
   const RecordingBTN = () => {
-    const mMeeting = useMeeting();
+    const { startRecording, stopRecording, recordingState } = useMeeting();
     const defaultOptions = {
       loop: true,
       autoplay: true,
@@ -97,12 +103,8 @@ export function BottomBar({
       height: 64,
       width: 160,
     };
-    const startRecording = mMeeting?.startRecording;
-    const stopRecording = mMeeting?.stopRecording;
-    const recordingState = mMeeting?.recordingState;
 
     const isRecording = useIsRecording();
-
     const isRecordingRef = useRef(isRecording);
 
     useEffect(() => {
@@ -434,10 +436,7 @@ export function BottomBar({
   };
 
   const ScreenShareBTN = ({ isMobile, isTab }) => {
-    const mMeeting = useMeeting();
-    const localScreenShareOn = mMeeting?.localScreenShareOn;
-    const toggleScreenShare = mMeeting?.toggleScreenShare;
-    const presenterId = mMeeting?.presenterId;
+    const { localScreenShareOn, toggleScreenShare, presenterId } = useMeeting();
 
     return isMobile || isTab ? (
       <MobileIconButton
@@ -491,14 +490,14 @@ export function BottomBar({
   };
 
   const LeaveBTN = () => {
-    const mMeeting = useMeeting();
+    const { leave } = useMeeting();
 
     return (
       <OutlinedButton
         Icon={EndIcon}
         bgColor="bg-red-150"
         onClick={() => {
-          mMeeting.leave();
+          leave();
           setIsMeetingLeft(true);
         }}
         tooltip="Leave Meeting"
@@ -548,6 +547,7 @@ export function BottomBar({
           );
         }}
         badge={`${new Map(participants)?.size}`}
+        disabled={meetingMode === meetingModes.VIEWER}
       />
     ) : (
       <OutlinedButton
@@ -560,21 +560,230 @@ export function BottomBar({
         isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
         tooltip={"View Participants"}
         badge={`${new Map(participants)?.size}`}
+        disabled={meetingMode === meetingModes.VIEWER}
       />
     );
   };
 
+  const PollBTN = ({ isMobile, isTab }) => {
+    return isMobile || isTab ? (
+      <MobileIconButton
+        id="poll-btn"
+        tooltipTitle={"Poll"}
+        buttonText={"Poll"}
+        isFocused={sideBarMode === sideBarModes.POLLS}
+        Icon={PollIcon}
+        onClick={() => {
+          setSideBarMode((s) =>
+            s === sideBarModes.POLLS ? null : sideBarModes.POLLS
+          );
+        }}
+      />
+    ) : (
+      <OutlinedButton
+        Icon={PollIcon}
+        onClick={() => {
+          setSideBarMode((s) =>
+            s === sideBarModes.POLLS ? null : sideBarModes.POLLS
+          );
+        }}
+        isFocused={sideBarMode === sideBarModes.POLLS}
+        tooltip={"Poll"}
+      />
+    );
+  };
+
+  const HLSBTN = ({ isMobile, isTab }) => {
+    const { startHls, stopHls, hlsState } = useMeeting({});
+
+    const isHls = useIsHls();
+
+    const { isRequestProcessing } = useMemo(
+      () => ({
+        isRequestProcessing:
+          hlsState === Constants.hlsEvents.HLS_STARTING ||
+          hlsState === Constants.hlsEvents.HLS_STOPPING,
+      }),
+      [hlsState]
+    );
+
+    const { type, priority, gridSize } = useMemo(
+      () => ({
+        type: "SPOTLIGHT",
+        priority: "SPEAKER",
+        gridSize: "12",
+      }),
+      []
+    );
+
+    const typeRef = useRef(type);
+    const priorityRef = useRef(priority);
+    const gridSizeRef = useRef(gridSize);
+    const isHlsRef = useRef(isHls);
+
+    useEffect(() => {
+      typeRef.current = type;
+    }, [type]);
+
+    useEffect(() => {
+      priorityRef.current = priority;
+    }, [priority]);
+
+    useEffect(() => {
+      gridSizeRef.current = gridSize;
+    }, [gridSize]);
+
+    useEffect(() => {
+      isHlsRef.current = isHls;
+    }, [isHls]);
+
+    const defaultOptions = {
+      loop: true,
+      autoplay: true,
+      animationData: liveHLS,
+      rendererSettings: {
+        preserveAspectRatio: "xMidYMid slice",
+      },
+      height: 64,
+      width: 170,
+    };
+
+    const _handleStartHLS = () => {
+      const type = typeRef.current;
+      const priority = priorityRef.current;
+      const gridSize = gridSizeRef.current;
+
+      const layout = { type, priority, gridSize };
+
+      startHls({ layout, theme: "DARK" });
+    };
+
+    const _handleClick = () => {
+      const isHls = isHlsRef.current;
+
+      if (isHls) {
+        stopHls();
+      } else {
+        _handleStartHLS();
+      }
+    };
+
+    return isMobile || isTab ? (
+      <MobileIconButton
+        onClick={_handleClick}
+        tooltipTitle={
+          hlsState === Constants.hlsEvents.HLS_STARTED
+            ? "Stop HLS"
+            : hlsState === Constants.hlsEvents.HLS_STARTING
+            ? "Starting HLS"
+            : hlsState === Constants.hlsEvents.HLS_STOPPED
+            ? "Start HLS"
+            : hlsState === Constants.hlsEvents.HLS_STOPPING
+            ? "Stopping HLS"
+            : "Start HLS"
+        }
+        Icon={LiveIcon}
+        buttonText={
+          hlsState === Constants.hlsEvents.HLS_STARTED
+            ? "Stop HLS"
+            : hlsState === Constants.hlsEvents.HLS_STARTING
+            ? "Starting HLS"
+            : hlsState === Constants.hlsEvents.HLS_STOPPED
+            ? "Start HLS"
+            : hlsState === Constants.hlsEvents.HLS_STOPPING
+            ? "Stopping HLS"
+            : "Start HLS"
+        }
+        isFocused={isHls}
+        lottieOption={isHls ? defaultOptions : null}
+        isRequestProcessing={isRequestProcessing}
+      />
+    ) : null;
+  };
+
+  const ReactionBTN = ({ isMobile, isTab }) => {
+    const [btnClicked, setBtnClicked] = useState(false);
+    const { publish } = usePubSub("REACTION");
+
+    const handleOpenMenu = (event) => {
+      setBtnClicked(event.currentTarget);
+    };
+
+    const handleCloseMenu = () => {
+      setBtnClicked(null);
+    };
+
+    function sendEmoji(emoji) {
+      // Dispatch custom event here so the local user can see their own emoji
+      window.dispatchEvent(
+        new CustomEvent("reaction_added", { detail: { emoji } })
+      );
+      handleCloseMenu();
+    }
+
+    const emojiArray = [
+      { emoji: "😍", emojiName: "heartEye" },
+      { emoji: "😂", emojiName: "laugh" },
+      { emoji: "👍", emojiName: "thumbsup" },
+      { emoji: "🎉", emojiName: "confetti" },
+      { emoji: "👏", emojiName: "clap" },
+      { emoji: "❤️", emojiName: "heart" },
+    ];
+
+    return (
+      <>
+        <OutlinedButton
+          Icon={ReactionIcon}
+          onClick={(e) => {
+            handleOpenMenu(e);
+          }}
+          isFocused={btnClicked}
+          tooltip={"Reactions"}
+        />
+        <Popover
+          container={tollTipEl.current}
+          anchorOrigin={{
+            vertical: isMobile || isTab ? "bottom" : "top",
+            horizontal: "center",
+          }}
+          transformOrigin={{
+            vertical: isMobile || isTab ? "top" : "bottom",
+            horizontal: "center",
+          }}
+          anchorEl={tollTipEl.current}
+          open={Boolean(btnClicked)}
+          onClose={handleCloseMenu}
+        >
+          <div className="px-1 py-2 bg-white rounded-md">
+            {emojiArray.map(({ emoji, emojiName }) => (
+              <button
+                key={`reaction-${emojiName}`}
+                className="mx-2"
+                onClick={() => {
+                  sendEmoji(emojiName);
+                  publish(emojiName);
+                }}
+              >
+                <p className="text-3xl">{emoji}</p>
+              </button>
+            ))}
+          </div>
+        </Popover>
+      </>
+    );
+  };
+
   const MeetingIdCopyBTN = () => {
-    const mMeeting = useMeeting();
+    const { meetingId } = useMeeting();
     const [isCopied, setIsCopied] = useState(false);
     return (
       <div className="flex items-center justify-center lg:ml-0 ml-4 mt-4 xl:mt-0">
         <div className="flex border-2 border-gray-850 p-2 rounded-md items-center justify-center">
-          <h1 className="text-white text-base ">{mMeeting.meetingId}</h1>
+          <h1 className="text-white text-base ">{meetingId}</h1>
           <button
             className="ml-2"
             onClick={() => {
-              navigator.clipboard.writeText(mMeeting.meetingId);
+              navigator.clipboard.writeText(meetingId);
               setIsCopied(true);
               setTimeout(() => {
                 setIsCopied(false);
@@ -588,16 +797,11 @@ export function BottomBar({
             )}
           </button>
         </div>
-
-        {/* <div className="flex border-2 border-gray-850 p-2 ml-4 rounded-md items-center justify-center">
-          <h1 className="text-white">00:30</h1>
-        </div> */}
       </div>
     );
   };
 
   const tollTipEl = useRef();
-
   const isMobile = useIsMobile();
   const isTab = useIsTab();
 
@@ -622,17 +826,27 @@ export function BottomBar({
       RAISE_HAND: "RAISE_HAND",
       RECORDING: "RECORDING",
       MEETING_ID_COPY: "MEETING_ID_COPY",
+      HLS: "HLS",
+      POLL: "POLL",
+      REACTION: "REACTION",
     }),
     []
   );
 
   const otherFeatures = [
     { icon: BottomBarButtonTypes.RAISE_HAND },
-    { icon: BottomBarButtonTypes.SCREEN_SHARE },
     { icon: BottomBarButtonTypes.CHAT },
     { icon: BottomBarButtonTypes.PARTICIPANTS },
     { icon: BottomBarButtonTypes.MEETING_ID_COPY },
+    { icon: BottomBarButtonTypes.POLL },
+    { icon: BottomBarButtonTypes.REACTION },
   ];
+
+  if (meetingMode === meetingModes.CONFERENCE) {
+    otherFeatures.pop({ icon: BottomBarButtonTypes.REACTION });
+    otherFeatures.push({ icon: BottomBarButtonTypes.SCREEN_SHARE });
+    otherFeatures.push({ icon: BottomBarButtonTypes.HLS });
+  }
 
   return isMobile || isTab ? (
     <div
@@ -671,6 +885,13 @@ export function BottomBar({
                   <ParticipantsBTN isMobile={isMobile} isTab={isTab} />
                 ) : icon === BottomBarButtonTypes.MEETING_ID_COPY ? (
                   <MeetingIdCopyBTN isMobile={isMobile} isTab={isTab} />
+                ) : icon === BottomBarButtonTypes.HLS ? (
+                  <HLSBTN isMobile={isMobile} isTab={isTab} />
+                ) : icon === BottomBarButtonTypes.POLL ? (
+                  <PollBTN isMobile={isMobile} isTab={isTab} />
+                ) : icon === BottomBarButtonTypes.REACTION &&
+                  meetingMode === meetingModes.VIEWER ? (
+                  <ReactionBTN isMobile={isMobile} isTab={isTab} />
                 ) : null}
               </Grid>
             );
@@ -683,14 +904,23 @@ export function BottomBar({
       <MeetingIdCopyBTN />
 
       <div className="flex flex-1 items-center justify-center" ref={tollTipEl}>
-        <RecordingBTN />
+        {meetingMode === meetingModes.CONFERENCE && (
+          <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
+        )}
         <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
-        <MicBTN />
-        <WebCamBTN />
-        <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
+        {meetingMode === meetingModes.VIEWER && (
+          <ReactionBTN isMobile={isMobile} isTab={isTab} />
+        )}
+        {meetingMode === meetingModes.CONFERENCE && (
+          <>
+            <MicBTN />
+            <WebCamBTN />
+          </>
+        )}
         <LeaveBTN />
       </div>
       <div className="flex items-center justify-center">
+        <PollBTN />
         <ChatBTN isMobile={isMobile} isTab={isTab} />
         <ParticipantsBTN isMobile={isMobile} isTab={isTab} />
       </div>

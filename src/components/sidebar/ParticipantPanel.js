@@ -1,18 +1,47 @@
 import { Avatar, useTheme } from "@material-ui/core";
-import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
-import React, { useMemo } from "react";
+import {
+  useMeeting,
+  useParticipant,
+  usePubSub,
+} from "@videosdk.live/react-sdk";
+import React, { useMemo, useState } from "react";
 import MicOffIcon from "../../icons/ParticipantTabPanel/MicOffIcon";
 import MicOnIcon from "../../icons/ParticipantTabPanel/MicOnIcon";
 import RaiseHand from "../../icons/ParticipantTabPanel/RaiseHand";
 import VideoCamOffIcon from "../../icons/ParticipantTabPanel/VideoCamOffIcon";
 import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
 import { nameTructed } from "../../utils/helper";
+import useIsHls from "../../hooks/useIsHls";
 
-function ParticipantListItem({ participantId, raisedHand, pId }) {
+function ParticipantListItem({ participantId, raisedHand, pId, meetingMode }) {
+  const [participantMode, setParticipantMode] = useState(null);
+
   const { micOn, webcamOn, displayName, isLocal } =
     useParticipant(participantId);
 
   const theme = useTheme();
+  const isHls = useIsHls();
+
+  usePubSub(`CURRENT_MODE_${participantId}`, {
+    onMessageReceived: (data) => {
+      setParticipantMode(data.message);
+    },
+    onOldMessagesReceived: (messages) => {
+      const latestMessage = messages.sort((a, b) => {
+        if (a.timestamp > b.timestamp) {
+          return -1;
+        }
+        if (a.timestamp < b.timestamp) {
+          return 1;
+        }
+        return 0;
+      })[0];
+
+      if (latestMessage) {
+        setParticipantMode(latestMessage.message);
+      }
+    },
+  });
 
   return (
     <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg mb-0">
@@ -25,7 +54,7 @@ function ParticipantListItem({ participantId, raisedHand, pId }) {
         </div>
         {raisedHand && (
           <div className="flex items-center justify-center m-1 p-1">
-            <RaiseHand fillColor={theme.palette.common.white} />
+            <RaiseHand fillcolor={theme.palette.common.white} />
           </div>
         )}
         <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
@@ -37,7 +66,11 @@ function ParticipantListItem({ participantId, raisedHand, pId }) {
   );
 }
 
-export function ParticipantSidePanel({ panelHeight, raisedHandsParticipants }) {
+export function ParticipantPanel({
+  panelHeight,
+  raisedHandsParticipants,
+  meetingMode,
+}) {
   const mMeeting = useMeeting();
   const participants = mMeeting.participants;
 
@@ -96,6 +129,7 @@ export function ParticipantSidePanel({ panelHeight, raisedHandsParticipants }) {
             <ParticipantListItem
               participantId={peerId}
               raisedHand={raisedHand}
+              meetingMode={meetingMode}
             />
           );
         })}

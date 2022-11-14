@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import useResponsiveSize from "../utils/useResponsiveSize";
-import animationData from "../../src/animations/join_meeting.json";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
+import animationData from "../../../src/animations/join_meeting.json";
 import Lottie from "react-lottie";
 import { useTheme } from "@material-ui/core";
 
-const WaitingToJoin = () => {
+const WaitingToJoinScreen = () => {
   const theme = useTheme();
 
   const waitingMessages = [
@@ -71,4 +71,4 @@ const WaitingToJoin = () => {
   );
 };
 
-export default WaitingToJoin;
+export default WaitingToJoinScreen;

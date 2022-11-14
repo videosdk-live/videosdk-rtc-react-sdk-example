@@ -11,11 +11,16 @@ import {
 import { Close } from "@material-ui/icons";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import React from "react";
-import useIsMobile from "../../utils/useIsMobile";
-import useIsTab from "../../utils/useIsTab";
-import useResponsiveSize from "../../utils/useResponsiveSize";
-import { ChatSidePanel } from "./ChatSidePanel";
-import { ParticipantSidePanel } from "./ParticipantSidePanel";
+import useIsMobile from "../../hooks/useIsMobile";
+import useIsTab from "../../hooks/useIsTab";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
+import CreatePoll from "../../interactive-live-streaming/components/pollContainer/CreatePoll";
+import PollList from "../../interactive-live-streaming/components/pollContainer/PollList";
+import SubmitPollList from "../../interactive-live-streaming/components/pollContainer/SubmitPollList";
+import { meetingModes, sideBarModes } from "../../utils/common";
+
+import { ChatPanel } from "./ChatPanel";
+import { ParticipantPanel } from "./ParticipantPanel";
 
 const SideBarTabView = ({
   height,
@@ -27,6 +32,10 @@ const SideBarTabView = ({
   panelHeaderPadding,
   panelPadding,
   handleClose,
+  meetingMode,
+  polls,
+  draftPolls,
+  setSideBarMode,
 }) => {
   const { participants } = useMeeting();
   const theme = useTheme();
@@ -69,6 +78,18 @@ const SideBarTabView = ({
                     ? `${capitalize(
                         String(sideBarMode || "").toLowerCase()
                       )} (${new Map(participants)?.size})`
+                    : sideBarMode === sideBarModes.CREATE_POLL
+                    ? "Create a poll"
+                    : sideBarMode === sideBarModes.POLLS
+                    ? polls?.length >= 1 || draftPolls?.length >= 1
+                      ? `Polls ${
+                          polls?.length || draftPolls?.length
+                            ? `(${polls?.length || draftPolls?.length})`
+                            : ""
+                        }`
+                      : meetingMode === meetingModes.VIEWER
+                      ? `Polls ${polls?.length ? `(${polls?.length})` : ""}`
+                      : "Create a poll"
                     : capitalize(String(sideBarMode || "").toLowerCase())}
                 </Typography>
                 <IconButton
@@ -80,12 +101,25 @@ const SideBarTabView = ({
               </Box>
             )}
             {sideBarMode === "PARTICIPANTS" ? (
-              <ParticipantSidePanel
+              <ParticipantPanel
                 panelHeight={panelHeight}
                 raisedHandsParticipants={raisedHandsParticipants}
+                meetingMode={meetingMode}
               />
             ) : sideBarMode === "CHAT" ? (
-              <ChatSidePanel panelHeight={panelHeight} />
+              <ChatPanel panelHeight={panelHeight} />
+            ) : sideBarMode === "POLLS" && meetingMode !== "VIEWER" ? (
+              polls.length === 0 && draftPolls.length === 0 ? (
+                <CreatePoll {...{ panelHeight, polls }} />
+              ) : (
+                <PollList
+                  {...{ panelHeight, polls, draftPolls, setSideBarMode }}
+                />
+              )
+            ) : sideBarMode === "POLLS" && meetingMode === "VIEWER" ? (
+              <SubmitPollList {...{ panelHeight, polls }} />
+            ) : sideBarMode === "CREATE_POLL" ? (
+              <CreatePoll {...{ panelHeight, polls, setSideBarMode }} />
             ) : null}
           </>
         </div>
@@ -99,21 +133,17 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 });
 export function SidebarConatiner({
   height,
+  sideBarContainerWidth,
   sideBarMode,
   setSideBarMode,
   raisedHandsParticipants,
+  meetingMode,
+  polls,
+  draftPolls,
 }) {
   const panelPadding = 8;
 
   const paddedHeight = height - panelPadding * 3.5;
-
-  const sideBarContainerWidth = useResponsiveSize({
-    xl: 400,
-    lg: 360,
-    md: 320,
-    sm: 280,
-    xs: 240,
-  });
 
   const panelHeaderHeight = useResponsiveSize({
     xl: 52,
@@ -157,6 +187,8 @@ export function SidebarConatiner({
           panelHeaderPadding={panelHeaderPadding}
           panelPadding={panelPadding}
           handleClose={handleClose}
+          polls={polls}
+          draftPolls={draftPolls}
         />
       </Dialog>
     ) : (
@@ -170,6 +202,10 @@ export function SidebarConatiner({
         panelHeaderPadding={panelHeaderPadding}
         panelPadding={panelPadding}
         handleClose={handleClose}
+        meetingMode={meetingMode}
+        polls={polls}
+        draftPolls={draftPolls}
+        setSideBarMode={setSideBarMode}
       />
     )
   ) : (

@@ -1,13 +1,21 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Grid, useTheme } from "@material-ui/core";
+import { useTheme } from "@material-ui/core";
 import { useParticipant, useMeeting } from "@videosdk.live/react-sdk";
 import { nameTructed } from "../../utils/helper";
 import { MicOff } from "@material-ui/icons";
 import ReactPlayer from "react-player";
 
 function ParticipantView({ participantId }) {
-  const { displayName, webcamStream, micStream, webcamOn, micOn, isLocal } =
-    useParticipant(participantId);
+  const {
+    displayName,
+    webcamStream,
+    micStream,
+    webcamOn,
+    micOn,
+    isLocal,
+    mode,
+  } = useParticipant(participantId);
+
   const micRef = useRef(null);
   const mMeeting = useMeeting();
   const isPresenting = mMeeting.isPresenting;
@@ -35,7 +43,7 @@ function ParticipantView({ participantId }) {
       return mediaStream;
     }
   }, [webcamStream, webcamOn]);
-  return (
+  return mode === "CONFERENCE" ? (
     <div
       className={`h-full w-full  bg-gray-750 relative overflow-hidden rounded-lg video-cover`}
     >
@@ -96,15 +104,18 @@ function ParticipantView({ participantId }) {
         </div>
       )}
     </div>
-  );
+  ) : null;
 }
-export function ParticipantsViewer({ isPresenting, sideBarMode }) {
+export function ILSParticipantView({ isPresenting, sideBarMode }) {
   const theme = useTheme();
   const mMeeting = useMeeting();
 
-  const participants = isPresenting
-    ? [...mMeeting?.participants.keys()].slice(0, 6)
-    : [...mMeeting?.participants.keys()];
+  const participants = [];
+  mMeeting?.participants.forEach((values, keys) => {
+    if (values.mode === "CONFERENCE") {
+      participants.push(values.id);
+    }
+  });
 
   const isXStoSM = theme.breakpoints.between("xs", "sm");
   const isMobile = window.matchMedia(
@@ -155,6 +166,7 @@ export function ParticipantsViewer({ isPresenting, sideBarMode }) {
           (_, i) => {
             return (
               <div
+                key={`participant-${i}`}
                 className={`flex flex-1 ${
                   isPresenting
                     ? participants.length === 1

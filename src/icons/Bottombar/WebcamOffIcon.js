@@ -17,7 +17,7 @@ const WebcamOffIcon = (props) => (
     <defs>
       <clipPath id="a">
         <path
-          fill={props.fillColor}
+          fill={props.fillcolor}
           transform="translate(1 1)"
           d="M0 0h21.905v22.59H0z"
         />

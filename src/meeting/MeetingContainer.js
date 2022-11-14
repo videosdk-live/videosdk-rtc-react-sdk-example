@@ -1,19 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
-import { BottomBar } from "../BottomBar";
-import { SidebarConatiner } from "../SidebarContainer/SidebarContainer";
-import { ParticipantsViewer } from "./ParticipantView";
-import { PresenterView } from "./PresenterView";
+import React, { useState, useEffect, useRef, createRef } from "react";
+import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import { BottomBar } from "./components/BottomBar";
+import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
+import { ParticipantsViewer } from "./components/ParticipantView";
+import { PresenterView } from "../components/PresenterView";
 import { useSnackbar } from "notistack";
-import { nameTructed, trimSnackBarText } from "../../utils/helper";
-import useResponsiveSize from "../../utils/useResponsiveSize";
-import WaitingToJoin from "../WaitingToJoin";
-import useWindowSize from "../../utils/useWindowSize";
+import { nameTructed, trimSnackBarText } from "../utils/helper";
+import useResponsiveSize from "../hooks/useResponsiveSize";
+import useWindowSize from "../hooks/useWindowSize";
+import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 
-export const sideBarModes = {
-  PARTICIPANTS: "PARTICIPANTS",
-  CHAT: "CHAT",
-};
 export function MeetingContainer({
   onMeetingLeave,
   setIsMeetingLeft,
@@ -28,35 +24,45 @@ export function MeetingContainer({
   micEnabled,
   webcamEnabled,
 }) {
+  const bottomBarHeight = 60;
+
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
-  const mMeetingRef = useRef();
+  const [sideBarMode, setSideBarMode] = useState(null);
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
-  const containerRef = useRef();
+
+  const mMeetingRef = useRef();
+  const containerRef = createRef();
+  const containerHeightRef = useRef();
+  const containerWidthRef = useRef();
   const { enqueueSnackbar } = useSnackbar();
 
-  const presentingSideBarWidth = useResponsiveSize({
-    xl: 320,
-    lg: 280,
-    md: 260,
-    sm: 240,
-    xs: 200,
+  useEffect(() => {
+    containerHeightRef.current = containerHeight;
+    containerWidthRef.current = containerWidth;
+  }, [containerHeight, containerWidth]);
+
+  const sideBarContainerWidth = useResponsiveSize({
+    xl: 400,
+    lg: 360,
+    md: 320,
+    sm: 280,
+    xs: 240,
   });
 
   useEffect(() => {
-    containerRef.current?.offsetHeight &&
-      setContainerHeight(containerRef.current.offsetHeight);
-    containerRef.current?.offsetWidth &&
-      setContainerWidth(containerRef.current.offsetWidth);
+    const boundingRect = containerRef.current.getBoundingClientRect();
+    const { width, height } = boundingRect;
 
-    window.addEventListener("resize", ({ target }) => {
-      containerRef.current?.offsetHeight &&
-        setContainerHeight(containerRef.current.offsetHeight);
-      containerRef.current?.offsetWidth &&
-        setContainerWidth(containerRef.current.offsetWidth);
-    });
-  }, []);
+    if (height !== containerHeightRef.current) {
+      setContainerHeight(height);
+    }
+
+    if (width !== containerWidthRef.current) {
+      setContainerWidth(width);
+    }
+  }, [containerRef]);
 
   const { participantRaisedHand } = useRaisedHandParticipants();
 
@@ -64,26 +70,24 @@ export function MeetingContainer({
     setIsMeetingLeft(true);
   };
 
+  const _handleOnRecordingStateChanged = ({ status }) => {
+    if (
+      status === Constants.recordingEvents.RECORDING_STARTED ||
+      status === Constants.recordingEvents.RECORDING_STOPPED
+    ) {
+      enqueueSnackbar(
+        status === Constants.recordingEvents.RECORDING_STARTED
+          ? "Meeting recording is started."
+          : "Meeting recording is stopped."
+      );
+    }
+  };
+
   function onParticipantJoined(participant) {
     // Change quality to low, med or high based on resolution
     participant && participant.setQuality("high");
-    console.log(" onParticipantJoined", participant);
   }
-  function onParticipantLeft(participant) {
-    // console.log(" onParticipantLeft", participant);
-  }
-  const onSpeakerChanged = (activeSpeakerId) => {
-    // console.log(" onSpeakerChanged", activeSpeakerId);
-  };
-  function onPresenterChanged(presenterId) {
-    // console.log(" onPresenterChanged", presenterId);
-  }
-  function onMainParticipantChanged(participant) {
-    // console.log(" onMainParticipantChanged", participant);
-  }
-  function onEntryRequested(participantId, name) {
-    // console.log(" onEntryRequested", participantId, name);
-  }
+
   function onEntryResponded(participantId, name) {
     // console.log(" onEntryResponded", participantId, name);
     if (mMeetingRef.current?.localParticipant?.id === participantId) {
@@ -97,15 +101,7 @@ export function MeetingContainer({
       }
     }
   }
-  function onRecordingStarted() {
-    // console.log(" onRecordingStarted");
-  }
-  function onRecordingStopped() {
-    // console.log(" onRecordingStopped");
-  }
-  function onChatMessage(data) {
-    // console.log(" onChatMessage", data);
-  }
+
   async function onMeetingJoined() {
     // console.log("onMeetingJoined");
     const { changeWebcam, changeMic, muteMic, disableWebcam } =
@@ -135,60 +131,20 @@ export function MeetingContainer({
     // console.log("onMeetingLeft");
     onMeetingLeave();
   }
-  const onLiveStreamStarted = (data) => {
-    // console.log("onLiveStreamStarted example", data);
-  };
-  const onLiveStreamStopped = (data) => {
-    // console.log("onLiveStreamStopped example", data);
-  };
-
-  const onVideoStateChanged = (data) => {
-    // console.log("onVideoStateChanged", data);
-  };
-  const onVideoSeeked = (data) => {
-    // console.log("onVideoSeeked", data);
-  };
-
-  const onWebcamRequested = (data) => {
-    // console.log("onWebcamRequested", data);
-  };
-  const onMicRequested = (data) => {
-    // console.log("onMicRequested", data);
-  };
-  const onPinStateChanged = (data) => {
-    // console.log("onPinStateChanged", data);
-  };
 
   const mMeeting = useMeeting({
     onParticipantJoined,
-    onParticipantLeft,
-    onSpeakerChanged,
-    onPresenterChanged,
-    onMainParticipantChanged,
-    onEntryRequested,
     onEntryResponded,
-    onRecordingStarted,
-    onRecordingStopped,
-    onChatMessage,
     onMeetingJoined,
     onMeetingLeft,
-    onLiveStreamStarted,
-    onLiveStreamStopped,
-    onVideoStateChanged,
-    onVideoSeeked,
-    onWebcamRequested,
-    onMicRequested,
-    onPinStateChanged,
+    onRecordingStateChanged: _handleOnRecordingStateChanged,
   });
+
+  const isPresenting = mMeeting.presenterId ? true : false;
 
   useEffect(() => {
     mMeetingRef.current = mMeeting;
   }, [mMeeting]);
-
-  const isPresenting = mMeeting.presenterId ? true : false;
-
-  const bottomBarHeight = 60;
-  const [sideBarMode, setSideBarMode] = useState(null);
 
   usePubSub("RAISE_HAND", {
     onMessageReceived: (data) => {
@@ -229,6 +185,7 @@ export function MeetingContainer({
       }
     },
   });
+
   const { width: windowWidth, height: windowHeight } = useWindowSize();
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
@@ -236,7 +193,7 @@ export function MeetingContainer({
 
   return (
     <div
-      style={{ height: windowHeight }}
+      // style={{ height: windowHeight }}
       ref={containerRef}
       className="h-screen flex flex-col bg-gray-800"
     >
@@ -255,13 +212,16 @@ export function MeetingContainer({
                   />
                 )}
               </div>
+
               <SidebarConatiner
                 height={containerHeight - bottomBarHeight}
+                sideBarContainerWidth={sideBarContainerWidth}
                 setSideBarMode={setSideBarMode}
                 sideBarMode={sideBarMode}
                 raisedHandsParticipants={raisedHandsParticipants}
               />
             </div>
+
             <BottomBar
               bottomBarHeight={bottomBarHeight}
               sideBarMode={sideBarMode}
@@ -277,7 +237,7 @@ export function MeetingContainer({
           <></>
         )
       ) : (
-        !mMeeting.isMeetingJoined && <WaitingToJoin />
+        !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
       )}
     </div>
   );

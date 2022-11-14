@@ -1,4 +1,4 @@
-import useResponsiveSize from "../utils/useResponsiveSize";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
 import Lottie from "react-lottie";
 import { Tooltip } from "@material-ui/core";
 import { useEffect, useRef, useState } from "react";
@@ -20,6 +20,7 @@ export const OutlinedButton = ({
   focusIconColor,
   isRequestProcessing,
   borderColor,
+  buttonText,
 }) => {
   const [mouseOver, setMouseOver] = useState(false);
   const [mouseDown, setMouseDown] = useState(false);
@@ -81,8 +82,10 @@ export const OutlinedButton = ({
           opacity: blinkingState,
         }}
       >
-        <div
-          className="cursor-pointer"
+        <button
+          className={`${
+            disabled ? "cursor-default" : "cursor-pointer"
+          } flex items-center justify-center`}
           id={btnID}
           onMouseEnter={() => {
             setMouseOver(true);
@@ -134,7 +137,7 @@ export const OutlinedButton = ({
                       height: iconSize,
                       width: iconSize,
                     }}
-                    fillColor={
+                    fillcolor={
                       isFocused
                         ? focusIconColor || "#1C1F2E"
                         : color
@@ -154,7 +157,12 @@ export const OutlinedButton = ({
                 </>
               ))}
           </div>
-        </div>
+          {buttonText ? (
+            <p className="text-sm text-white font-semibold mr-2 text-center">
+              {buttonText}
+            </p>
+          ) : null}
+        </button>
         {typeof renderRightComponent === "function" && renderRightComponent()}
       </div>
     </Tooltip>

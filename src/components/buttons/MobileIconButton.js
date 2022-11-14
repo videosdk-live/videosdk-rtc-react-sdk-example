@@ -1,11 +1,4 @@
-import {
-  Badge,
-  Box,
-  ButtonBase,
-  Tooltip,
-  Typography,
-  useTheme,
-} from "@material-ui/core";
+import { Badge, Tooltip, useTheme } from "@material-ui/core";
 import React, { useState } from "react";
 import Lottie from "react-lottie";
 
@@ -24,7 +17,6 @@ export const MobileIconButton = ({
   buttonText,
   lottieOption,
 }) => {
-  const theme = useTheme();
   const [mouseOver, setMouseOver] = useState(false);
   const [mouseDown, setMouseDown] = useState(false);
 
@@ -32,16 +24,15 @@ export const MobileIconButton = ({
 
   return (
     <Tooltip placement="bottom" title={tooltipTitle || ""}>
-      <Box
-        p={0}
+      <div
+        className="p-0 rounded-lg"
         style={{
-          borderRadius: theme.spacing(1),
-          // overflow: "hidden",
           transition: `all ${200 * 0.5}ms`,
           transitionTimingFunction: "linear",
         }}
       >
-        <ButtonBase
+        <button
+          className="flex flex-col items-center justify-center"
           style={{
             display: "flex",
             flexDirection: "column",
@@ -64,15 +55,10 @@ export const MobileIconButton = ({
           disabled={disabled}
           onClick={onClick}
         >
-          <Box
-            p={1}
+          <div
+            className="p-1 flex items-center justify-center rounded-lg"
             style={{
               opacity: disabled ? disabledOpacity || 0.7 : 1,
-              // overflow: "hidden",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: theme.spacing(1),
               transform: `scale(${mouseOver ? (mouseDown ? 0.95 : 1.1) : 1})`,
               transition: `all ${200 * 0.5}ms`,
               transitionTimingFunction: "linear",
@@ -80,15 +66,9 @@ export const MobileIconButton = ({
           >
             <Badge max={1000} color={"secondary"} badgeContent={badge}>
               {lottieOption ? (
-                <Box
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    backgroundColor: bgColor,
-                    padding: "5px",
-                    borderRadius: "5px",
-                  }}
+                <div
+                  className={`flex items-center justify-center p-[5px] rounded-[5px]`}
+                  style={{ backgroundColor: bgColor }}
                 >
                   <Lottie
                     style={{ height: iconSize }}
@@ -100,7 +80,7 @@ export const MobileIconButton = ({
                     }
                     isClickToPauseDisabled
                   />
-                </Box>
+                </div>
               ) : (
                 <Icon
                   style={{
@@ -108,26 +88,24 @@ export const MobileIconButton = ({
                     height: iconSize,
                     width: iconSize,
                   }}
-                  fillColor={isFocused ? focusIconColor || "#fff" : "#95959E"}
+                  fillcolor={isFocused ? focusIconColor || "#fff" : "#95959E"}
                 />
               )}
             </Badge>
-          </Box>
-          <Box>
+          </div>
+          <div>
             {buttonText ? (
-              <Typography
-                variant="subtitle2"
-                style={{
-                  fontWeight: "bold",
-                  color: isFocused ? "#fff" : "#95959E",
-                }}
+              <p
+                className={`${
+                  isFocused ? "text-white" : "text-gray-900"
+                } text-sm`}
               >
                 {buttonText}
-              </Typography>
+              </p>
             ) : null}
-          </Box>
-        </ButtonBase>
-      </Box>
+          </div>
+        </button>
+      </div>
     </Tooltip>
   );
 };

@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MeetingProvider } from "@videosdk.live/react-sdk";
-import { JoiningScreen } from "./components/JoiningScreen";
-import { MeetingContainer } from "./components/MeetingContainer/MeetingContainer";
 import { SnackbarProvider } from "notistack";
-import { LeaveScreen } from "./components/LeaveScreen";
+import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
+import { JoiningScreen } from "./components/screens/JoiningScreen";
+import { meetingModes, meetingTypes } from "./utils/common";
+import { MeetingContainer } from "./meeting/MeetingContainer";
+import { ILSContainer } from "./interactive-live-streaming/ILSContainer";
 
 const App = () => {
   const [token, setToken] = useState("");
@@ -18,10 +20,29 @@ const App = () => {
   const [selectWebcamDeviceId, setSelectWebcamDeviceId] = useState(
     selectedWebcam.id
   );
+  const [meetingType, setMeetingType] = useState(meetingTypes.MEETING);
+  const [meetingMode, setMeetingMode] = useState(meetingModes.CONFERENCE);
   const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
   const [raisedHandsParticipants, setRaisedHandsParticipants] = useState([]);
+
+  const [draftPolls, setDraftPolls] = useState([]);
+  const [createdPolls, setCreatedPolls] = useState([]);
+  const [endedPolls, setEndedPolls] = useState([]);
+  const [downstreamUrl, setDownstreamUrl] = useState(null);
+  const [afterMeetingJoinedHLSState, setAfterMeetingJoinedHLSState] =
+    useState(null);
+
+  const polls = useMemo(
+    () =>
+      createdPolls.map((poll) => ({
+        ...poll,
+        isActive:
+          endedPolls.findIndex(({ pollId }) => pollId === poll.id) === -1,
+      })),
+    [createdPolls, endedPolls]
+  );
 
   const useRaisedHandParticipants = () => {
     const raisedHandsParticipantsRef = useRef();
@@ -101,31 +122,66 @@ const App = () => {
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
+              mode: meetingMode,
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
             joinWithoutUserInteraction={true}
           >
-            <MeetingContainer
-              onMeetingLeave={() => {
-                setToken("");
-                setMeetingId("");
-                setWebcamOn(false);
-                setMicOn(false);
-                setMeetingStarted(false);
-              }}
-              setIsMeetingLeft={setIsMeetingLeft}
-              selectedMic={selectedMic}
-              selectedWebcam={selectedWebcam}
-              selectWebcamDeviceId={selectWebcamDeviceId}
-              setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-              selectMicDeviceId={selectMicDeviceId}
-              setSelectMicDeviceId={setSelectMicDeviceId}
-              useRaisedHandParticipants={useRaisedHandParticipants}
-              raisedHandsParticipants={raisedHandsParticipants}
-              micEnabled={micOn}
-              webcamEnabled={webcamOn}
-            />
+            {meetingType === meetingTypes.MEETING ? (
+              <MeetingContainer
+                onMeetingLeave={() => {
+                  setToken("");
+                  setMeetingId("");
+                  setWebcamOn(false);
+                  setMicOn(false);
+                  setMeetingStarted(false);
+                }}
+                setIsMeetingLeft={setIsMeetingLeft}
+                selectedMic={selectedMic}
+                selectedWebcam={selectedWebcam}
+                selectWebcamDeviceId={selectWebcamDeviceId}
+                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                selectMicDeviceId={selectMicDeviceId}
+                setSelectMicDeviceId={setSelectMicDeviceId}
+                useRaisedHandParticipants={useRaisedHandParticipants}
+                raisedHandsParticipants={raisedHandsParticipants}
+                micEnabled={micOn}
+                webcamEnabled={webcamOn}
+              />
+            ) : (
+              <ILSContainer
+                onMeetingLeave={() => {
+                  setToken("");
+                  setMeetingId("");
+                  setWebcamOn(false);
+                  setMicOn(false);
+                  setMeetingStarted(false);
+                }}
+                setIsMeetingLeft={setIsMeetingLeft}
+                selectedMic={selectedMic}
+                selectedWebcam={selectedWebcam}
+                selectWebcamDeviceId={selectWebcamDeviceId}
+                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                selectMicDeviceId={selectMicDeviceId}
+                setSelectMicDeviceId={setSelectMicDeviceId}
+                useRaisedHandParticipants={useRaisedHandParticipants}
+                raisedHandsParticipants={raisedHandsParticipants}
+                micEnabled={micOn}
+                webcamEnabled={webcamOn}
+                meetingMode={meetingMode}
+                setMeetingMode={setMeetingMode}
+                polls={polls}
+                draftPolls={draftPolls}
+                setDraftPolls={setDraftPolls}
+                setCreatedPolls={setCreatedPolls}
+                setEndedPolls={setEndedPolls}
+                downstreamUrl={downstreamUrl}
+                setDownstreamUrl={setDownstreamUrl}
+                afterMeetingJoinedHLSState={afterMeetingJoinedHLSState}
+                setAfterMeetingJoinedHLSState={setAfterMeetingJoinedHLSState}
+              />
+            )}
           </MeetingProvider>
         </SnackbarProvider>
       ) : isMeetingLeft ? (
@@ -147,6 +203,10 @@ const App = () => {
           }}
           startMeeting={isMeetingStarted}
           setIsMeetingLeft={setIsMeetingLeft}
+          meetingType={meetingType}
+          setMeetingType={setMeetingType}
+          meetingMode={meetingMode}
+          setMeetingMode={setMeetingMode}
         />
       )}
     </>

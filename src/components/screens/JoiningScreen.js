@@ -11,13 +11,14 @@ import {
 } from "@material-ui/core";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { VideocamOff, MicOff, Mic, Videocam } from "@material-ui/icons";
-import useResponsiveSize from "../utils/useResponsiveSize";
+import useResponsiveSize from "../../hooks/useResponsiveSize";
 import { red } from "@material-ui/core/colors";
-import { MeetingDetailsScreen } from "./MeetingDetailsScreen";
-import { createMeeting, getToken, validateMeeting } from "../api";
+import { MeetingDetailsScreen } from "../MeetingDetailsScreen";
+import { createMeeting, getToken, validateMeeting } from "../../api";
 import { CheckCircleIcon } from "@heroicons/react/outline";
-import SettingDialogueBox from "./SettingDialogueBox";
-import ConfirmBox from "./ConfirmBox";
+import SettingDialogueBox from "../SettingDialogueBox";
+import ConfirmBox from "../ConfirmBox";
+import { meetingModes, meetingTypes } from "../../utils/common";
 
 const useStyles = makeStyles((theme) => ({
   video: {
@@ -55,6 +56,10 @@ export function JoiningScreen({
   webcamEnabled,
   setWebcamOn,
   setMicOn,
+  meetingType,
+  setMeetingType,
+  setMeetingMode,
+  meetingMode,
 }) {
   const theme = useTheme();
   const classes = useStyles();
@@ -286,12 +291,6 @@ export function JoiningScreen({
     xs: 32,
   };
 
-  const spacingSettingChip = useResponsiveSize({
-    xl: 190,
-    lg: 175,
-    md: 80,
-    sm: 160,
-  });
   const spacingHorizontalTopics = useResponsiveSize(
     spacingHorizontalTopicsObject
   );
@@ -301,6 +300,13 @@ export function JoiningScreen({
 
     startMuteListener();
   }, [audioTrack]);
+
+  useEffect(() => {
+    if (meetingMode === meetingModes.VIEWER) {
+      _handleTurnOffMic();
+      _handleTurnOffWebcam();
+    }
+  }, [meetingMode]);
 
   useEffect(() => {
     videoTrackRef.current = videoTrack;
@@ -351,8 +357,8 @@ export function JoiningScreen({
             display: "flex",
             flex: 1,
             flexDirection: isXStoSM ? "column" : "row",
-            justifyContent: "center",
-            alignItems: "center",
+            justifyContent: gtThenMD ? "" : "center",
+            alignItems: gtThenMD ? "" : "center",
           }}
         >
           <Grid
@@ -370,18 +376,15 @@ export function JoiningScreen({
               item
               xs={12}
               md={gtThenXL ? 6 : 7}
-              style={{
-                display: "flex",
-                flex: 1,
-              }}
+              style={{ display: "flex", flex: 1 }}
             >
               <Box
                 style={{
                   width: isXSOnly ? "100%" : "100vw",
                   display: "flex",
                   flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
+                  // alignItems: "center",
+                  // justifyContent: "center",
                 }}
                 p={internalPadding}
               >
@@ -424,8 +427,10 @@ export function JoiningScreen({
                             }}
                           >
                             {!webcamOn ? (
-                              <Typography variant={isXLOnly ? "h4" : "h6"}>
-                                The camera is off
+                              <Typography variant={isXLOnly ? "h5" : "h6"}>
+                                {meetingMode === meetingModes.VIEWER
+                                  ? "You are not permitted to use your microphone and camera."
+                                  : "The camera is off"}
                               </Typography>
                             ) : null}
                           </Box>
@@ -460,7 +465,7 @@ export function JoiningScreen({
                         <Grid
                           container
                           alignItems="center"
-                          justify="center"
+                          justifyContent="center"
                           spacing={2}
                         >
                           <Grid item>
@@ -481,6 +486,7 @@ export function JoiningScreen({
                                       }
                                 }
                                 className={classes.toggleButton}
+                                disabled={meetingMode === meetingModes.VIEWER}
                               >
                                 {micOn ? <Mic /> : <MicOff />}
                               </Button>
@@ -507,6 +513,7 @@ export function JoiningScreen({
                                       }
                                 }
                                 className={classes.toggleButton}
+                                disabled={meetingMode === meetingModes.VIEWER}
                               >
                                 {webcamOn ? <Videocam /> : <VideocamOff />}
                               </Button>
@@ -516,53 +523,44 @@ export function JoiningScreen({
                       </Box>
                     </Box>
                   </Box>
-                  {!isXSOnly && (
-                    <Box
-                      className="absolute md:left-52 lg:left-24 xl:left-44 md:right-52 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
-                      // style={{
-                      //   position: "absolute",
-                      //   display: "flex",
-                      //   alignItems: "center",
-                      //   justifyContent: "center",
-                      //   left: spacingSettingChip,
-                      //   right: spacingSettingChip,
-                      //   backgroundColor: theme.palette.darkTheme.seven,
-                      //   borderRadius: 4,
-                      //   cursor: "pointer",
-                      // }}
-                      m={2}
-                      onClick={(e) => {
-                        handleClickOpen();
-                      }}
-                    >
+                  {!isXSOnly &&
+                    (meetingMode === meetingModes.CONFERENCE ||
+                      meetingType === meetingTypes.MEETING) && (
                       <Box
-                        style={{
-                          display: "flex",
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "center",
+                        className="absolute md:left-36 lg:left-24 xl:left-44 md:right-36 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
+                        m={2}
+                        onClick={(e) => {
+                          handleClickOpen();
                         }}
-                        m={0.5}
                       >
-                        <IconButton
+                        <Box
                           style={{
-                            margin: 0,
-                            padding: 0,
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            justifyContent: "center",
                           }}
+                          m={0.5}
                         >
-                          <CheckCircleIcon className="h-5 w-5" />
-                        </IconButton>
-                        <Typography
-                          variant="subtitle1"
-                          style={{
-                            marginLeft: 4,
-                          }}
-                        >
-                          Check your audio and video
-                        </Typography>
+                          <IconButton
+                            style={{
+                              margin: 0,
+                              padding: 0,
+                            }}
+                          >
+                            <CheckCircleIcon className="h-5 w-5" />
+                          </IconButton>
+                          <Typography
+                            variant="subtitle1"
+                            style={{
+                              marginLeft: 4,
+                            }}
+                          >
+                            Check your audio and video
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                  )}
+                    )}
                 </Box>
               </Box>
             </Grid>
@@ -570,21 +568,17 @@ export function JoiningScreen({
               item
               xs={12}
               md={isXStoSM ? 5 : gtThenXL ? 6 : 5}
-              style={{
-                width: "100%",
-                display: "flex",
-                flex: 1,
-                height: "100%",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+              style={{ display: "flex", flex: 1 }}
             >
-              <div className="w-full flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mx-44 md:mt-11 lg:mt-4">
+              <div className="w-full flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6  md:mt-11 lg:mt-4">
                 <MeetingDetailsScreen
                   participantName={participantName}
                   setParticipantName={setParticipantName}
                   videoTrack={videoTrack}
                   setVideoTrack={setVideoTrack}
+                  meetingType={meetingType}
+                  setMeetingType={setMeetingType}
+                  setMeetingMode={setMeetingMode}
                   onClickStartMeeting={onClickStartMeeting}
                   onClickJoin={async (id) => {
                     const token = await getToken();
@@ -604,7 +598,7 @@ export function JoiningScreen({
                       setParticipantName("");
                     } else alert("Invalid Meeting Id");
                   }}
-                  onClickCreateMeeting={async () => {
+                  _handleOnCreateMeeting={async () => {
                     const token = await getToken();
                     const _meetingId = await createMeeting({ token });
                     setToken(token);

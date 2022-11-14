@@ -22,12 +22,12 @@ function RecordingIcon(props) {
         <path fill="#D9D9D9" d="M0 0H24V24H0z"></path>
       </mask>
       <g mask="url(#mask0_24_98)">
-        <circle cx="12" cy="12" r="5" fill={props.fillColor}></circle>
+        <circle cx="12" cy="12" r="5" fill={props.fillcolor}></circle>
         <circle
           cx="12"
           cy="12"
           r="9"
-          stroke={props.fillColor}
+          stroke={props.fillcolor}
           strokeWidth="2"
         ></circle>
       </g>

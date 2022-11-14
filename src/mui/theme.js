@@ -26,6 +26,9 @@ export default function generateMuiTheme(type, primary, secondary) {
           contrastText: "#fff",
         },
         common: { white: "#fff", black: "#000", sidePanel: "#3D3C4E" },
+        red: {
+          150: "#E03B34",
+        },
         darkTheme: {
           one: "#FFFFFF",
           two: "#EFEFEF",
