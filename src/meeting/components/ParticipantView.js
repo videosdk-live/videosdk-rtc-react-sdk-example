@@ -62,7 +62,7 @@ function ParticipantView({ participantId }) {
             : nameTructed(displayName, 26)}
         </p>
       </div>
-      <audio ref={micRef} autoPlay />
+      <audio ref={micRef} autoPlay muted={isLocal} />
       {webcamOn ? (
         <ReactPlayer
           //
