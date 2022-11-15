@@ -1,4 +1,9 @@
-import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import {
+  Constants,
+  createCameraVideoTrack,
+  useMeeting,
+  usePubSub,
+} from "@videosdk.live/react-sdk";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
 import recordingBlink from "../../animations/recording-blink.json";
@@ -358,8 +363,14 @@ export function BottomBar({
       <>
         <OutlinedButton
           Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
-          onClick={() => {
-            mMeeting.toggleWebcam();
+          onClick={async () => {
+            const track = await createCameraVideoTrack({
+              optimizationMode: "motion",
+              encoderConfig: "h720p_w1280p",
+              facingMode: "environment",
+              multiStream: false,
+            });
+            mMeeting.toggleWebcam(track);
           }}
           bgColor={localWebcamOn ? "bg-gray-750" : "bg-white"}
           borderColor={localWebcamOn && "#ffffff33"}
@@ -411,10 +422,17 @@ export function BottomBar({
               <MenuItem
                 key={`output_webcams_${deviceId}`}
                 selected={deviceId === selectWebcamDeviceId}
-                onClick={() => {
+                onClick={async () => {
                   handleCloseWebCam();
                   setSelectWebcamDeviceId(deviceId);
-                  changeWebcam(deviceId);
+                  const track = await createCameraVideoTrack({
+                    optimizationMode: "motion",
+                    encoderConfig: "h720p_w1280p",
+                    facingMode: "environment",
+                    multiStream: false,
+                    cameraId: deviceId,
+                  });
+                  changeWebcam(track);
                 }}
                 classes={{
                   root: classes.popoverHoverDark,

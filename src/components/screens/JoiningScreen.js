@@ -18,7 +18,8 @@ import { createMeeting, getToken, validateMeeting } from "../../api";
 import { CheckCircleIcon } from "@heroicons/react/outline";
 import SettingDialogueBox from "../SettingDialogueBox";
 import ConfirmBox from "../ConfirmBox";
-import { meetingModes, meetingTypes } from "../../utils/common";
+import { meetingTypes } from "../../utils/common";
+import { Constants } from "@videosdk.live/react-sdk";
 
 const useStyles = makeStyles((theme) => ({
   video: {
@@ -302,7 +303,7 @@ export function JoiningScreen({
   }, [audioTrack]);
 
   useEffect(() => {
-    if (meetingMode === meetingModes.VIEWER) {
+    if (meetingMode === Constants.modes.VIEWER) {
       _handleTurnOffMic();
       _handleTurnOffWebcam();
     }
@@ -428,7 +429,7 @@ export function JoiningScreen({
                           >
                             {!webcamOn ? (
                               <Typography variant={isXLOnly ? "h5" : "h6"}>
-                                {meetingMode === meetingModes.VIEWER
+                                {meetingMode === Constants.modes.VIEWER
                                   ? "You are not permitted to use your microphone and camera."
                                   : "The camera is off"}
                               </Typography>
@@ -486,7 +487,9 @@ export function JoiningScreen({
                                       }
                                 }
                                 className={classes.toggleButton}
-                                disabled={meetingMode === meetingModes.VIEWER}
+                                disabled={
+                                  meetingMode === Constants.modes.VIEWER
+                                }
                               >
                                 {micOn ? <Mic /> : <MicOff />}
                               </Button>
@@ -513,7 +516,9 @@ export function JoiningScreen({
                                       }
                                 }
                                 className={classes.toggleButton}
-                                disabled={meetingMode === meetingModes.VIEWER}
+                                disabled={
+                                  meetingMode === Constants.modes.VIEWER
+                                }
                               >
                                 {webcamOn ? <Videocam /> : <VideocamOff />}
                               </Button>
@@ -524,7 +529,7 @@ export function JoiningScreen({
                     </Box>
                   </Box>
                   {!isXSOnly &&
-                    (meetingMode === meetingModes.CONFERENCE ||
+                    (meetingMode === Constants.modes.CONFERENCE ||
                       meetingType === meetingTypes.MEETING) && (
                       <Box
                         className="absolute md:left-36 lg:left-24 xl:left-44 md:right-36 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"

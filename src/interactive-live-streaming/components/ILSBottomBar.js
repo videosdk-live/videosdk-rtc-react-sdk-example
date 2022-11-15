@@ -1,4 +1,9 @@
-import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import {
+  Constants,
+  createCameraVideoTrack,
+  useMeeting,
+  usePubSub,
+} from "@videosdk.live/react-sdk";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
 import recordingBlink from "../../animations/recording-blink.json";
@@ -39,7 +44,7 @@ import PollIcon from "../../icons/Bottombar/PollIcon";
 import useIsHls from "../../hooks/useIsHls";
 import LiveIcon from "../../icons/LiveIcon";
 import ReactionIcon from "../../icons/Bottombar/ReactionIcon";
-import { meetingModes, sideBarModes } from "../../utils/common";
+import { sideBarModes } from "../../utils/common";
 
 const useStyles = makeStyles({
   popoverHoverDark: {
@@ -364,8 +369,14 @@ export function ILSBottomBar({
       <>
         <OutlinedButton
           Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
-          onClick={() => {
-            mMeeting.toggleWebcam();
+          onClick={async () => {
+            const track = await createCameraVideoTrack({
+              optimizationMode: "motion",
+              encoderConfig: "h720p_w1280p",
+              facingMode: "environment",
+              multiStream: false,
+            });
+            mMeeting.toggleWebcam(track);
           }}
           bgColor={localWebcamOn ? "bg-gray-750" : "bg-white"}
           borderColor={localWebcamOn && "#ffffff33"}
@@ -417,10 +428,17 @@ export function ILSBottomBar({
               <MenuItem
                 key={`output_webcams_${deviceId}`}
                 selected={deviceId === selectWebcamDeviceId}
-                onClick={() => {
+                onClick={async () => {
                   handleCloseWebCam();
                   setSelectWebcamDeviceId(deviceId);
-                  changeWebcam(deviceId);
+                  const track = await createCameraVideoTrack({
+                    optimizationMode: "motion",
+                    encoderConfig: "h720p_w1280p",
+                    facingMode: "environment",
+                    multiStream: false,
+                    cameraId: deviceId,
+                  });
+                  changeWebcam(track);
                 }}
                 classes={{
                   root: classes.popoverHoverDark,
@@ -547,7 +565,7 @@ export function ILSBottomBar({
           );
         }}
         badge={`${new Map(participants)?.size}`}
-        disabled={meetingMode === meetingModes.VIEWER}
+        disabled={meetingMode === Constants.modes.VIEWER}
       />
     ) : (
       <OutlinedButton
@@ -560,7 +578,7 @@ export function ILSBottomBar({
         isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
         tooltip={"View Participants"}
         badge={`${new Map(participants)?.size}`}
-        disabled={meetingMode === meetingModes.VIEWER}
+        disabled={meetingMode === Constants.modes.VIEWER}
       />
     );
   };
@@ -610,7 +628,7 @@ export function ILSBottomBar({
     const { type, priority, gridSize } = useMemo(
       () => ({
         type: "SPOTLIGHT",
-        priority: "SPEAKER",
+        priority: "PIN",
         gridSize: "12",
       }),
       []
@@ -842,7 +860,7 @@ export function ILSBottomBar({
     { icon: BottomBarButtonTypes.REACTION },
   ];
 
-  if (meetingMode === meetingModes.CONFERENCE) {
+  if (meetingMode === Constants.modes.CONFERENCE) {
     otherFeatures.pop({ icon: BottomBarButtonTypes.REACTION });
     otherFeatures.push({ icon: BottomBarButtonTypes.SCREEN_SHARE });
     otherFeatures.push({ icon: BottomBarButtonTypes.HLS });
@@ -890,7 +908,7 @@ export function ILSBottomBar({
                 ) : icon === BottomBarButtonTypes.POLL ? (
                   <PollBTN isMobile={isMobile} isTab={isTab} />
                 ) : icon === BottomBarButtonTypes.REACTION &&
-                  meetingMode === meetingModes.VIEWER ? (
+                  meetingMode === Constants.modes.VIEWER ? (
                   <ReactionBTN isMobile={isMobile} isTab={isTab} />
                 ) : null}
               </Grid>
@@ -904,14 +922,14 @@ export function ILSBottomBar({
       <MeetingIdCopyBTN />
 
       <div className="flex flex-1 items-center justify-center" ref={tollTipEl}>
-        {meetingMode === meetingModes.CONFERENCE && (
+        {meetingMode === Constants.modes.CONFERENCE && (
           <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
         )}
         <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
-        {meetingMode === meetingModes.VIEWER && (
+        {meetingMode === Constants.modes.VIEWER && (
           <ReactionBTN isMobile={isMobile} isTab={isTab} />
         )}
-        {meetingMode === meetingModes.CONFERENCE && (
+        {meetingMode === Constants.modes.CONFERENCE && (
           <>
             <MicBTN />
             <WebCamBTN />

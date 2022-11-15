@@ -655,11 +655,15 @@ There are 2 folders :
 <img width="364" height="631" src="public/submit_poll_list.png"/>
 </p>
 
-**10. PollListner**
+**10. LocalParticipantListner**
+
+- [`interactive-live-streaming/components/LocalParticipantListner.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/interactive-live-streaming/components/LocalParticipantListner.js) - It contains local participant pin state for host.
+
+**11. PollListner**
 
 - [`interactive-live-streaming/components/pollContainer/PollListner.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/interactive-live-streaming/components/pollContainer/PollListner.js) - It contains create a poll, submit a poll, end poll , draft a poll and remove poll from draft pubsub methods.
 
-**11. Reactions**
+**12. Reactions**
 
 - [`interactive-live-streaming/components/FlyingEmojisOverlay.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/interactive-live-streaming/components/FlyingEmojisOverlay.js) - It contains emoji animation, functions for sending and receiving emoji using pubsub method.
 

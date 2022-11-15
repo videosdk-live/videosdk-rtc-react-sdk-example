@@ -1,11 +1,15 @@
 import React, { useState, useEffect, useRef, createRef } from "react";
-import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import {
+  Constants,
+  createCameraVideoTrack,
+  useMeeting,
+  usePubSub,
+} from "@videosdk.live/react-sdk";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import { PresenterView } from "../components/PresenterView";
 import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
 import useResponsiveSize from "../hooks/useResponsiveSize";
-import useWindowSize from "../hooks/useWindowSize";
 import { ILSBottomBar } from "./components/ILSBottomBar";
 import { TopBar } from "./components/TopBar";
 import useIsTab from "../hooks/useIsTab";
@@ -14,7 +18,7 @@ import HLSContainer from "./components/hlsViewContainer/HLSContainer";
 import FlyingEmojisOverlay from "./components/FlyingEmojisOverlay";
 import { ILSParticipantView } from "./components/ILSParticipantView";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
-import { meetingModes } from "../utils/common";
+import LocalParticipantListner from "./components/LocalParticipantListner";
 
 export function ILSContainer({
   onMeetingLeave,
@@ -91,7 +95,7 @@ export function ILSContainer({
 
   const _handleOnRecordingStateChanged = ({ status }) => {
     if (
-      meetingModeRef.current === meetingModes.CONFERENCE &&
+      meetingModeRef.current === Constants.modes.CONFERENCE &&
       (status === Constants.recordingEvents.RECORDING_STARTED ||
         status === Constants.recordingEvents.RECORDING_STOPPED)
     ) {
@@ -106,7 +110,7 @@ export function ILSContainer({
   const _handleOnHlsStateChanged = (data) => {
     //
     if (
-      meetingModeRef.current === meetingModes.CONFERENCE && // trigger on conference mode only
+      meetingModeRef.current === Constants.modes.CONFERENCE && // trigger on conference mode only
       (data.status === Constants.hlsEvents.HLS_STARTED ||
         data.status === Constants.hlsEvents.HLS_STOPPED)
     ) {
@@ -167,8 +171,15 @@ export function ILSContainer({
     if (webcamEnabled && selectedWebcam.id) {
       await new Promise((resolve) => {
         disableWebcam();
-        setTimeout(() => {
-          changeWebcam(selectedWebcam.id);
+        setTimeout(async () => {
+          const track = await createCameraVideoTrack({
+            optimizationMode: "motion",
+            encoderConfig: "h720p_w1280p",
+            facingMode: "environment",
+            cameraId: selectedWebcam.id,
+            multiStream: false,
+          });
+          changeWebcam(track);
           resolve();
         }, 500);
       });
@@ -244,7 +255,6 @@ export function ILSContainer({
     },
   });
 
-  const { width: windowWidth, height: windowHeight } = useWindowSize();
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
   ).matches;
@@ -268,7 +278,13 @@ export function ILSContainer({
               setSideBarMode={setSideBarMode}
             />
 
-            {meetingMode === meetingModes.CONFERENCE && (
+            {mMeeting?.localParticipant?.id && (
+              <LocalParticipantListner
+                localParticipantId={mMeeting?.localParticipant?.id}
+                meetingMode={meetingMode}
+              />
+            )}
+            {meetingMode === Constants.modes.CONFERENCE && (
               <div
                 style={{
                   display: "flex",
@@ -281,7 +297,7 @@ export function ILSContainer({
             )}
 
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
-              {meetingMode === meetingModes.CONFERENCE ? (
+              {meetingMode === Constants.modes.CONFERENCE ? (
                 <div className={`flex flex-1 `}>
                   {isPresenting ? (
                     <PresenterView
@@ -312,7 +328,7 @@ export function ILSContainer({
               )}
               <SidebarConatiner
                 height={
-                  meetingMode === meetingModes.VIEWER
+                  meetingMode === Constants.modes.VIEWER
                     ? containerHeight - bottomBarHeight
                     : containerHeight - topBarHeight - bottomBarHeight
                 }

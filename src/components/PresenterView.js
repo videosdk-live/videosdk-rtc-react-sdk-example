@@ -1,10 +1,4 @@
-import {
-  Box,
-  Button,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@material-ui/core";
+import { Box, Button, Typography, useTheme } from "@material-ui/core";
 import { MicOff, ScreenShare } from "@material-ui/icons";
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
@@ -16,7 +10,6 @@ export function PresenterView({ height }) {
   const mMeeting = useMeeting();
   const presenterId = mMeeting?.presenterId;
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.between("xs", "sm"));
 
   const padding = useResponsiveSize({
     xs: 4,

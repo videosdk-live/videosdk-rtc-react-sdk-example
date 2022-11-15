@@ -91,7 +91,7 @@ export function TopBar({ topBarHeight }) {
     const { type, priority, gridSize } = useMemo(
       () => ({
         type: "SPOTLIGHT",
-        priority: "SPEAKER",
+        priority: "PIN",
         gridSize: "12",
       }),
       []

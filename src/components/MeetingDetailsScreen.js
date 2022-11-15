@@ -1,7 +1,8 @@
 import { CheckIcon, ClipboardIcon } from "@heroicons/react/outline";
+import { Constants } from "@videosdk.live/react-sdk";
 import React, { useState } from "react";
 import useResponsiveSize from "../hooks/useResponsiveSize";
-import { meetingModes, meetingTypes } from "../utils/common";
+import { meetingTypes } from "../utils/common";
 
 export function MeetingDetailsScreen({
   onClickJoin,
@@ -78,7 +79,9 @@ export function MeetingDetailsScreen({
             className="px-4 py-3 bg-gray-650 rounded-xl text-white w-full text-center"
           />
           {meetingIdError && (
-            <p className="text-xs text-red-600">Please enter valid meetingId</p>
+            <p className="text-xs text-red-600">{`Please enter valid ${
+              meetingType === meetingTypes.MEETING ? "meetingId" : "studioCode"
+            }`}</p>
           )}
         </>
       ) : null}
@@ -166,7 +169,7 @@ export function MeetingDetailsScreen({
                 setMeetingId(meetingId);
                 setIscreateMeetingClicked(true);
                 if (meetingType === meetingTypes.ILS) {
-                  setMeetingMode(meetingModes.CONFERENCE);
+                  setMeetingMode(Constants.modes.CONFERENCE);
                 }
               }}
             >
@@ -179,7 +182,7 @@ export function MeetingDetailsScreen({
               onClick={(e) => {
                 setIsJoinMeetingClicked(true);
                 if (meetingType === meetingTypes.ILS) {
-                  setMeetingMode(meetingModes.VIEWER);
+                  setMeetingMode(Constants.modes.VIEWER);
                 }
               }}
             >

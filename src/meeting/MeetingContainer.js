@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef, createRef } from "react";
-import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import {
+  Constants,
+  createCameraVideoTrack,
+  useMeeting,
+  usePubSub,
+} from "@videosdk.live/react-sdk";
 import { BottomBar } from "./components/BottomBar";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import { ParticipantsViewer } from "./components/ParticipantView";
@@ -7,7 +12,6 @@ import { PresenterView } from "../components/PresenterView";
 import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
 import useResponsiveSize from "../hooks/useResponsiveSize";
-import useWindowSize from "../hooks/useWindowSize";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 
 export function MeetingContainer({
@@ -110,8 +114,15 @@ export function MeetingContainer({
     if (webcamEnabled && selectedWebcam.id) {
       await new Promise((resolve) => {
         disableWebcam();
-        setTimeout(() => {
-          changeWebcam(selectedWebcam.id);
+        setTimeout(async () => {
+          const track = await createCameraVideoTrack({
+            optimizationMode: "motion",
+            encoderConfig: "h720p_w1280p",
+            facingMode: "environment",
+            cameraId: selectedWebcam.id,
+            multiStream: false,
+          });
+          changeWebcam(track);
           resolve();
         }, 500);
       });
@@ -186,7 +197,6 @@ export function MeetingContainer({
     },
   });
 
-  const { width: windowWidth, height: windowHeight } = useWindowSize();
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
   ).matches;

@@ -68,11 +68,6 @@ export const meetingLayoutTopics = {
   HLS_LAYOUT: "HLS_LAYOUT",
 };
 
-export const meetingModes = {
-  VIEWER: "VIEWER",
-  CONFERENCE: "CONFERENCE",
-};
-
 export function debounce(func, wait, immediate) {
   var timeout;
 
