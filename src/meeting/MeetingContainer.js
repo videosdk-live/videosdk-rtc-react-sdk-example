@@ -1,5 +1,10 @@
 import React, { useState, useEffect, useRef, createRef } from "react";
-import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import {
+  Constants,
+  createCameraVideoTrack,
+  useMeeting,
+  usePubSub,
+} from "@videosdk.live/react-sdk";
 import { BottomBar } from "./components/BottomBar";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import { ParticipantsViewer } from "./components/ParticipantView";
@@ -110,8 +115,15 @@ export function MeetingContainer({
     if (webcamEnabled && selectedWebcam.id) {
       await new Promise((resolve) => {
         disableWebcam();
-        setTimeout(() => {
-          changeWebcam(selectedWebcam.id);
+        setTimeout(async () => {
+          const track = await createCameraVideoTrack({
+            cameraId: selectedWebcam.id,
+            optimizationMode: "motion",
+            encoderConfig: "h1080p_w1920p",
+            facingMode: "environment",
+            multiStream: false,
+          });
+          changeWebcam(track);
           resolve();
         }, 500);
       });

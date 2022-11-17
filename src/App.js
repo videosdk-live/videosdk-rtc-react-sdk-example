@@ -123,6 +123,7 @@ const App = () => {
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
               mode: meetingMode,
+              multiStream: false,
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
