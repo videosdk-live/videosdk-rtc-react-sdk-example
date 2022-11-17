@@ -1,5 +1,3 @@
-import { EventEmitter } from "events";
-
 export const json_verify = (s) => {
   try {
     JSON.parse(s);
@@ -36,16 +34,6 @@ export const nameTructed = (name, tructedLength) => {
   } else {
     return name;
   }
-};
-
-export const eventEmitter = new EventEmitter();
-
-export const appEvents = {
-  "enter-full-screen": "enter-full-screen",
-  "exit-full-screen": "exit-full-screen",
-  "toggle-full-screen": "toggle-full-screen",
-  "participant-visible": "participant-visible",
-  "participant-invisible": "participant-invisible",
 };
 
 export const sideBarModes = {

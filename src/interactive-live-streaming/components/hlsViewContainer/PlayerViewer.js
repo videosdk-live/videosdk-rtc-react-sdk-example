@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Lottie from "react-lottie";
 import animationData from "../../../animations/wait_for_HLS_animation.json";
 import stoppedHLSSnimationData from "../../../animations/stopped_HLS_animation.json";
-import { appEvents, eventEmitter } from "../../../utils/common";
 import Hls from "hls.js";
 import useResponsiveSize from "../../../hooks/useResponsiveSize";
 
@@ -116,9 +115,6 @@ const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
       className={`h-full w-full ${
         downstreamUrl && canPlay ? "bg-gray-800" : "bg-gray-750"
       } relative overflow-hidden rounded-lg`}
-      onDoubleClick={() => {
-        eventEmitter.emit(appEvents["toggle-full-screen"]);
-      }}
     >
       {downstreamUrl && canPlay ? (
         <div className="flex flex-col items-center justify-center absolute top-0 left-0 bottom-0 right-0">
