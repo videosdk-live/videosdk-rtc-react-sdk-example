@@ -114,7 +114,7 @@ const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
   return (
     <div
       className={`h-full w-full ${
-        downstreamUrl && canPlay ? "bg-gray-750" : "bg-gray-750"
+        downstreamUrl && canPlay ? "bg-gray-800" : "bg-gray-750"
       } relative overflow-hidden rounded-lg`}
       onDoubleClick={() => {
         eventEmitter.emit(appEvents["toggle-full-screen"]);

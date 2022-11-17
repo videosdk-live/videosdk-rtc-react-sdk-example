@@ -584,6 +584,7 @@ export function JoiningScreen({
                   meetingType={meetingType}
                   setMeetingType={setMeetingType}
                   setMeetingMode={setMeetingMode}
+                  meetingMode={meetingMode}
                   onClickStartMeeting={onClickStartMeeting}
                   onClickJoin={async (id) => {
                     const token = await getToken();

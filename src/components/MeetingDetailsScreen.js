@@ -15,6 +15,7 @@ export function MeetingDetailsScreen({
   meetingType,
   setMeetingType,
   setMeetingMode,
+  meetingMode,
 }) {
   const [meetingId, setMeetingId] = useState("");
   const [meetingIdError, setMeetingIdError] = useState(false);
@@ -117,12 +118,15 @@ export function MeetingDetailsScreen({
               }
             }}
           >
-            {iscreateMeetingClicked
-              ? meetingType === meetingTypes.MEETING
+            {meetingType === meetingTypes.MEETING
+              ? iscreateMeetingClicked
                 ? "Start a meeting"
-                : "Join Studio"
-              : meetingType === meetingTypes.MEETING
-              ? "Join a meeting"
+                : "Join a meeting"
+              : iscreateMeetingClicked
+              ? "Start a meeting"
+              : isJoinMeetingClicked &&
+                meetingMode === Constants.modes.CONFERENCE
+              ? "Join Studio"
               : "Join Streaming Room"}
           </button>
         </>
@@ -162,34 +166,73 @@ export function MeetingDetailsScreen({
           </div>
 
           <div className="flex items-center justify-center flex-col w-full mt-2">
-            <button
-              className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
-              onClick={async (e) => {
-                const meetingId = await _handleOnCreateMeeting();
-                setMeetingId(meetingId);
-                setIscreateMeetingClicked(true);
-                if (meetingType === meetingTypes.ILS) {
-                  setMeetingMode(Constants.modes.CONFERENCE);
-                }
-              }}
-            >
-              {meetingType === meetingTypes.MEETING
-                ? "Create a meeting"
-                : "Join as a Host"}
-            </button>
-            <button
-              className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-5"
-              onClick={(e) => {
-                setIsJoinMeetingClicked(true);
-                if (meetingType === meetingTypes.ILS) {
-                  setMeetingMode(Constants.modes.VIEWER);
-                }
-              }}
-            >
-              {meetingType === meetingTypes.MEETING
-                ? "Join a meeting"
-                : "Join as a Viewer"}
-            </button>
+            {meetingType === meetingTypes.ILS ? (
+              <>
+                <button
+                  className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
+                  onClick={async (e) => {
+                    const meetingId = await _handleOnCreateMeeting();
+                    setMeetingId(meetingId);
+                    setIscreateMeetingClicked(true);
+                    if (meetingType === meetingTypes.ILS) {
+                      setMeetingMode(Constants.modes.CONFERENCE);
+                    }
+                  }}
+                >
+                  Create a meeting
+                </button>
+
+                <button
+                  className="w-full bg-purple-350 text-white px-2 py-3 mt-5 rounded-xl"
+                  onClick={async (e) => {
+                    setIsJoinMeetingClicked(true);
+                    if (meetingType === meetingTypes.ILS) {
+                      setMeetingMode(Constants.modes.CONFERENCE);
+                    }
+                  }}
+                >
+                  Join as a Host
+                </button>
+                <button
+                  className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-5"
+                  onClick={(e) => {
+                    setIsJoinMeetingClicked(true);
+                    if (meetingType === meetingTypes.ILS) {
+                      setMeetingMode(Constants.modes.VIEWER);
+                    }
+                  }}
+                >
+                  Join as a Viewer
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
+                  onClick={async (e) => {
+                    const meetingId = await _handleOnCreateMeeting();
+                    setMeetingId(meetingId);
+                    setIscreateMeetingClicked(true);
+                    if (meetingType === meetingTypes.ILS) {
+                      setMeetingMode(Constants.modes.CONFERENCE);
+                    }
+                  }}
+                >
+                  Create a meeting
+                </button>
+                <button
+                  className="w-full bg-gray-650 text-white px-2 py-3 rounded-xl mt-5"
+                  onClick={(e) => {
+                    setIsJoinMeetingClicked(true);
+                    if (meetingType === meetingTypes.ILS) {
+                      setMeetingMode(Constants.modes.VIEWER);
+                    }
+                  }}
+                >
+                  Join a meeting
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

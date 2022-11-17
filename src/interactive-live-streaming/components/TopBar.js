@@ -56,7 +56,7 @@ export function TopBar({ topBarHeight }) {
         Icon={RecordingIcon}
         onClick={_handleClick}
         isFocused={isRecording}
-        buttonText={"REC"}
+        buttonText={!isRecording && "REC"}
         tooltip={
           recordingState === Constants.recordingEvents.RECORDING_STARTED
             ? "Stop Recording"
