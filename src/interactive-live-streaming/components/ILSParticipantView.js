@@ -153,8 +153,10 @@ export function ILSParticipantView({ isPresenting, sideBarMode }) {
       className={`${
         participants.length < 2 && !sideBarMode && !isPresenting
           ? "md:px-16 md:py-2"
+          : participants.length < 3 && !sideBarMode && !isPresenting
+          ? "md:px-16 md:py-8"
           : participants.length < 4 && !sideBarMode && !isPresenting
-          ? "md:px-16 md:py-10"
+          ? "md:px-16 md:py-4"
           : participants.length > 4 && !sideBarMode && !isPresenting
           ? "md:px-14"
           : "md:px-0"
