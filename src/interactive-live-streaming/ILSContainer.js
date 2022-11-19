@@ -19,6 +19,7 @@ import FlyingEmojisOverlay from "./components/FlyingEmojisOverlay";
 import { ILSParticipantView } from "./components/ILSParticipantView";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import LocalParticipantListner from "./components/LocalParticipantListner";
+import ConfirmBox from "../components/ConfirmBox";
 
 export function ILSContainer({
   onMeetingLeave,
@@ -34,7 +35,6 @@ export function ILSContainer({
   micEnabled,
   webcamEnabled,
   meetingMode,
-  setMeetingMode,
   polls,
   draftPolls,
   setDraftPolls,
@@ -51,6 +51,7 @@ export function ILSContainer({
   const [sideBarMode, setSideBarMode] = useState(null);
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [meetingError, setMeetingError] = useState(false);
   const mMeetingRef = useRef();
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
@@ -200,11 +201,34 @@ export function ILSContainer({
     onMeetingLeave();
   }
 
+  const _handleOnError = (data) => {
+    const { code, message } = data;
+
+    const joiningErrCodes = [
+      4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010,
+    ];
+
+    const isJoiningError = joiningErrCodes.findIndex((c) => c === code) !== -1;
+    const isCriticalError = `${code}`.startsWith("500");
+
+    new Audio(
+      isCriticalError
+        ? `https://static.videosdk.live/prebuilt/notification_critical_err.mp3`
+        : `https://static.videosdk.live/prebuilt/notification_err.mp3`
+    ).play();
+
+    setMeetingError({
+      code,
+      message: isJoiningError ? "Unable to join meeting!" : message,
+    });
+  };
+
   const mMeeting = useMeeting({
     onParticipantJoined,
     onEntryResponded,
     onMeetingJoined,
     onMeetingLeft,
+    onError: _handleOnError,
     onRecordingStateChanged: _handleOnRecordingStateChanged,
     onHlsStateChanged: _handleOnHlsStateChanged,
   });
@@ -360,6 +384,15 @@ export function ILSContainer({
       ) : (
         !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
       )}
+      <ConfirmBox
+        open={meetingError}
+        successText="OKAY"
+        onSuccess={() => {
+          setMeetingError(false);
+        }}
+        title={`Error Code: ${meetingError.code}`}
+        subTitle={meetingError.message}
+      />
     </div>
   );
 }

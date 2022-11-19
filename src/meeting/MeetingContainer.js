@@ -13,6 +13,7 @@ import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
 import useResponsiveSize from "../hooks/useResponsiveSize";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
+import ConfirmBox from "../components/ConfirmBox";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -35,6 +36,7 @@ export function MeetingContainer({
   const [sideBarMode, setSideBarMode] = useState(null);
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
+  const [meetingError, setMeetingError] = useState(false);
 
   const mMeetingRef = useRef();
   const containerRef = createRef();
@@ -143,11 +145,34 @@ export function MeetingContainer({
     onMeetingLeave();
   }
 
+  const _handleOnError = (data) => {
+    const { code, message } = data;
+
+    const joiningErrCodes = [
+      4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010,
+    ];
+
+    const isJoiningError = joiningErrCodes.findIndex((c) => c === code) !== -1;
+    const isCriticalError = `${code}`.startsWith("500");
+
+    new Audio(
+      isCriticalError
+        ? `https://static.videosdk.live/prebuilt/notification_critical_err.mp3`
+        : `https://static.videosdk.live/prebuilt/notification_err.mp3`
+    ).play();
+
+    setMeetingError({
+      code,
+      message: isJoiningError ? "Unable to join meeting!" : message,
+    });
+  };
+
   const mMeeting = useMeeting({
     onParticipantJoined,
     onEntryResponded,
     onMeetingJoined,
     onMeetingLeft,
+    onError: _handleOnError,
     onRecordingStateChanged: _handleOnRecordingStateChanged,
   });
 
@@ -249,6 +274,15 @@ export function MeetingContainer({
       ) : (
         !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
       )}
+      <ConfirmBox
+        open={meetingError}
+        successText="OKAY"
+        onSuccess={() => {
+          setMeetingError(false);
+        }}
+        title={`Error Code: ${meetingError.code}`}
+        subTitle={meetingError.message}
+      />
     </div>
   );
 }
