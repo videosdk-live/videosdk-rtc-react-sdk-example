@@ -156,9 +156,9 @@ input[type="radio"]:checked + label{
   color: #fff;
   cursor: pointer;
   display: none;
-  font-size: 40px;
+  font-size: 30px;
   height: 35px;
-  line-height: 35px;
+  line-height: 30px;
   position: absolute;
   top: 25%;
   -webkit-transform: translate(0, -50%);
@@ -166,10 +166,7 @@ input[type="radio"]:checked + label{
   -ms-transform: translate(0, -50%);
   transform: translate(0, -50%);
   text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 35px;
+  width:35px;
   z-index: 10;
 }
 
@@ -191,9 +188,3 @@ input[type="radio"]:checked + label{
 #carousel-3:checked ~ .control-3 {
   display: block;
 }
-
-
-
-
-
-
