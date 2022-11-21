@@ -366,7 +366,7 @@ export function BottomBar({
           onClick={async () => {
             const track = await createCameraVideoTrack({
               optimizationMode: "motion",
-              encoderConfig: "h720p_w1280p",
+              encoderConfig: "h1080p_w1920p",
               facingMode: "environment",
               multiStream: false,
             });

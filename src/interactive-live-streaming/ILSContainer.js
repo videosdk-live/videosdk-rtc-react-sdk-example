@@ -175,7 +175,7 @@ export function ILSContainer({
         setTimeout(async () => {
           const track = await createCameraVideoTrack({
             optimizationMode: "motion",
-            encoderConfig: "h720p_w1280p",
+            encoderConfig: "h1080p_w1920p",
             facingMode: "environment",
             cameraId: selectedWebcam.id,
             multiStream: false,
