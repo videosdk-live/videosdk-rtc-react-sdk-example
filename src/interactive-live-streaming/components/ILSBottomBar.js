@@ -45,6 +45,7 @@ import useIsHls from "../../hooks/useIsHls";
 import LiveIcon from "../../icons/LiveIcon";
 import ReactionIcon from "../../icons/Bottombar/ReactionIcon";
 import { sideBarModes } from "../../utils/common";
+import ECommerceIcon from "../../icons/Bottombar/ECommerceIcon";
 
 const useStyles = makeStyles({
   popoverHoverDark: {
@@ -791,6 +792,34 @@ export function ILSBottomBar({
     );
   };
 
+  const ECommerceBTN = ({ isMobile, isTab }) => {
+    return isMobile || isTab ? (
+      <MobileIconButton
+        id="ecommerce-btn"
+        tooltipTitle={"Ecommerce"}
+        buttonText={"Ecommerce"}
+        isFocused={sideBarMode === sideBarModes.ECOMMERCE}
+        Icon={ECommerceIcon}
+        onClick={() => {
+          setSideBarMode((s) =>
+            s === sideBarModes.ECOMMERCE ? null : sideBarModes.ECOMMERCE
+          );
+        }}
+      />
+    ) : (
+      <OutlinedButton
+        Icon={ECommerceIcon}
+        onClick={() => {
+          setSideBarMode((s) =>
+            s === sideBarModes.ECOMMERCE ? null : sideBarModes.ECOMMERCE
+          );
+        }}
+        isFocused={sideBarMode === sideBarModes.ECOMMERCE}
+        tooltip={"Ecommerce"}
+      />
+    );
+  };
+
   const MeetingIdCopyBTN = () => {
     const { meetingId } = useMeeting();
     const [isCopied, setIsCopied] = useState(false);
@@ -847,6 +876,7 @@ export function ILSBottomBar({
       HLS: "HLS",
       POLL: "POLL",
       REACTION: "REACTION",
+      ECOMMERCE: "ECOMMERCE",
     }),
     []
   );
@@ -858,6 +888,7 @@ export function ILSBottomBar({
     { icon: BottomBarButtonTypes.MEETING_ID_COPY },
     { icon: BottomBarButtonTypes.POLL },
     { icon: BottomBarButtonTypes.REACTION },
+    { icon: BottomBarButtonTypes.ECOMMERCE },
   ];
 
   if (meetingMode === Constants.modes.CONFERENCE) {
@@ -910,6 +941,8 @@ export function ILSBottomBar({
                 ) : icon === BottomBarButtonTypes.REACTION &&
                   meetingMode === Constants.modes.VIEWER ? (
                   <ReactionBTN isMobile={isMobile} isTab={isTab} />
+                ) : meetingMode === Constants.modes.VIEWER ? (
+                  <ECommerceBTN isMobile={isMobile} isTab={isTab} />
                 ) : null}
               </Grid>
             );
@@ -938,7 +971,10 @@ export function ILSBottomBar({
         <LeaveBTN />
       </div>
       <div className="flex items-center justify-center">
-        <PollBTN />
+        {meetingMode === Constants.modes.VIEWER && (
+          <ECommerceBTN isMobile={isMobile} isTab={isTab} />
+        )}
+        <PollBTN isMobile={isMobile} isTab={isTab} />
         <ChatBTN isMobile={isMobile} isTab={isTab} />
         <ParticipantsBTN isMobile={isMobile} isTab={isTab} />
       </div>

@@ -14,6 +14,7 @@ import React from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 import useIsTab from "../../hooks/useIsTab";
 import useResponsiveSize from "../../hooks/useResponsiveSize";
+import ECommercePanel from "../../interactive-live-streaming/components/ECommercePanel";
 import CreatePoll from "../../interactive-live-streaming/components/pollContainer/CreatePoll";
 import PollList from "../../interactive-live-streaming/components/pollContainer/PollList";
 import SubmitPollList from "../../interactive-live-streaming/components/pollContainer/SubmitPollList";
@@ -90,6 +91,8 @@ const SideBarTabView = ({
                       : meetingMode === Constants.modes.VIEWER
                       ? `Polls ${polls?.length ? `(${polls?.length})` : ""}`
                       : "Create a poll"
+                    : sideBarMode === sideBarModes.ECOMMERCE
+                    ? "Products"
                     : capitalize(String(sideBarMode || "").toLowerCase())}
                 </Typography>
                 <IconButton
@@ -119,6 +122,8 @@ const SideBarTabView = ({
               <SubmitPollList {...{ panelHeight, polls }} />
             ) : sideBarMode === "CREATE_POLL" ? (
               <CreatePoll {...{ panelHeight, polls, setSideBarMode }} />
+            ) : sideBarMode === "ECOMMERCE" ? (
+              <ECommercePanel {...{ panelHeight, setSideBarMode }} />
             ) : null}
           </>
         </div>
