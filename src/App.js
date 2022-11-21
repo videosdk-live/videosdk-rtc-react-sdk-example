@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { MeetingProvider } from "@videosdk.live/react-sdk";
+import { Constants, MeetingProvider } from "@videosdk.live/react-sdk";
 import { SnackbarProvider } from "notistack";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { useTheme } from "@material-ui/styles";
 import { useMediaQuery } from "@material-ui/core";
 import { JoiningScreen } from "./components/screens/JoiningScreen";
-import { meetingModes, meetingTypes } from "./utils/common";
+import { meetingTypes } from "./utils/common";
 import { MeetingContainer } from "./meeting/MeetingContainer";
 import { ILSContainer } from "./interactive-live-streaming/ILSContainer";
 
@@ -21,7 +21,7 @@ const App = () => {
     selectedWebcam.id
   );
   const [meetingType, setMeetingType] = useState(meetingTypes.MEETING);
-  const [meetingMode, setMeetingMode] = useState(meetingModes.CONFERENCE);
+  const [meetingMode, setMeetingMode] = useState(Constants.modes.CONFERENCE);
   const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
@@ -119,6 +119,7 @@ const App = () => {
           <MeetingProvider
             config={{
               meetingId,
+              multiStream: false,
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",

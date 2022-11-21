@@ -60,65 +60,61 @@ const Poll = ({ poll, isDraft, publishDraftPoll }) => {
     [hasTimer, isTimerPollActive, isActive]
   );
 
-  const {
-    localSubmittedOption,
-    totalSubmissions,
-    groupedSubmissionCount,
-    maxSubmittedOptions,
-  } = useMemo(() => {
-    const localSubmittedOption = poll?.submissions?.find(
-      ({ participantId }) => participantId === localParticipantId
-    );
+  const { totalSubmissions, groupedSubmissionCount, maxSubmittedOptions } =
+    useMemo(() => {
+      const localSubmittedOption = poll?.submissions?.find(
+        ({ participantId }) => participantId === localParticipantId
+      );
 
-    const totalSubmissions = poll?.submissions?.length || 0;
+      const totalSubmissions = poll?.submissions?.length || 0;
 
-    const groupedSubmissionCount = poll?.submissions?.reduce(
-      (group, { optionId }) => {
-        group[optionId] = group[optionId] || 0;
+      const groupedSubmissionCount = poll?.submissions?.reduce(
+        (group, { optionId }) => {
+          group[optionId] = group[optionId] || 0;
 
-        group[optionId] += 1;
+          group[optionId] += 1;
 
-        return group;
-      },
-      {}
-    );
+          return group;
+        },
+        {}
+      );
 
-    const maxSubmittedOptions = [];
+      const maxSubmittedOptions = [];
 
-    const maxSubmittedOptionId =
+      const maxSubmittedOptionId =
+        groupedSubmissionCount &&
+        Object.keys(groupedSubmissionCount)
+          .map((optionId) => ({
+            optionId,
+            count: groupedSubmissionCount[optionId],
+          }))
+          .sort((a, b) => {
+            if (a.count > b.count) {
+              return -1;
+            }
+            if (a.count < b.count) {
+              return 1;
+            }
+            return 0;
+          })[0]?.optionId;
+
       groupedSubmissionCount &&
-      Object.keys(groupedSubmissionCount)
-        .map((optionId) => ({
-          optionId,
-          count: groupedSubmissionCount[optionId],
-        }))
-        .sort((a, b) => {
-          if (a.count > b.count) {
-            return -1;
+        Object.keys(groupedSubmissionCount).forEach((optionId) => {
+          if (
+            groupedSubmissionCount[optionId] ===
+            groupedSubmissionCount[maxSubmittedOptionId]
+          ) {
+            maxSubmittedOptions.push(optionId);
           }
-          if (a.count < b.count) {
-            return 1;
-          }
-          return 0;
-        })[0]?.optionId;
+        });
 
-    groupedSubmissionCount &&
-      Object.keys(groupedSubmissionCount).forEach((optionId) => {
-        if (
-          groupedSubmissionCount[optionId] ===
-          groupedSubmissionCount[maxSubmittedOptionId]
-        ) {
-          maxSubmittedOptions.push(optionId);
-        }
-      });
-
-    return {
-      localSubmittedOption,
-      totalSubmissions,
-      groupedSubmissionCount,
-      maxSubmittedOptions,
-    };
-  }, [poll, localParticipantId]);
+      return {
+        localSubmittedOption,
+        totalSubmissions,
+        groupedSubmissionCount,
+        maxSubmittedOptions,
+      };
+    }, [poll, localParticipantId]);
 
   const checkTimeOver = ({ timeout, createdAt }) =>
     !(new Date(createdAt).getTime() + timeout * 1000 > new Date().getTime());
@@ -278,8 +274,6 @@ const PollList = ({ panelHeight, polls, draftPolls, setSideBarMode }) => {
     `REMOVE_POLL_FROM_DRAFT`
   );
   const { publish: publishCreatePoll } = usePubSub(`CREATE_POLL`);
-
-  const totalPolls = useMemo(() => polls?.length || 0, [polls]);
 
   const padding = useResponsiveSize({
     xl: 12,

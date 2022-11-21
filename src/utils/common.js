@@ -1,5 +1,3 @@
-import { EventEmitter } from "events";
-
 export const json_verify = (s) => {
   try {
     JSON.parse(s);
@@ -8,6 +6,17 @@ export const json_verify = (s) => {
     return false;
   }
 };
+
+export function getQualityScore(stats) {
+  const packetLossPercent = stats.packetsLost / stats.totalPackets || 0;
+  const jitter = stats.jitter;
+  const rtt = stats.rtt;
+  let score = 100;
+  score -= packetLossPercent * 50 > 50 ? 50 : packetLossPercent * 50;
+  score -= ((jitter / 30) * 25 > 25 ? 25 : (jitter / 30) * 25) || 0;
+  score -= ((rtt / 300) * 25 > 25 ? 25 : (rtt / 300) * 25) || 0;
+  return score / 10;
+}
 
 export function formatAMPM(date) {
   var hours = date.getHours();
@@ -38,22 +47,13 @@ export const nameTructed = (name, tructedLength) => {
   }
 };
 
-export const eventEmitter = new EventEmitter();
-
-export const appEvents = {
-  "enter-full-screen": "enter-full-screen",
-  "exit-full-screen": "exit-full-screen",
-  "toggle-full-screen": "toggle-full-screen",
-  "participant-visible": "participant-visible",
-  "participant-invisible": "participant-invisible",
-};
-
 export const sideBarModes = {
   PARTICIPANTS: "PARTICIPANTS",
   CHAT: "CHAT",
   LAYOUT: "LAYOUT",
   POLLS: "POLLS",
   CREATE_POLL: "CREATE_POLL",
+  ECOMMERCE: "ECOMMERCE",
 };
 
 export const meetingTypes = {
@@ -66,11 +66,6 @@ export const meetingLayoutTopics = {
   RECORDING_LAYOUT: "RECORDING_LAYOUT",
   LIVE_STREAM_LAYOUT: "LIVE_STREAM_LAYOUT",
   HLS_LAYOUT: "HLS_LAYOUT",
-};
-
-export const meetingModes = {
-  VIEWER: "VIEWER",
-  CONFERENCE: "CONFERENCE",
 };
 
 export function debounce(func, wait, immediate) {

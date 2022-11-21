@@ -1,4 +1,4 @@
-import { Badge, Tooltip, useTheme } from "@material-ui/core";
+import { Badge, Tooltip } from "@material-ui/core";
 import React, { useState } from "react";
 import Lottie from "react-lottie";
 

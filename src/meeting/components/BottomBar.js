@@ -365,9 +365,8 @@ export function BottomBar({
           Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
           onClick={async () => {
             const track = await createCameraVideoTrack({
-              // cameraId: selectedWebcam.id,
               optimizationMode: "motion",
-              encoderConfig: "h1080p_w1920p",
+              encoderConfig: "h720p_w1280p",
               facingMode: "environment",
               multiStream: false,
             });
