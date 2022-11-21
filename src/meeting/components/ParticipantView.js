@@ -9,7 +9,7 @@ function ParticipantView({ participantId }) {
   const { displayName, webcamStream, micStream, webcamOn, micOn, isLocal } =
     useParticipant(participantId);
   const micRef = useRef(null);
-  const mMeeting = useMeeting();
+  const [mouseOver, setMouseOver] = useState(false);
 
   useEffect(() => {
     if (micRef.current) {
