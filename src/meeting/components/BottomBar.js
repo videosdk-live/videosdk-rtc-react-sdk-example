@@ -426,11 +426,11 @@ export function BottomBar({
                   handleCloseWebCam();
                   setSelectWebcamDeviceId(deviceId);
                   const track = await createCameraVideoTrack({
+                    cameraId: deviceId,
                     optimizationMode: "motion",
-                    encoderConfig: "h720p_w1280p",
+                    encoderConfig: "h1080p_w1920p",
                     facingMode: "environment",
                     multiStream: false,
-                    cameraId: deviceId,
                   });
                   changeWebcam(track);
                 }}
