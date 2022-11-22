@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Lottie from "react-lottie";
-import animationData from "../../../animations/wait_for_HLS_animation.json";
-import stoppedHLSSnimationData from "../../../animations/stopped_HLS_animation.json";
+import animationData from "../../../static/animations/wait_for_HLS_animation.json";
+import stoppedHLSSnimationData from "../../../static/animations/stopped_HLS_animation.json";
 import Hls from "hls.js";
 import useResponsiveSize from "../../../hooks/useResponsiveSize";
 

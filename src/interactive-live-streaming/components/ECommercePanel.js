@@ -1,7 +1,9 @@
 import useResponsiveSize from "../../hooks/useResponsiveSize";
-import ProductImage from "../../product1.png";
-import ProductImage2 from "../../product2.png";
-import ProductImage3 from "../../product3.png";
+import {
+  product1Image,
+  product2Image,
+  product3Image,
+} from "../../static/images";
 
 const ProductPart = ({ padding }) => {
   return (
@@ -20,7 +22,7 @@ const ProductPart = ({ padding }) => {
             />
             <div id="carousel-1" class="carousel-item ">
               <div className="flex flex-1 items-center justify-center w-full h-full rounded bg-white">
-                <img src={ProductImage} />
+                <img src={product1Image} />
               </div>
               <div className="mt-5">
                 <p className="text-base font-semibold text-white text-justify">
@@ -48,7 +50,7 @@ const ProductPart = ({ padding }) => {
             />
             <div id="carousel-2" class="carousel-item">
               <div className="flex flex-1 items-center justify-center w-full h-full rounded bg-pink-250">
-                <img src={ProductImage2} />
+                <img src={product2Image} />
               </div>
               <div className="mt-5">
                 <p className="text-base font-semibold text-white text-justify">
@@ -76,7 +78,7 @@ const ProductPart = ({ padding }) => {
             />
             <div id="carousel-3" class="carousel-item">
               <div className="flex flex-1 items-center justify-center w-full h-full rounded bg-green-750">
-                <img src={ProductImage3} />
+                <img src={product3Image} />
               </div>
               <div className="mt-5">
                 <p className="text-base font-semibold text-white text-justify">

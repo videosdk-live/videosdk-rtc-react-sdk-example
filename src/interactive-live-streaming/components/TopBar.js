@@ -1,7 +1,7 @@
 import { OutlinedButton } from "../../components/buttons/OutlinedButton";
 import RecordingIcon from "../../icons/Bottombar/RecordingIcon";
-import recordingBlink from "../../animations/recording-blink.json";
-import liveHLS from "../../animations/live-hls.json";
+import recordingBlink from "../../static/animations/recording-blink.json";
+import liveHLS from "../../static/animations/live-hls.json";
 import { Constants, useMeeting } from "@videosdk.live/react-sdk";
 import useIsRecording from "../../hooks/useIsRecording";
 import { useEffect, useMemo, useRef } from "react";

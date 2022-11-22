@@ -6,8 +6,8 @@ import {
 } from "@videosdk.live/react-sdk";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ClipboardIcon, CheckIcon } from "@heroicons/react/outline";
-import recordingBlink from "../../animations/recording-blink.json";
-import liveHLS from "../../animations/live-hls.json";
+import recordingBlink from "../../static/animations/recording-blink.json";
+import liveHLS from "../../static/animations/live-hls.json";
 import useIsRecording from "../../hooks/useIsRecording";
 import RecordingIcon from "../../icons/Bottombar/RecordingIcon";
 import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
@@ -376,6 +376,7 @@ export function ILSBottomBar({
               encoderConfig: "h1080p_w1920p",
               facingMode: "environment",
               multiStream: false,
+              cameraId: selectWebcamDeviceId,
             });
             mMeeting.toggleWebcam(track);
           }}

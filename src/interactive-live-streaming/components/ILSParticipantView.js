@@ -190,7 +190,7 @@ export const CornerDisplayName = ({
         clearInterval(statsIntervalIdRef.current);
       }
 
-      statsIntervalIdRef.current = setInterval(updateStats, 100);
+      statsIntervalIdRef.current = setInterval(updateStats, 500);
     } else {
       if (statsIntervalIdRef.current) {
         clearInterval(statsIntervalIdRef.current);
