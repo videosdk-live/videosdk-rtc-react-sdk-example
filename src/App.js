@@ -119,7 +119,6 @@ const App = () => {
           <MeetingProvider
             config={{
               meetingId,
-              multiStream: false,
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
