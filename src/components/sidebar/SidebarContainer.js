@@ -123,7 +123,7 @@ const SideBarTabView = ({
             ) : sideBarMode === "CREATE_POLL" ? (
               <CreatePoll {...{ panelHeight, polls, setSideBarMode }} />
             ) : sideBarMode === "ECOMMERCE" ? (
-              <ECommercePanel {...{ panelHeight, setSideBarMode }} />
+              <ECommercePanel {...{ panelHeight }} />
             ) : null}
           </>
         </div>

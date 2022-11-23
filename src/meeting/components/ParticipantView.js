@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-
 import { useTheme } from "@material-ui/core";
 import { useParticipant, useMeeting } from "@videosdk.live/react-sdk";
 import ReactPlayer from "react-player";
-import { CornerDisplayName } from "../../interactive-live-streaming/components/ILSParticipantView";
+import { CornerDisplayName } from "../../utils/common";
 
 function ParticipantView({ participantId }) {
   const { displayName, webcamStream, micStream, webcamOn, micOn, isLocal } =

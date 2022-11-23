@@ -663,7 +663,11 @@ There are 2 folders :
 
 - [`interactive-live-streaming/components/pollContainer/PollListner.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/interactive-live-streaming/components/pollContainer/PollListner.js) - It contains create a poll, submit a poll, end poll , draft a poll and remove poll from draft pubsub methods.
 
-**12. Reactions**
+**12. ECommercePanel**
+
+- [`interactive-live-streaming/components/ECommercePanel.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/interactive-live-streaming/components/ECommercePanel.js) - It contains product related details and viewer can buy product from here.
+
+**13. Reactions**
 
 - [`interactive-live-streaming/components/FlyingEmojisOverlay.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/interactive-live-streaming/components/FlyingEmojisOverlay.js) - It contains emoji animation, functions for sending and receiving emoji using pubsub method.
 
