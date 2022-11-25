@@ -1,16 +1,14 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTheme } from "@material-ui/core";
 import { useParticipant, useMeeting } from "@videosdk.live/react-sdk";
-import { nameTructed } from "../../utils/helper";
-import { MicOff } from "@material-ui/icons";
 import ReactPlayer from "react-player";
+import { CornerDisplayName } from "../../utils/common";
 
 function ParticipantView({ participantId }) {
   const { displayName, webcamStream, micStream, webcamOn, micOn, isLocal } =
     useParticipant(participantId);
   const micRef = useRef(null);
-  const mMeeting = useMeeting();
-  const isPresenting = mMeeting.isPresenting;
+  const [mouseOver, setMouseOver] = useState(false);
 
   useEffect(() => {
     if (micRef.current) {
@@ -37,31 +35,14 @@ function ParticipantView({ participantId }) {
   }, [webcamStream, webcamOn]);
   return (
     <div
+      onMouseEnter={() => {
+        setMouseOver(true);
+      }}
+      onMouseLeave={() => {
+        setMouseOver(false);
+      }}
       className={`h-full w-full  bg-gray-750 relative overflow-hidden rounded-lg video-cover`}
     >
-      <div
-        className="absolute bottom-2 left-2 rounded-md flex items-center justify-center p-2"
-        style={{
-          backgroundColor: "#00000066",
-          transition: "all 200ms",
-          transitionTimingFunction: "linear",
-        }}
-      >
-        {!micOn ? (
-          <MicOff fontSize="small" style={{ color: "white" }}></MicOff>
-        ) : (
-          <></>
-        )}
-        <p className="text-sm text-white">
-          {isPresenting
-            ? isLocal
-              ? `You are presenting`
-              : `${nameTructed(displayName, 15)} is presenting`
-            : isLocal
-            ? "You"
-            : nameTructed(displayName, 26)}
-        </p>
-      </div>
       <audio ref={micRef} autoPlay muted={isLocal} />
       {webcamOn ? (
         <ReactPlayer
@@ -95,6 +76,17 @@ function ParticipantView({ participantId }) {
           </div>
         </div>
       )}
+      <CornerDisplayName
+        {...{
+          isLocal,
+          displayName,
+          micOn,
+          webcamOn,
+          isPresenting: false,
+          participantId,
+          mouseOver,
+        }}
+      />
     </div>
   );
 }

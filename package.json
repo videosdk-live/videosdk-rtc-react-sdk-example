@@ -2,7 +2,7 @@
   "name": "react-sdk-example",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://lab.zujonow.com/react-rtc-demo/",
+  "homepage": "https://lab.videosdk.live/react-rtc-demo/",
   "dependencies": {
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.2",
@@ -12,7 +12,7 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "@videosdk.live/react-sdk": "^0.1.53",
+    "@videosdk.live/react-sdk": "^0.1.54",
     "@windmill/react-ui": "^0.6.0",
     "hls.js": "^1.2.5",
     "notistack": "^1.0.10",

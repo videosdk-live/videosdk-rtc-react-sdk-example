@@ -140,8 +140,6 @@ export function ILSContainer({
     if (data.status === Constants.hlsEvents.HLS_STOPPED) {
       setAfterMeetingJoinedHLSState("STOPPED");
     }
-
-    //set downstream url on basis of started or stopped
   };
 
   function onParticipantJoined(participant) {
@@ -175,7 +173,7 @@ export function ILSContainer({
         setTimeout(async () => {
           const track = await createCameraVideoTrack({
             optimizationMode: "motion",
-            encoderConfig: "h720p_w1280p",
+            encoderConfig: "h1080p_w1920p",
             facingMode: "environment",
             cameraId: selectedWebcam.id,
             multiStream: false,

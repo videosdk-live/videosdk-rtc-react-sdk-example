@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Lottie from "react-lottie";
-import animationData from "../../../animations/wait_for_HLS_animation.json";
-import stoppedHLSSnimationData from "../../../animations/stopped_HLS_animation.json";
+import animationData from "../../../static/animations/wait_for_HLS_animation.json";
+import stoppedHLSSnimationData from "../../../static/animations/stopped_HLS_animation.json";
 import Hls from "hls.js";
 import useResponsiveSize from "../../../hooks/useResponsiveSize";
 
@@ -13,6 +13,7 @@ export async function sleep(ms) {
 
 const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
   const [canPlay, setCanPlay] = useState(false);
+  const playerRef = useRef();
 
   const lottieSize = useResponsiveSize({
     xl: 240,
@@ -105,7 +106,11 @@ const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
           console.log(err);
         });
       } else {
-        console.error("HLS is not supported");
+        if (typeof playerRef.current?.play === "function") {
+          playerRef.current.src = downstreamUrl;
+          playerRef.current.play();
+        }
+        // console.error("HLS is not supported");
       }
     }
   }, [downstreamUrl, canPlay]);
@@ -117,13 +122,21 @@ const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
       } relative overflow-hidden rounded-lg`}
     >
       {downstreamUrl && canPlay ? (
-        <div className="flex flex-col items-center justify-center absolute top-0 left-0 bottom-0 right-0">
+        <div className="flex flex-col  items-center justify-center absolute top-0 left-0 bottom-0 right-0">
           <video
-            // controls={hlsPlayerControlsVisible}
+            ref={playerRef}
             id="hlsPlayer"
             autoPlay={true}
+            controls
             style={{ width: "100%", height: "100%" }}
-          />
+            playsinline
+            playsInline
+            muted={true}
+            playing
+            onError={(err) => {
+              console.log(err, "hls video error");
+            }}
+          ></video>
         </div>
       ) : (
         <div className="flex h-full w-full items-center justify-center">
