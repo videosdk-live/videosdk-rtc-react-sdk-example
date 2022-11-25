@@ -140,8 +140,6 @@ export function ILSContainer({
     if (data.status === Constants.hlsEvents.HLS_STOPPED) {
       setAfterMeetingJoinedHLSState("STOPPED");
     }
-
-    //set downstream url on basis of started or stopped
   };
 
   function onParticipantJoined(participant) {
