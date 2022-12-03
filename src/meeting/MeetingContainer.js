@@ -7,7 +7,7 @@ import {
 } from "@videosdk.live/react-sdk";
 import { BottomBar } from "./components/BottomBar";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
-import { ParticipantsViewer } from "./components/ParticipantView";
+import MemorizedParticipantView from "./components/ParticipantView";
 import { PresenterView } from "../components/PresenterView";
 import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
@@ -241,7 +241,7 @@ export function MeetingContainer({
                   <PresenterView height={containerHeight - bottomBarHeight} />
                 ) : null}
                 {isPresenting && isMobile ? null : (
-                  <ParticipantsViewer
+                  <MemorizedParticipantView
                     isPresenting={isPresenting}
                     sideBarMode={sideBarMode}
                   />

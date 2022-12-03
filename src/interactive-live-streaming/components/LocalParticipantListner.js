@@ -35,7 +35,7 @@ const LocalParticipantListner = ({ localParticipantId, meetingMode }) => {
 
   useEffect(() => {
     _handleChangePinState({ meetingMode, localParticipant });
-  }, [meetingMode, localParticipant]);
+  }, [meetingMode]);
   return <></>;
 };
 

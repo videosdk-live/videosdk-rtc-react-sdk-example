@@ -499,7 +499,7 @@ There are 2 folders :
   <img width="600" height="338" src="public/join_streaming_room.gif"/>
   </p>
 
-  **2. PresenterView**
+**2. PresenterView**
 
 [`components/PresenterView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/PresenterView.js) - It contains the view when participant share their screen.
 
@@ -507,7 +507,15 @@ There are 2 folders :
 <img width="600" height="338" src="public/presenter-view.gif"/>
 </p>
 
-**3. ParticipantList**
+**3. ParticipantView**
+
+[`components/ParticipantView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/ParticipantView.js) - It contains single participant video and corner display name.
+
+**4. ParticipantGrid**
+
+[`components/ParticipantGrid.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/ParticipantGrid.js) - It contains the grid of participant that are displayed in the main screen.
+
+**5. ParticipantList**
 
 [`sidebar/ParticipantPanel.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/sidebar/ParticipantPanel.js) - This file is used to show the list of participants present in the meeting.
 
@@ -515,7 +523,7 @@ There are 2 folders :
 <img width="600" height="338" src="public/participant_list.gif"/>
 </p>
 
-**4. Chat**
+**6. Chat**
 
 [`sidebar/ChatPanel.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/sidebar/ChatPanel.js) - It contains the chat side panel with chat input and chat messages list.
 
@@ -523,7 +531,7 @@ There are 2 folders :
 <img width="600" height="338" src="public/chat.gif"/>
 </p>
 
-**5. Waiting Screen**
+**7. Waiting Screen**
 
 [`components/screens/WaitingToJoin.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/WaitingToJoinScreen.js) - It contains the lottie animation with messages. Untill you receive `isMeetingJoined` true from `meeting` that you intialize using `useMeeting()` from `@videosdk.live/react-sdk`, this screen will be displayed.
 
@@ -531,7 +539,7 @@ There are 2 folders :
 <img width="600" height="338" src="public/waiting-screen.gif"/>
 </p>
 
-**6. Leave Screen**
+**8. Leave Screen**
 
 [`components/screens/LeaveScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/LeaveScreen.js) - This file contains the leave screen.
 
@@ -539,7 +547,7 @@ There are 2 folders :
 <img width="600"  src="public/leave-screen.png"/>
 </p>
 
-**7. SidebarContainer**
+**9. SidebarContainer**
 
 - [`components/sidebar/SidebarContainer.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/sidebar/SidebarContainer.js) - It containes `Participanel`, `ChatPanel`, `CreatePoll`, `PollList` and `SubmitPollList` component rendering.
 

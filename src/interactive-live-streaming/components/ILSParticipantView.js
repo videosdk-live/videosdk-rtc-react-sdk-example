@@ -1,202 +1,75 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useTheme } from "@material-ui/core";
-import { useParticipant, useMeeting } from "@videosdk.live/react-sdk";
-import ReactPlayer from "react-player";
-import { CornerDisplayName } from "../../utils/common";
+import React, { useMemo } from "react";
+import { useMeeting } from "@videosdk.live/react-sdk";
+import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
 
-function ParticipantView({ participantId }) {
+function ILSParticipantView({ isPresenting, sideBarMode }) {
   const {
-    displayName,
-    webcamStream,
-    micStream,
-    webcamOn,
-    micOn,
-    isLocal,
-    mode,
-  } = useParticipant(participantId);
+    participants,
+    pinnedParticipants,
+    activeSpeakerId,
+    localParticipant,
+    localScreenShareOn,
+    presenterId,
+  } = useMeeting();
 
-  const micRef = useRef(null);
-  const [mouseOver, setMouseOver] = useState(false);
+  const participantIds = useMemo(() => {
+    const pinnedParticipantId = [...pinnedParticipants.keys()].filter(
+      (participantId) => {
+        return participantId != localParticipant.id;
+      }
+    );
+    const regularParticipantIds = [...participants.keys()].filter(
+      (participantId) => {
+        return (
+          ![...pinnedParticipants.keys()].includes(participantId) &&
+          localParticipant.id != participantId
+        );
+      }
+    );
 
-  useEffect(() => {
-    if (micRef.current) {
-      if (micOn && micStream) {
-        const mediaStream = new MediaStream();
-        mediaStream.addTrack(micStream.track);
-        micRef.current.srcObject = mediaStream;
-        micRef.current
-          .play()
-          .catch((error) =>
-            console.error("videoElem.current.play() failed", error)
-          );
-      } else {
-        micRef.current.srcObject = null;
+    const ids = [
+      localParticipant.id,
+      ...pinnedParticipantId,
+      ...regularParticipantIds,
+    ];
+
+    const filteredParticipants = ids
+      .filter((participantId) => {
+        return participants.get(participantId).mode === "CONFERENCE";
+      })
+      .slice(0, 16);
+
+    if (activeSpeakerId) {
+      if (!ids.includes(activeSpeakerId)) {
+        ids[ids.length - 1] = activeSpeakerId;
       }
     }
-  }, [micStream, micOn]);
-  const webcamMediaStream = useMemo(() => {
-    if (webcamOn && webcamStream) {
-      const mediaStream = new MediaStream();
-      mediaStream.addTrack(webcamStream.track);
-      return mediaStream;
-    }
-  }, [webcamStream, webcamOn]);
-  return mode === "CONFERENCE" ? (
-    <div
-      onMouseEnter={() => {
-        setMouseOver(true);
-      }}
-      onMouseLeave={() => {
-        setMouseOver(false);
-      }}
-      className={`h-full w-full  bg-gray-750 relative overflow-hidden rounded-lg video-cover`}
-    >
-      <audio ref={micRef} autoPlay />
-      {webcamOn ? (
-        <ReactPlayer
-          //
-          playsinline // very very imp prop
-          playIcon={<></>}
-          //
-          pip={false}
-          light={false}
-          controls={false}
-          muted={true}
-          playing={true}
-          //
-          url={webcamMediaStream}
-          //
-          height={"100%"}
-          width={"100%"}
-          onError={(err) => {
-            console.log(err, "participant video error");
-          }}
-        />
-      ) : (
-        <div className="h-full w-full flex items-center justify-center">
-          <div
-            className={`z-10 flex items-center justify-center rounded-full bg-gray-800 2xl:h-[92px] h-[52px] 2xl:w-[92px] w-[52px]`}
-          >
-            <p className="text-2xl text-white">
-              {String(displayName).charAt(0).toUpperCase()}
-            </p>
-          </div>
-        </div>
-      )}
-      <CornerDisplayName
-        {...{
-          isLocal,
-          displayName,
-          micOn,
-          webcamOn,
-          isPresenting: false,
-          participantId,
-          mouseOver,
-        }}
-      />
-    </div>
-  ) : null;
-}
-export function ILSParticipantView({ isPresenting, sideBarMode }) {
-  const theme = useTheme();
-  const mMeeting = useMeeting();
+    return filteredParticipants;
+  }, [
+    participants,
+    activeSpeakerId,
+    pinnedParticipants,
+    presenterId,
+    localScreenShareOn,
+  ]);
 
-  const participants = [];
-  mMeeting?.participants.forEach((values, keys) => {
-    if (values.mode === "CONFERENCE") {
-      participants.push(values.id);
-    }
-  });
-
-  const isXStoSM = theme.breakpoints.between("xs", "sm");
-  const isMobile = window.matchMedia(
-    "only screen and (max-width: 768px)"
-  ).matches;
-
-  const perRow =
-    isMobile || isPresenting
-      ? participants.length < 4
-        ? 1
-        : participants.length < 9
-        ? 2
-        : 3
-      : participants.length < 5
-      ? 2
-      : participants.length < 7
-      ? 3
-      : participants.length < 9
-      ? 4
-      : participants.length < 10
-      ? 3
-      : participants.length < 11
-      ? 4
-      : 4;
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: isXStoSM ? "column" : "row",
-        flexGrow: 1,
-        margin: 12,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-      className={`${
-        participants.length < 2 && !sideBarMode && !isPresenting
-          ? "md:px-16 md:py-2"
-          : participants.length < 3 && !sideBarMode && !isPresenting
-          ? "md:px-16 md:py-8"
-          : participants.length < 4 && !sideBarMode && !isPresenting
-          ? "md:px-16 md:py-4"
-          : participants.length > 4 && !sideBarMode && !isPresenting
-          ? "md:px-14"
-          : "md:px-0"
-      }`}
-    >
-      <div className="flex flex-col w-full h-full">
-        {Array.from(
-          { length: Math.ceil(participants.length / perRow) },
-          (_, i) => {
-            return (
-              <div
-                key={`participant-${i}`}
-                className={`flex flex-1 ${
-                  isPresenting
-                    ? participants.length === 1
-                      ? "justify-start items-start"
-                      : "items-center justify-center"
-                    : "items-center justify-center"
-                }`}
-              >
-                {participants
-                  .slice(i * perRow, (i + 1) * perRow)
-                  .map((participantId) => {
-                    return (
-                      <div
-                        key={`participant_${participantId}`}
-                        className={`flex flex-1 ${
-                          isPresenting
-                            ? participants.length === 1
-                              ? "md:h-48 md:w-44 xl:w-52 xl:h-48 "
-                              : participants.length === 2
-                              ? "md:w-44 xl:w-56"
-                              : "md:w-44 xl:w-48"
-                            : "w-full"
-                        } items-center justify-center h-full ${
-                          participants.length === 1
-                            ? "md:max-w-7xl 2xl:max-w-[1480px] "
-                            : "md:max-w-lg 2xl:max-w-2xl"
-                        } overflow-clip overflow-hidden  p-1`}
-                      >
-                        <ParticipantView participantId={participantId} />
-                      </div>
-                    );
-                  })}
-              </div>
-            );
-          }
-        )}
-      </div>
-    </div>
+    <MemoizedParticipantGrid
+      participantIds={participantIds}
+      isPresenting={isPresenting}
+      sideBarMode={sideBarMode}
+    />
   );
 }
+
+const MemorizedILSParticipantView = React.memo(
+  ILSParticipantView,
+  (prevProps, nextProps) => {
+    return (
+      prevProps.sideBarMode === nextProps.sideBarMode &&
+      prevProps.isPresenting === nextProps.isPresenting
+    );
+  }
+);
+
+export default MemorizedILSParticipantView;

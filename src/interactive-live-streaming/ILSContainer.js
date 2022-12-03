@@ -16,7 +16,7 @@ import useIsTab from "../hooks/useIsTab";
 import PollsListner from "./components/pollContainer/PollListner";
 import HLSContainer from "./components/hlsViewContainer/HLSContainer";
 import FlyingEmojisOverlay from "./components/FlyingEmojisOverlay";
-import { ILSParticipantView } from "./components/ILSParticipantView";
+import MemorizedILSParticipantView from "./components/ILSParticipantView";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import LocalParticipantListner from "./components/LocalParticipantListner";
 import ConfirmBox from "../components/ConfirmBox";
@@ -327,7 +327,7 @@ export function ILSContainer({
                     />
                   ) : null}
                   {isPresenting && isMobile ? null : (
-                    <ILSParticipantView
+                    <MemorizedILSParticipantView
                       isPresenting={isPresenting}
                       sideBarMode={sideBarMode}
                     />
