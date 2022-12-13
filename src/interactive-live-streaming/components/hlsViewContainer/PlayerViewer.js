@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import Lottie from "react-lottie";
+import Lottie from "lottie-react";
 import animationData from "../../../static/animations/wait_for_HLS_animation.json";
 import stoppedHLSSnimationData from "../../../static/animations/stopped_HLS_animation.json";
 import Hls from "hls.js";
-import useResponsiveSize from "../../../hooks/useResponsiveSize";
+import useIsMobile from "../../../hooks/useIsMobile";
+import useIsTab from "../../../hooks/useIsTab";
+import { useMediaQuery } from "react-responsive";
 
 export async function sleep(ms) {
   return new Promise((resolve) => {
@@ -15,31 +17,20 @@ const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
   const [canPlay, setCanPlay] = useState(false);
   const playerRef = useRef();
 
-  const lottieSize = useResponsiveSize({
-    xl: 240,
-    lg: 240,
-    md: 180,
-    sm: 180,
-    xs: 160,
-  });
+  const isMobile = useIsMobile();
+  const isTab = useIsTab();
+  const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
+  const isXLDesktop = useMediaQuery({ minWidth: 1440 });
 
-  const defaultOptions = {
-    loop: true,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
-
-  const defaultOptionsStoppedHls = {
-    loop: false,
-    autoplay: true,
-    animationData: stoppedHLSSnimationData,
-    rendererSettings: {
-      preserveAspectRatio: "xMidYMid slice",
-    },
-  };
+  const lottieSize = isMobile
+    ? 180
+    : isTab
+    ? 180
+    : isLGDesktop
+    ? 240
+    : isXLDesktop
+    ? 240
+    : 160;
 
   async function waitForHLSPlayable(downstreamUrl, maxRetry) {
     return new Promise(async (resolve, reject) => {
@@ -80,6 +71,15 @@ const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
 
   useEffect(async () => {
     if (downstreamUrl) {
+      const defaultOptions = {
+        loop: true,
+        autoplay: true,
+        animationData: animationData,
+        rendererSettings: {
+          preserveAspectRatio: "xMidYMid slice",
+        },
+      };
+
       checkHLSPlayable(downstreamUrl);
     } else {
       setCanPlay(false);
@@ -141,17 +141,30 @@ const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
       ) : (
         <div className="flex h-full w-full items-center justify-center">
           <div className="flex flex-col items-center justify-center absolute top-0 left-0 bottom-0 right-0">
-            <Lottie
-              options={
-                afterMeetingJoinedHLSState === "STOPPED"
-                  ? defaultOptionsStoppedHls
-                  : defaultOptions
-              }
-              eventListeners={[{ eventName: "done" }]}
-              height={lottieSize}
-              width={lottieSize}
-            />
-            <p className="text-white text-center font-semibold text-2xl">
+            <div
+              style={{
+                height: lottieSize,
+                width: lottieSize,
+              }}
+            >
+              <Lottie
+                animationData={
+                  afterMeetingJoinedHLSState === "STOPPED"
+                    ? stoppedHLSSnimationData
+                    : animationData
+                }
+                rendererSettings={{
+                  preserveAspectRatio: "xMidYMid slice",
+                }}
+                loop={afterMeetingJoinedHLSState === "STOPPED" ? false : true}
+                autoPlay={true}
+                style={{
+                  height: "100%",
+                  width: "100%",
+                }}
+              />
+            </div>
+            <p className="text-white text-center font-semibold text-2xl mt-0">
               {afterMeetingJoinedHLSState === "STOPPED"
                 ? "Host has stopped the live streaming."
                 : "Waiting for host to start live stream."}

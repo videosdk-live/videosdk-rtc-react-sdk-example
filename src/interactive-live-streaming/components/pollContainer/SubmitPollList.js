@@ -1,31 +1,15 @@
-import { Tooltip } from "@material-ui/core";
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useMemo, useRef, useState, useEffect } from "react";
-import useResponsiveSize from "../../../hooks/useResponsiveSize";
 import AnswerSubmittedIcon from "../../../icons/Poll/AnswerSubmittedIcon";
 import CorrectSelectedIcon from "../../../icons/Poll/CorrectSelectedIcon";
 import NoPollActiveIcon from "../../../icons/Poll/NoPollActiveIcon";
 import WrongOptionSelectedIcon from "../../../icons/Poll/WrongOptionSelectedIcon";
-import { MarkCorrectCheckbox } from "./CreatePoll";
 import { secondsToMinutes } from "./PollList";
+import { createPopper } from "@popperjs/core";
+import { Input } from "@windmill/react-ui";
 
 const SubmitPollListItem = ({ poll }) => {
   const timerIntervalRef = useRef();
-
-  const padding = useResponsiveSize({
-    xl: 12,
-    lg: 16,
-    md: 8,
-    sm: 6,
-    xs: 4,
-  });
-  const marginY = useResponsiveSize({
-    xl: 18,
-    lg: 16,
-    md: 14,
-    sm: 12,
-    xs: 10,
-  });
 
   const mMeeting = useMeeting();
 
@@ -139,15 +123,49 @@ const SubmitPollListItem = ({ poll }) => {
     };
   }, []);
 
+  const TooltipIconRender = ({ Icon, tooltipTitle }) => {
+    const [tooltipShow, setTooltipShow] = useState(false);
+    const btnRef = useRef();
+    const tooltipRef = useRef();
+
+    const openTooltip = () => {
+      createPopper(btnRef.current, tooltipRef.current, {
+        placement: "right",
+      });
+      setTooltipShow(true);
+    };
+    const closeTooltip = () => {
+      setTooltipShow(false);
+    };
+    return (
+      <>
+        <div
+          ref={btnRef}
+          onMouseEnter={openTooltip}
+          onMouseLeave={closeTooltip}
+        >
+          <div className="ml-2 mr-2 cursor-pointer">
+            <Icon />
+          </div>
+        </div>
+        <div
+          style={{ zIndex: 999 }}
+          className={`${
+            tooltipShow ? "" : "hidden"
+          } overflow-hidden flex flex-col items-center justify-center pb-1`}
+          ref={tooltipRef}
+        >
+          <div className={"rounded-md p-1.5 bg-black "}>
+            <p className="text-base text-white ">{tooltipTitle}</p>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   return (
     <div style={{ borderBottom: "1px solid #70707033" }}>
-      <div
-        style={{
-          margin: padding,
-          marginTop: marginY,
-          marginBottom: marginY,
-        }}
-      >
+      <div className="xl:m-4 m-2 xl:my-[18px] lg:my-4 md:my-[14px] sm:my-3 my-[10px]">
         <div className="flex items-center p-0 m-0">
           <p className="text-sm text-gray-900 font-medium my-0">{`Poll ${index}`}</p>
           <p className="mx-2 text-gray-900 font-medium my-0">&#x2022;</p>
@@ -198,23 +216,15 @@ const SubmitPollListItem = ({ poll }) => {
                             ) : null
                           ) : hasCorrectAnswer ? (
                             isCorrectOption ? (
-                              <Tooltip
-                                placement="right"
-                                title={"Correct Answer"}
-                              >
-                                <div className="ml-2 cursor-pointer">
-                                  <CorrectSelectedIcon />
-                                </div>
-                              </Tooltip>
+                              <TooltipIconRender
+                                Icon={CorrectSelectedIcon}
+                                tooltipTitle={"Correct Answer"}
+                              />
                             ) : isOptionSelectedByLocalIncorrect ? (
-                              <Tooltip
-                                placement="right"
-                                title={"Your answer is wrong"}
-                              >
-                                <div className="ml-2 cursor-pointer">
-                                  <WrongOptionSelectedIcon />
-                                </div>
-                              </Tooltip>
+                              <TooltipIconRender
+                                Icon={WrongOptionSelectedIcon}
+                                tooltipTitle={"Your answer is wrong"}
+                              />
                             ) : null
                           ) : null}
                         </div>
@@ -223,7 +233,7 @@ const SubmitPollListItem = ({ poll }) => {
                             <div
                               className={`${
                                 hasCorrectAnswer && isPollActive
-                                  ? "bg-orange-350"
+                                  ? "bg-blue-500"
                                   : hasCorrectAnswer && !isPollActive
                                   ? isCorrectOption
                                     ? "bg-purple-550"
@@ -249,17 +259,20 @@ const SubmitPollListItem = ({ poll }) => {
                 })
               : poll?.options.map((option) => {
                   return (
-                    <div className="flex mb-3">
-                      <MarkCorrectCheckbox
+                    <div className="flex mb-3 items-center">
+                      <Input
+                        type="checkbox"
                         onClick={() => {
                           publish(
                             { optionId: option.optionId },
                             { persist: true }
                           );
                         }}
+                        className="bg-transparent rounded-xl h-5 w-5 border-2 border-gray-300 focus:outline-none focus:border-gray-300 focus:ring-0"
                       />
+
                       <div
-                        className="ml-8 w-full rounded bg-gray-700"
+                        className="ml-3 w-full rounded bg-gray-700"
                         style={{ padding: "8px 8px 8px" }}
                       >
                         <p className="text-white">{option.option}</p>

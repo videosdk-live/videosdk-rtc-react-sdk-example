@@ -1,13 +1,5 @@
-import {
-  Box,
-  Dialog,
-  DialogTitle,
-  Typography,
-  DialogActions,
-  Button,
-  useTheme,
-} from "@material-ui/core";
-import React from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { Fragment } from "react";
 
 const ConfirmBox = ({
   successText,
@@ -19,98 +11,73 @@ const ConfirmBox = ({
   subTitle,
   subTitleColor,
 }) => {
-  const theme = useTheme();
-
   return (
-    <Dialog
-      fullWidth
-      maxWidth="xs"
-      open={open}
-      onClose={() => {}}
-      aria-labelledby="responsive-dialog-title"
-    >
-      <Box
-        style={{
-          padding: 8,
-          backgroundColor: theme.palette.darkTheme.main,
-        }}
-      >
-        <Box
-          style={{
-            display: "flex",
-            alignItems: "center",
-            flexDirection: "row",
-          }}
-        >
-          <Box
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexDirection: "column",
-            }}
+    <>
+      <Transition appear show={open} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={() => {}}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
-            <DialogTitle
-              style={{
-                padding: 8,
-                margin: 0,
-                color: "#fff",
-              }}
-              id="responsive-dialog-title"
-            >
-              <Typography
-                variant="subtitle1"
-                style={{
-                  fontWeight: "bold",
-                  color: "#fff",
-                }}
-              >
-                {title}
-                {/* {`Allow participant entry?`} */}
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                style={{
-                  marginTop: 3,
-                  color: subTitleColor ? subTitleColor : "#9FA0A7",
-                }}
-              >
-                {subTitle}
-                {/* {`${name} wants to join meeting.`} */}
-              </Typography>
-            </DialogTitle>
-          </Box>
-        </Box>
-        <Box>
-          <DialogActions>
-            <Button
-              onClick={onReject}
-              color={"white"}
-              style={{
-                color: "white",
-              }}
-              size="medium"
-            >
-              {rejectText}
-            </Button>
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
 
-            <Button
-              size="medium"
-              onClick={onSuccess}
-              color="white"
-              autoFocus
-              variant="outlined"
-              style={{
-                color: "white",
-                borderColor: "white",
-              }}
-            >
-              {successText}
-            </Button>
-          </DialogActions>
-        </Box>
-      </Box>
-    </Dialog>
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center  text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel className="w-11/12 max-w-md transform overflow-hidden rounded bg-gray-750 p-4 text-left align-middle shadow-xl transition-all">
+                  <Dialog.Title className="text-base font-medium  text-white ">
+                    {title}
+                  </Dialog.Title>
+                  <div className="mt-2">
+                    <p
+                      className="text-base"
+                      style={{
+                        color: subTitleColor ? subTitleColor : "#9FA0A7",
+                      }}
+                    >
+                      {subTitle}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 flex justify-end">
+                    {rejectText && (
+                      <button
+                        type="button"
+                        className="mr-2 rounded px-4 py-2 text-sm font-medium text-white hover:bg-gray-700 "
+                        onClick={onReject}
+                      >
+                        {rejectText}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="rounded border border-white bg-transparent px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                      onClick={onSuccess}
+                    >
+                      {successText}
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+    </>
   );
 };
 

@@ -1,18 +1,4 @@
-import {
-  Box,
-  Button,
-  useTheme,
-  Grid,
-  makeStyles,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  IconButton,
-} from "@material-ui/core";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { VideocamOff, MicOff, Mic, Videocam } from "@material-ui/icons";
-import useResponsiveSize from "../../hooks/useResponsiveSize";
-import { red } from "@material-ui/core/colors";
 import { MeetingDetailsScreen } from "../MeetingDetailsScreen";
 import { createMeeting, getToken, validateMeeting } from "../../api";
 import { CheckCircleIcon } from "@heroicons/react/outline";
@@ -20,30 +6,12 @@ import SettingDialogueBox from "../SettingDialogueBox";
 import ConfirmBox from "../ConfirmBox";
 import { meetingTypes } from "../../utils/common";
 import { Constants } from "@videosdk.live/react-sdk";
-
-const useStyles = makeStyles((theme) => ({
-  video: {
-    borderRadius: "10px",
-    backgroundColor: "#1c1c1c",
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  toggleButton: {
-    borderRadius: "100%",
-    minWidth: "auto",
-    width: "44px",
-    height: "44px",
-  },
-  previewBox: {
-    width: "100%",
-    height: "45vh",
-    position: "relative",
-  },
-}));
+import useIsMobile from "../../hooks/useIsMobile";
+import { createPopper } from "@popperjs/core";
+import WebcamOffIcon from "../../icons/WebcamOffIcon";
+import WebcamOnIcon from "../../icons/Bottombar/WebcamOnIcon";
+import MicOffIcon from "../../icons/MicOffIcon";
+import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
 
 export function JoiningScreen({
   participantName,
@@ -62,9 +30,6 @@ export function JoiningScreen({
   setMeetingMode,
   meetingMode,
 }) {
-  const theme = useTheme();
-  const classes = useStyles();
-
   const [setting, setSetting] = useState("video");
   const [{ webcams, mics }, setDevices] = useState({
     devices: [],
@@ -97,12 +62,7 @@ export function JoiningScreen({
     setSettingDialogueOpen(false);
   };
 
-  const isXStoSM = useMediaQuery(theme.breakpoints.between("xs", "sm"));
-  const gtThenMD = useMediaQuery(theme.breakpoints.up("md"));
-  const gtThenXL = useMediaQuery(theme.breakpoints.only("xl"));
-  const isXSOnly = useMediaQuery(theme.breakpoints.only("xs"));
-  const isSMOnly = useMediaQuery(theme.breakpoints.only("sm"));
-  const isXLOnly = useMediaQuery(theme.breakpoints.only("xl"));
+  const isMobile = useIsMobile();
 
   const webcamOn = useMemo(() => !!videoTrack, [videoTrack]);
   const micOn = useMemo(() => !!audioTrack, [audioTrack]);
@@ -276,26 +236,6 @@ export function JoiningScreen({
     }
   };
 
-  const internalPadding = useResponsiveSize({
-    xl: 3,
-    lg: 3,
-    md: 2,
-    sm: 2,
-    xs: 1.5,
-  });
-
-  const spacingHorizontalTopicsObject = {
-    xl: 60,
-    lg: 40,
-    md: 40,
-    sm: 40,
-    xs: 32,
-  };
-
-  const spacingHorizontalTopics = useResponsiveSize(
-    spacingHorizontalTopicsObject
-  );
-
   useEffect(() => {
     audioTrackRef.current = audioTrack;
 
@@ -340,101 +280,95 @@ export function JoiningScreen({
     getDevices({ micEnabled, webcamEnabled });
   }, []);
 
+  const ButtonWithTooltip = ({ onClick, onState, OnIcon, OffIcon, mic }) => {
+    const [tooltipShow, setTooltipShow] = useState(false);
+    const btnRef = useRef();
+    const tooltipRef = useRef();
+
+    const openTooltip = () => {
+      createPopper(btnRef.current, tooltipRef.current, {
+        placement: "top",
+      });
+      setTooltipShow(true);
+    };
+    const closeTooltip = () => {
+      setTooltipShow(false);
+    };
+
+    return (
+      <>
+        <div>
+          <button
+            ref={btnRef}
+            onMouseEnter={openTooltip}
+            onMouseLeave={closeTooltip}
+            onClick={onClick}
+            className={`rounded-full min-w-auto w-11 h-11 flex items-center justify-center ${
+              onState ? "bg-white" : "bg-red-650 text-white"
+            }`}
+            disabled={meetingMode === Constants.modes.VIEWER}
+          >
+            {onState ? (
+              <OnIcon fillcolor={onState ? "#050A0E" : "#fff"} />
+            ) : (
+              <OffIcon fillcolor={onState ? "#050A0E" : "#fff"} />
+            )}
+          </button>
+        </div>
+        <div
+          style={{ zIndex: 999 }}
+          className={`${
+            tooltipShow ? "" : "hidden"
+          } overflow-hidden flex flex-col items-center justify-center pb-1.5`}
+          ref={tooltipRef}
+        >
+          <div className={"rounded-md p-1.5 bg-black "}>
+            <p className="text-base text-white ">
+              {onState
+                ? `Turn off ${mic ? "mic" : "webcam"}`
+                : `Turn on ${mic ? "mic" : "webcam"}`}
+            </p>
+          </div>
+        </div>
+      </>
+    );
+  };
+
   return (
     <>
-      <Box
-        className="overflow-y-auto"
-        style={{
-          display: "flex",
-          flex: 1,
-          flexDirection: "column",
-          height: "100vh",
-          backgroundColor: theme.palette.darkTheme.main,
-        }}
-      >
-        <Box
-          m={isXSOnly ? 8 : gtThenMD ? 9 : 0}
-          style={{
-            display: "flex",
-            flex: 1,
-            flexDirection: isXStoSM ? "column" : "row",
-            justifyContent: gtThenMD ? "" : "center",
-            alignItems: gtThenMD ? "" : "center",
-          }}
-        >
-          <Grid
-            container
-            spacing={gtThenMD ? 0 : isXStoSM ? 0 : 9}
-            style={{
-              display: "flex",
-              flex: isSMOnly ? 0 : 1,
-              flexDirection: isXStoSM ? "column" : "row",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <Grid
-              item
-              xs={12}
-              md={gtThenXL ? 6 : 7}
-              style={{ display: "flex", flex: 1 }}
-            >
-              <Box
-                style={{
-                  width: isXSOnly ? "100%" : "100vw",
-                  display: "flex",
-                  flexDirection: "column",
-                  // alignItems: "center",
-                  // justifyContent: "center",
-                }}
-                p={internalPadding}
-              >
-                <Box
-                  style={{
-                    paddingLeft:
-                      spacingHorizontalTopics -
-                      (gtThenMD ? theme.spacing(10) : theme.spacing(2)),
-                    paddingRight:
-                      spacingHorizontalTopics -
-                      (gtThenMD ? theme.spacing(10) : theme.spacing(2)),
-
-                    position: "relative",
-                    width: "100%",
-                  }}
-                >
-                  <Box>
-                    <Box className={classes.previewBox}>
+      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gray-800">
+        <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16">
+          <div className="container grid  md:grid-flow-col grid-flow-row ">
+            <div className="grid grid-cols-12">
+              <div className="md:col-span-7 2xl:col-span-6 col-span-12">
+                <div className="flex items-center justify-center p-1.5 sm:p-4 lg:p-6">
+                  <div className="relative w-full md:pl-4 sm:pl-10 pl-5  md:pr-4 sm:pr-10 pr-5">
+                    <div className="w-full relative" style={{ height: "45vh" }}>
                       <video
                         autoPlay
                         playsInline
                         muted
                         ref={videoPlayerRef}
                         controls={false}
-                        className={classes.video + " flip"}
+                        style={{
+                          backgroundColor: "#1c1c1c",
+                        }}
+                        className={
+                          "rounded-[10px] h-full w-full object-cover flex items-center justify-center flip"
+                        }
                       />
 
-                      {!isXSOnly ? (
+                      {!isMobile ? (
                         <>
-                          <Box
-                            style={{
-                              position: "absolute",
-                              top: 0,
-                              bottom: 0,
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              right: 0,
-                              left: 0,
-                            }}
-                          >
+                          <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center">
                             {!webcamOn ? (
-                              <Typography variant={isXLOnly ? "h5" : "h6"}>
+                              <p className="text-xl xl:text-lg 2xl:text-xl text-white">
                                 {meetingMode === Constants.modes.VIEWER
                                   ? "You are not permitted to use your microphone and camera."
                                   : "The camera is off"}
-                              </Typography>
+                              </p>
                             ) : null}
-                          </Box>
+                          </div>
                         </>
                       ) : null}
 
@@ -457,188 +391,113 @@ export function JoiningScreen({
                         />
                       ) : null}
 
-                      <Box
-                        position="absolute"
-                        bottom={theme.spacing(2)}
-                        left="0"
-                        right="0"
-                      >
-                        <Grid
-                          container
-                          alignItems="center"
-                          justifyContent="center"
-                          spacing={2}
-                        >
-                          <Grid item>
-                            <Tooltip
-                              title={micOn ? "Turn off mic" : "Turn on mic"}
-                              arrow
-                              placement="top"
-                            >
-                              <Button
-                                onClick={() => _handleToggleMic()}
-                                variant="contained"
-                                style={
-                                  micOn
-                                    ? {}
-                                    : {
-                                        backgroundColor: red[500],
-                                        color: "white",
-                                      }
-                                }
-                                className={classes.toggleButton}
-                                disabled={
-                                  meetingMode === Constants.modes.VIEWER
-                                }
-                              >
-                                {micOn ? <Mic /> : <MicOff />}
-                              </Button>
-                            </Tooltip>
-                          </Grid>
+                      <div className="absolute xl:bottom-6 bottom-4 left-0 right-0">
+                        <div className="container grid grid-flow-col space-x-4 items-center justify-center md:-m-2">
+                          <ButtonWithTooltip
+                            onClick={_handleToggleMic}
+                            onState={micOn}
+                            mic={true}
+                            OnIcon={MicOnIcon}
+                            OffIcon={MicOffIcon}
+                          />
+                          <ButtonWithTooltip
+                            onClick={_toggleWebcam}
+                            onState={webcamOn}
+                            mic={false}
+                            OnIcon={WebcamOnIcon}
+                            OffIcon={WebcamOffIcon}
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                          <Grid item>
-                            <Tooltip
-                              title={
-                                webcamOn ? "Turn off camera" : "Turn on camera"
-                              }
-                              arrow
-                              placement="top"
-                            >
-                              <Button
-                                onClick={() => _toggleWebcam()}
-                                variant="contained"
-                                style={
-                                  webcamOn
-                                    ? {}
-                                    : {
-                                        backgroundColor: red[500],
-                                        color: "white",
-                                      }
-                                }
-                                className={classes.toggleButton}
-                                disabled={
-                                  meetingMode === Constants.modes.VIEWER
-                                }
-                              >
-                                {webcamOn ? <Videocam /> : <VideocamOff />}
-                              </Button>
-                            </Tooltip>
-                          </Grid>
-                        </Grid>
-                      </Box>
-                    </Box>
-                  </Box>
-                  {!isXSOnly &&
-                    (meetingMode === Constants.modes.CONFERENCE ||
-                      meetingType === meetingTypes.MEETING) && (
-                      <Box
-                        className="absolute md:left-36 lg:left-24 xl:left-44 md:right-36 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
-                        m={2}
-                        onClick={(e) => {
-                          handleClickOpen();
-                        }}
-                      >
-                        <Box
-                          style={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            justifyContent: "center",
+                    {!isMobile &&
+                      (meetingMode === Constants.modes.CONFERENCE ||
+                        meetingType === meetingTypes.MEETING) && (
+                        <div
+                          className="m-4 absolute md:left-12 lg:left-24 xl:left-44 md:right-12 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
+                          onClick={(e) => {
+                            handleClickOpen();
                           }}
-                          m={0.5}
                         >
-                          <IconButton
-                            style={{
-                              margin: 0,
-                              padding: 0,
-                            }}
-                          >
-                            <CheckCircleIcon className="h-5 w-5" />
-                          </IconButton>
-                          <Typography
-                            variant="subtitle1"
-                            style={{
-                              marginLeft: 4,
-                            }}
-                          >
-                            Check your audio and video
-                          </Typography>
-                        </Box>
-                      </Box>
-                    )}
-                </Box>
-              </Box>
-            </Grid>
-            <Grid
-              item
-              xs={12}
-              md={isXStoSM ? 5 : gtThenXL ? 6 : 5}
-              style={{ display: "flex", flex: 1 }}
-            >
-              <div className="w-full flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6  md:mt-11 lg:mt-4">
-                <MeetingDetailsScreen
-                  participantName={participantName}
-                  setParticipantName={setParticipantName}
-                  videoTrack={videoTrack}
-                  setVideoTrack={setVideoTrack}
-                  meetingType={meetingType}
-                  setMeetingType={setMeetingType}
-                  setMeetingMode={setMeetingMode}
-                  meetingMode={meetingMode}
-                  onClickStartMeeting={onClickStartMeeting}
-                  onClickJoin={async (id) => {
-                    const token = await getToken();
-                    const valid = await validateMeeting({
-                      roomId: id,
-                      token,
-                    });
-
-                    if (valid) {
-                      setToken(token);
-                      setMeetingId(id);
-                      if (videoTrack) {
-                        videoTrack.stop();
-                        setVideoTrack(null);
-                      }
-                      onClickStartMeeting();
-                      setParticipantName("");
-                    } else alert("Invalid Meeting Id");
-                  }}
-                  _handleOnCreateMeeting={async () => {
-                    const token = await getToken();
-                    const _meetingId = await createMeeting({ token });
-                    setToken(token);
-                    setMeetingId(_meetingId);
-                    setParticipantName("");
-                    return _meetingId;
-                  }}
-                />
+                          <div className="flex flex-row items-center justify-center m-1">
+                            <button className="text-white">
+                              <CheckCircleIcon className="h-5 w-5" />
+                            </button>
+                            <p className="text-base text-white ml-1">
+                              Check your audio and video
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                  </div>
+                </div>
               </div>
-            </Grid>
-          </Grid>
+              <div className="md:col-span-5 2xl:col-span-6 col-span-12 md:relative">
+                <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
+                  <MeetingDetailsScreen
+                    participantName={participantName}
+                    setParticipantName={setParticipantName}
+                    videoTrack={videoTrack}
+                    setVideoTrack={setVideoTrack}
+                    meetingType={meetingType}
+                    setMeetingType={setMeetingType}
+                    setMeetingMode={setMeetingMode}
+                    meetingMode={meetingMode}
+                    onClickStartMeeting={onClickStartMeeting}
+                    onClickJoin={async (id) => {
+                      const token = await getToken();
+                      const valid = await validateMeeting({
+                        roomId: id,
+                        token,
+                      });
 
-          <ConfirmBox
-            open={dlgMuted}
-            successText="OKAY"
-            onSuccess={() => {
-              setDlgMuted(false);
-            }}
-            title="System mic is muted"
-            subTitle="You're default microphone is muted, please unmute it or increase audio
+                      if (valid) {
+                        setToken(token);
+                        setMeetingId(id);
+                        if (videoTrack) {
+                          videoTrack.stop();
+                          setVideoTrack(null);
+                        }
+                        onClickStartMeeting();
+                        setParticipantName("");
+                      } else alert("Invalid Meeting Id");
+                    }}
+                    _handleOnCreateMeeting={async () => {
+                      const token = await getToken();
+                      const _meetingId = await createMeeting({ token });
+                      setToken(token);
+                      setMeetingId(_meetingId);
+                      setParticipantName("");
+                      return _meetingId;
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ConfirmBox
+        open={dlgMuted}
+        successText="OKAY"
+        onSuccess={() => {
+          setDlgMuted(false);
+        }}
+        title="System mic is muted"
+        subTitle="You're default microphone is muted, please unmute it or increase audio
             input volume from system settings."
-          />
+      />
 
-          <ConfirmBox
-            open={dlgDevices}
-            successText="DISMISS"
-            onSuccess={() => {
-              setDlgDevices(false);
-            }}
-            title="Mic or webcam not available"
-            subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
-          />
-        </Box>
-      </Box>
+      <ConfirmBox
+        open={dlgDevices}
+        successText="DISMISS"
+        onSuccess={() => {
+          setDlgDevices(false);
+        }}
+        title="Mic or webcam not available"
+        subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
+      />
     </>
   );
 }

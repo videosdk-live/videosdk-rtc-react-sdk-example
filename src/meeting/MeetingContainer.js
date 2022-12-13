@@ -9,11 +9,12 @@ import { BottomBar } from "./components/BottomBar";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import MemorizedParticipantView from "./components/ParticipantView";
 import { PresenterView } from "../components/PresenterView";
-import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
-import useResponsiveSize from "../hooks/useResponsiveSize";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import ConfirmBox from "../components/ConfirmBox";
+import useIsMobile from "../hooks/useIsMobile";
+import useIsTab from "../hooks/useIsTab";
+import { useMediaQuery } from "react-responsive";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -36,26 +37,33 @@ export function MeetingContainer({
   const [sideBarMode, setSideBarMode] = useState(null);
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
+  const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
   const [meetingError, setMeetingError] = useState(false);
 
   const mMeetingRef = useRef();
   const containerRef = createRef();
   const containerHeightRef = useRef();
   const containerWidthRef = useRef();
-  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     containerHeightRef.current = containerHeight;
     containerWidthRef.current = containerWidth;
   }, [containerHeight, containerWidth]);
 
-  const sideBarContainerWidth = useResponsiveSize({
-    xl: 400,
-    lg: 360,
-    md: 320,
-    sm: 280,
-    xs: 240,
-  });
+  const isMobile = useIsMobile();
+  const isTab = useIsTab();
+  const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
+  const isXLDesktop = useMediaQuery({ minWidth: 1440 });
+
+  const sideBarContainerWidth = isXLDesktop
+    ? 400
+    : isLGDesktop
+    ? 360
+    : isTab
+    ? 320
+    : isMobile
+    ? 280
+    : 240;
 
   useEffect(() => {
     const boundingRect = containerRef.current.getBoundingClientRect();
@@ -81,11 +89,11 @@ export function MeetingContainer({
       status === Constants.recordingEvents.RECORDING_STARTED ||
       status === Constants.recordingEvents.RECORDING_STOPPED
     ) {
-      enqueueSnackbar(
-        status === Constants.recordingEvents.RECORDING_STARTED
-          ? "Meeting recording is started."
-          : "Meeting recording is stopped."
-      );
+      // enqueueSnackbar(
+      //   status === Constants.recordingEvents.RECORDING_STARTED
+      //     ? "Meeting recording is started."
+      //     : "Meeting recording is stopped."
+      // );
     }
   };
 
@@ -161,6 +169,7 @@ export function MeetingContainer({
         : `https://static.videosdk.live/prebuilt/notification_err.mp3`
     ).play();
 
+    setMeetingErrorVisible(true);
     setMeetingError({
       code,
       message: isJoiningError ? "Unable to join meeting!" : message,
@@ -194,9 +203,9 @@ export function MeetingContainer({
         `https://static.videosdk.live/prebuilt/notification.mp3`
       ).play();
 
-      enqueueSnackbar(
-        `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
-      );
+      // enqueueSnackbar(
+      //   `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
+      // );
 
       participantRaisedHand(senderId);
     },
@@ -215,16 +224,12 @@ export function MeetingContainer({
           `https://static.videosdk.live/prebuilt/notification.mp3`
         ).play();
 
-        enqueueSnackbar(
-          trimSnackBarText(`${nameTructed(senderName, 15)} says: ${message}`)
-        );
+        // enqueueSnackbar(
+        //   trimSnackBarText(`${nameTructed(senderName, 15)} says: ${message}`)
+        // );
       }
     },
   });
-
-  const isMobile = window.matchMedia(
-    "only screen and (max-width: 768px)"
-  ).matches;
 
   return (
     <div
@@ -275,10 +280,10 @@ export function MeetingContainer({
         !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
       )}
       <ConfirmBox
-        open={meetingError}
+        open={meetingErrorVisible}
         successText="OKAY"
         onSuccess={() => {
-          setMeetingError(false);
+          setMeetingErrorVisible(false);
         }}
         title={`Error Code: ${meetingError.code}`}
         subTitle={meetingError.message}

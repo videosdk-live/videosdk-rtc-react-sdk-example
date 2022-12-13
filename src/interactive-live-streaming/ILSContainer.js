@@ -7,9 +7,7 @@ import {
 } from "@videosdk.live/react-sdk";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import { PresenterView } from "../components/PresenterView";
-import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
-import useResponsiveSize from "../hooks/useResponsiveSize";
 import { ILSBottomBar } from "./components/ILSBottomBar";
 import { TopBar } from "./components/TopBar";
 import useIsTab from "../hooks/useIsTab";
@@ -20,6 +18,8 @@ import MemorizedILSParticipantView from "./components/ILSParticipantView";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import LocalParticipantListner from "./components/LocalParticipantListner";
 import ConfirmBox from "../components/ConfirmBox";
+import useIsMobile from "../hooks/useIsMobile";
+import { useMediaQuery } from "react-responsive";
 
 export function ILSContainer({
   onMeetingLeave,
@@ -52,6 +52,7 @@ export function ILSContainer({
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const [meetingError, setMeetingError] = useState(false);
+  const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
   const mMeetingRef = useRef();
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
@@ -60,20 +61,26 @@ export function ILSContainer({
   const containerHeightRef = useRef();
   const containerWidthRef = useRef();
   const meetingModeRef = useRef(meetingMode);
-  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     containerHeightRef.current = containerHeight;
     containerWidthRef.current = containerWidth;
   }, [containerHeight, containerWidth]);
 
-  const sideBarContainerWidth = useResponsiveSize({
-    xl: 400,
-    lg: 360,
-    md: 320,
-    sm: 280,
-    xs: 240,
-  });
+  const isMobile = useIsMobile();
+  const isTab = useIsTab();
+  const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
+  const isXLDesktop = useMediaQuery({ minWidth: 1440 });
+
+  const sideBarContainerWidth = isXLDesktop
+    ? 400
+    : isLGDesktop
+    ? 360
+    : isTab
+    ? 320
+    : isMobile
+    ? 280
+    : 240;
 
   useEffect(() => {
     const boundingRect = containerRef.current.getBoundingClientRect();
@@ -100,11 +107,11 @@ export function ILSContainer({
       (status === Constants.recordingEvents.RECORDING_STARTED ||
         status === Constants.recordingEvents.RECORDING_STOPPED)
     ) {
-      enqueueSnackbar(
-        status === Constants.recordingEvents.RECORDING_STARTED
-          ? "Meeting recording is started."
-          : "Meeting recording is stopped."
-      );
+      // enqueueSnackbar(
+      //   status === Constants.recordingEvents.RECORDING_STARTED
+      //     ? "Meeting recording is started."
+      //     : "Meeting recording is stopped."
+      // );
     }
   };
 
@@ -115,11 +122,11 @@ export function ILSContainer({
       (data.status === Constants.hlsEvents.HLS_STARTED ||
         data.status === Constants.hlsEvents.HLS_STOPPED)
     ) {
-      enqueueSnackbar(
-        data.status === Constants.hlsEvents.HLS_STARTED
-          ? "Meeting HLS is started."
-          : "Meeting HLS is stopped."
-      );
+      //  enqueueSnackbar (
+      //     data.status === Constants.hlsEvents.HLS_STARTED
+      //       ? "Meeting HLS is started."
+      //       : "Meeting HLS is stopped."
+      //   );
     }
 
     if (
@@ -215,6 +222,7 @@ export function ILSContainer({
         : `https://static.videosdk.live/prebuilt/notification_err.mp3`
     ).play();
 
+    setMeetingErrorVisible(true);
     setMeetingError({
       code,
       message: isJoiningError ? "Unable to join meeting!" : message,
@@ -249,9 +257,9 @@ export function ILSContainer({
         `https://static.videosdk.live/prebuilt/notification.mp3`
       ).play();
 
-      enqueueSnackbar(
-        `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
-      );
+      // enqueueSnackbar(
+      //   `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
+      // );
 
       participantRaisedHand(senderId);
     },
@@ -270,17 +278,12 @@ export function ILSContainer({
           `https://static.videosdk.live/prebuilt/notification.mp3`
         ).play();
 
-        enqueueSnackbar(
-          trimSnackBarText(`${nameTructed(senderName, 15)} says: ${message}`)
-        );
+        // enqueueSnackbar(
+        //   trimSnackBarText(`${nameTructed(senderName, 15)} says: ${message}`)
+        // );
       }
     },
   });
-
-  const isMobile = window.matchMedia(
-    "only screen and (max-width: 768px)"
-  ).matches;
-  const isTab = useIsTab();
 
   return (
     <div
@@ -306,17 +309,20 @@ export function ILSContainer({
                 meetingMode={meetingMode}
               />
             )}
-            {meetingMode === Constants.modes.CONFERENCE && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: isTab || isMobile ? "" : "column",
-                  height: topBarHeight,
-                }}
-              >
-                <TopBar topBarHeight={topBarHeight} />
-              </div>
-            )}
+            {meetingMode === Constants.modes.CONFERENCE &&
+              (isMobile || isTab ? (
+                <></>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: isTab || isMobile ? "" : "column",
+                    height: topBarHeight,
+                  }}
+                >
+                  <TopBar topBarHeight={topBarHeight} />
+                </div>
+              ))}
 
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
               {meetingMode === Constants.modes.CONFERENCE ? (
@@ -352,6 +358,8 @@ export function ILSContainer({
                 height={
                   meetingMode === Constants.modes.VIEWER
                     ? containerHeight - bottomBarHeight
+                    : isMobile || isTab
+                    ? containerHeight - bottomBarHeight
                     : containerHeight - topBarHeight - bottomBarHeight
                 }
                 sideBarContainerWidth={sideBarContainerWidth}
@@ -383,10 +391,10 @@ export function ILSContainer({
         !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
       )}
       <ConfirmBox
-        open={meetingError}
+        open={meetingErrorVisible}
         successText="OKAY"
         onSuccess={() => {
-          setMeetingError(false);
+          setMeetingErrorVisible(false);
         }}
         title={`Error Code: ${meetingError.code}`}
         subTitle={meetingError.message}

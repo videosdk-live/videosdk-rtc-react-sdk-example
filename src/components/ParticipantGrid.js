@@ -1,4 +1,3 @@
-import { useTheme } from "@material-ui/core";
 import React from "react";
 import { ParticipantView } from "./ParticipantView";
 
@@ -10,8 +9,6 @@ const MemoizedParticipant = React.memo(
 );
 
 function ParticipantGrid({ participantIds, isPresenting, sideBarMode }) {
-  const theme = useTheme();
-  const isXStoSM = theme.breakpoints.between("xs", "sm");
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
   ).matches;
@@ -37,15 +34,7 @@ function ParticipantGrid({ participantIds, isPresenting, sideBarMode }) {
 
   return (
     <div
-      style={{
-        display: "flex",
-        flexDirection: isXStoSM ? "column" : "row",
-        flexGrow: 1,
-        margin: 12,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-      className={`${
+      className={`flex flex-col md:flex-row flex-grow m-3 items-center justify-center ${
         participantIds.length < 2 && !sideBarMode && !isPresenting
           ? "md:px-16 md:py-2"
           : participantIds.length < 3 && !sideBarMode && !isPresenting

@@ -1,12 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import useResponsiveSize from "../../hooks/useResponsiveSize";
 import animationData from "../../../src/static/animations/join_meeting.json";
-import Lottie from "react-lottie";
-import { useTheme } from "@material-ui/core";
+import Lottie from "lottie-react";
+import useIsTab from "../../hooks/useIsTab";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const WaitingToJoinScreen = () => {
-  const theme = useTheme();
-
   const waitingMessages = [
     { index: 0, text: "Creating a room for you..." },
     { index: 1, text: "Almost there..." },
@@ -29,13 +27,8 @@ const WaitingToJoinScreen = () => {
     };
   }, []);
 
-  const lottieSize = useResponsiveSize({
-    xl: 250,
-    lg: 250,
-    md: 200,
-    sm: 200,
-    xs: 180,
-  });
+  const isTab = useIsTab();
+  const isMobile = useIsMobile();
 
   const animationDefaultOptions = {
     loop: true,
@@ -48,21 +41,33 @@ const WaitingToJoinScreen = () => {
 
   return (
     <div
+      className="bg-gray-800"
       style={{
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         height: "100vh",
-        backgroundColor: theme.palette.darkTheme.main,
+        // backgroundColor: theme.palette.darkTheme.main,
       }}
     >
       <div className="flex flex-col">
-        <Lottie
-          options={animationDefaultOptions}
-          eventListeners={[{ eventName: "done" }]}
-          height={lottieSize}
-          width={lottieSize}
-        />
+        <div
+          style={{
+            height: isTab ? 200 : isMobile ? 200 : 250,
+            width: isTab ? 200 : isMobile ? 200 : 250,
+          }}
+        >
+          <Lottie
+            loop={animationDefaultOptions.loop}
+            autoplay={animationDefaultOptions.autoplay}
+            animationData={animationDefaultOptions.animationData}
+            rendererSettings={{
+              preserveAspectRatio:
+                animationDefaultOptions.rendererSettings.preserveAspectRatio,
+            }}
+            style={{ height: "100%", width: "100%" }}
+          />
+        </div>
         <h1 className="text-white text-center font-bold mt-1 text-xl">
           {message.text}
         </h1>

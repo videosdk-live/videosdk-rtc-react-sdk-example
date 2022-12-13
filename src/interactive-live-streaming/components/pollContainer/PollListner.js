@@ -1,5 +1,4 @@
 import { usePubSub } from "@videosdk.live/react-sdk";
-import { useSnackbar } from "notistack";
 import { sideBarModes } from "../../../utils/common";
 
 const PollListner = ({ pollId, setCreatedPolls }) => {
@@ -54,8 +53,6 @@ const PollsListner = ({
   setEndedPolls,
   setSideBarMode,
 }) => {
-  const { enqueueSnackbar } = useSnackbar();
-
   usePubSub(`CREATE_POLL`, {
     onMessageReceived: ({ message, timestamp }) => {
       setCreatedPolls((s) => [
@@ -66,8 +63,7 @@ const PollsListner = ({
       new Audio(
         `https://static.videosdk.live/prebuilt/notification.mp3`
       ).play();
-
-      enqueueSnackbar("New Poll Asked 📊");
+      // enqueueSnackbar("New Poll Asked 📊");
       setSideBarMode(sideBarModes.POLLS);
     },
     onOldMessagesReceived: (messages) => {
@@ -152,9 +148,6 @@ const PollsListner = ({
           setCreatedPolls={setCreatedPolls}
         />
       ))}
-      {/* {draftPolls?.map((poll) => {
-        return <PollListner poll={poll} />;
-      })} */}
     </>
   );
 };

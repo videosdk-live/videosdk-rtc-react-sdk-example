@@ -1,10 +1,4 @@
-import {
-  IconButton,
-  InputAdornment,
-  OutlinedInput as Input,
-  useTheme,
-} from "@material-ui/core";
-import { Send } from "@material-ui/icons";
+import { PaperAirplaneIcon } from "@heroicons/react/solid";
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useRef, useState } from "react";
 import { formatAMPM, json_verify, nameTructed } from "../../utils/helper";
@@ -48,69 +42,62 @@ const ChatInput = ({ inputHeight }) => {
   const [message, setMessage] = useState("");
   const { publish } = usePubSub("CHAT");
   const input = useRef();
-  const theme = useTheme();
 
   return (
     <div
-      style={{
-        height: inputHeight,
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        paddingRight: theme.spacing(1),
-        paddingLeft: theme.spacing(1),
-      }}
+      className="w-full flex items-center px-2"
+      style={{ height: inputHeight }}
     >
-      <Input
-        style={{
-          paddingRight: 0,
-          width: "100%",
-        }}
-        minRows={1}
-        maxRows={2}
-        multiline
-        id="outlined"
-        onChange={(e) => {
-          setMessage(e.target.value);
-        }}
-        ref={input}
-        value={message}
-        placeholder="Write your message"
-        onKeyPress={(e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            const messageText = message.trim();
+      <div class="relative  w-full">
+        <span class="absolute inset-y-0 right-0 flex mr-2 rotate-90 ">
+          <button
+            disabled={message.length < 2}
+            type="submit"
+            className="p-1 focus:outline-none focus:shadow-outline"
+            onClick={() => {
+              const messageText = message.trim();
+              if (messageText.length > 0) {
+                publish(messageText, { persist: true });
+                setTimeout(() => {
+                  setMessage("");
+                }, 100);
+                input.current?.focus();
+              }
+            }}
+          >
+            <PaperAirplaneIcon
+              className={`w-6 h-6 ${
+                message.length < 2 ? "text-gray-500 " : "text-white"
+              }`}
+            />
+          </button>
+        </span>
+        <input
+          type="text"
+          className="py-4 text-base text-white bg-gray-750 rounded pr-10 focus:outline-none w-full"
+          placeholder="Write your message"
+          autocomplete="off"
+          ref={input}
+          value={message}
+          onChange={(e) => {
+            setMessage(e.target.value);
+          }}
+          onKeyPress={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              const messageText = message.trim();
 
-            if (messageText.length > 0) {
-              publish(messageText, { persist: true });
-              setTimeout(() => {
-                setMessage("");
-              }, 100);
-              input.current?.focus();
+              if (messageText.length > 0) {
+                publish(messageText, { persist: true });
+                setTimeout(() => {
+                  setMessage("");
+                }, 100);
+                input.current?.focus();
+              }
             }
-          }
-        }}
-        endAdornment={
-          <InputAdornment position="end">
-            <IconButton
-              disabled={message.length < 2}
-              variant="outlined"
-              onClick={() => {
-                const messageText = message.trim();
-                if (messageText.length > 0) {
-                  publish(messageText, { persist: true });
-                  setTimeout(() => {
-                    setMessage("");
-                  }, 100);
-                  input.current?.focus();
-                }
-              }}
-            >
-              <Send />
-            </IconButton>
-          </InputAdornment>
-        }
-      />
+          }}
+        />
+      </div>
     </div>
   );
 };

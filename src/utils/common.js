@@ -1,11 +1,12 @@
 import { useParticipant } from "@videosdk.live/react-sdk";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import useIsMobile from "../hooks/useIsMobile";
 import useIsTab from "../hooks/useIsTab";
-import useResponsiveSize from "../hooks/useResponsiveSize";
-import { CloseOutlined, MicOff } from "@material-ui/icons";
 import NetworkIcon from "../icons/NetworkIcon";
-import { Popover } from "@material-ui/core";
+import { Popover, Transition } from "@headlessui/react";
+import { useMediaQuery } from "react-responsive";
+import { XIcon } from "@heroicons/react/outline";
+import MicOffSmallIcon from "../icons/MicOffSmallIcon";
 
 export const json_verify = (s) => {
   try {
@@ -110,14 +111,18 @@ export const CornerDisplayName = ({
 }) => {
   const isMobile = useIsMobile();
   const isTab = useIsTab();
+  const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
+  const isXLDesktop = useMediaQuery({ minWidth: 1440 });
 
-  const analyzerSize = useResponsiveSize({
-    xl: 32,
-    lg: 28,
-    md: 24,
-    sm: 20,
-    xs: 18,
-  });
+  const analyzerSize = isXLDesktop
+    ? 32
+    : isLGDesktop
+    ? 28
+    : isTab
+    ? 24
+    : isMobile
+    ? 20
+    : 18;
 
   const show = useMemo(() => mouseOver, [mouseOver]);
 
@@ -133,15 +138,6 @@ export const CornerDisplayName = ({
   const [score, setScore] = useState({});
   const [audioStats, setAudioStats] = useState({});
   const [videoStats, setVideoStats] = useState({});
-
-  const [downArrow, setDownArrow] = useState(null);
-  const handleClick = (event) => {
-    setDownArrow(event.currentTarget);
-  };
-
-  const handleClose = () => {
-    setDownArrow(null);
-  };
 
   const updateStats = async () => {
     let stats = [];
@@ -302,9 +298,7 @@ export const CornerDisplayName = ({
           transform: `scale(${show ? 1 : 0})`,
         }}
       >
-        {!micOn && !isPresenting && (
-          <MicOff fontSize="small" style={{ color: "white" }}></MicOff>
-        )}
+        {!micOn && !isPresenting && <MicOffSmallIcon fillcolor="white" />}
         <p className="text-sm text-white">
           {isPresenting
             ? isLocal
@@ -319,113 +313,140 @@ export const CornerDisplayName = ({
       {(webcamStream || micStream || screenShareStream) && (
         <div>
           <div
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClick(e);
-            }}
-            className="absolute top-2 right-2 rounded-md flex items-center justify-center p-2 cursor-pointer"
-            style={{
-              backgroundColor:
-                score > 7 ? "#3BA55D" : score > 4 ? "#faa713" : "#FF5D5D",
-              transition: "all 200ms",
-              transitionTimingFunction: "linear",
-              transform: `scale(${show ? 1 : 0})`,
-            }}
-          >
-            <NetworkIcon
-              color1={"#ffffff"}
-              color2={"#ffffff"}
-              color3={"#ffffff"}
-              color4={"#ffffff"}
-              style={{
-                height: analyzerSize * 0.6,
-                width: analyzerSize * 0.6,
-              }}
-            />
-          </div>
-          <div
             style={{
               position: "absolute",
-              top: show ? (isMobile ? 4 : isTab ? 8 : 12) : -32,
-              right: show ? (isMobile ? 4 : isTab ? 8 : 12) : -42,
+              top: isMobile ? 4 : isTab ? 8 : 12,
+              right: isMobile ? 4 : isTab ? 8 : 12,
             }}
           >
-            <Popover
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              anchorEl={downArrow}
-              open={Boolean(downArrow)}
-              onClose={(e) => {
-                e.stopPropagation();
-                handleClose();
-              }}
-            >
-              <div>
-                <div
-                  className={`p-[9px] flex items-center justify-between `}
-                  style={{
-                    backgroundColor:
-                      score > 7 ? "#3BA55D" : score > 4 ? "#faa713" : "#FF5D5D",
-                  }}
-                >
-                  <p className="text-sm text-white font-semibold">{`Quality Score : ${
-                    score > 7 ? "Good" : score > 4 ? "Average" : "Poor"
-                  }`}</p>
-
-                  <button className="cursor-pointer" onClick={handleClose}>
-                    <CloseOutlined style={{ height: 16, width: 16 }} />
-                  </button>
-                </div>
-                <div className="flex">
-                  <div className="flex flex-col">
-                    {qualityStateArray.map((item, index) => {
-                      return (
-                        <div
-                          className="flex"
-                          style={{
-                            borderBottom:
-                              index === qualityStateArray.length - 1
-                                ? ""
-                                : `1px solid #ffffff33`,
-                          }}
-                        >
-                          <div className="flex flex-1 items-center w-[120px]">
-                            {index !== 0 && (
-                              <p className="text-xs my-[6px] ml-2">
-                                {item.label}
-                              </p>
-                            )}
-                          </div>
+            <Popover className="relative ">
+              {({ close }) => (
+                <>
+                  <Popover.Button
+                    className="absolute right-0 top-0 rounded-md flex items-center justify-center p-1.5 cursor-pointer"
+                    style={{
+                      backgroundColor:
+                        score > 7
+                          ? "#3BA55D"
+                          : score > 4
+                          ? "#faa713"
+                          : "#FF5D5D",
+                    }}
+                  >
+                    <div>
+                      <NetworkIcon
+                        color1={"#ffffff"}
+                        color2={"#ffffff"}
+                        color3={"#ffffff"}
+                        color4={"#ffffff"}
+                        style={{
+                          height: analyzerSize * 0.6,
+                          width: analyzerSize * 0.6,
+                        }}
+                      />
+                    </div>
+                  </Popover.Button>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-200"
+                    enterFrom="opacity-0 translate-y-1"
+                    enterTo="opacity-100 translate-y-0"
+                    leave="transition ease-in duration-150"
+                    leaveFrom="opacity-100 translate-y-0"
+                    leaveTo="opacity-0 translate-y-1"
+                  >
+                    <Popover.Panel
+                      style={{ zIndex: 999 }}
+                      className="absolute left-1/2 mt-0 -translate-x-full transform "
+                    >
+                      <div
+                        className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 "
+                        // style={{ maxHeight: "calc(100% - 32px)" }}
+                      >
+                        <div className="bg-gray-800">
                           <div
-                            className="flex flex-1 items-center justify-center"
-                            style={{ borderLeft: `1px solid #ffffff33` }}
-                          >
-                            <p className="text-xs my-[6px] w-[65px] text-center">
-                              {item.audio}
-                            </p>
-                          </div>
-                          <div
-                            className="flex flex-1 items-center justify-center"
+                            className={`p-[9px] flex items-center justify-between `}
                             style={{
-                              borderLeft: `1px solid #ffffff33`,
+                              backgroundColor:
+                                score > 7
+                                  ? "#3BA55D"
+                                  : score > 4
+                                  ? "#faa713"
+                                  : "#FF5D5D",
                             }}
                           >
-                            <p className="text-xs my-[6px] w-[65px] text-center">
-                              {item.video}
-                            </p>
+                            <p className="text-sm text-white font-semibold">{`Quality Score : ${
+                              score > 7
+                                ? "Good"
+                                : score > 4
+                                ? "Average"
+                                : "Poor"
+                            }`}</p>
+
+                            <button
+                              className="cursor-pointer text-white hover:bg-[#ffffff33] rounded-full px-1 text-center"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                close();
+                              }}
+                            >
+                              <XIcon
+                                className="text-white"
+                                style={{ height: 16, width: 16 }}
+                              />
+                            </button>
+                          </div>
+                          <div className="flex">
+                            <div className="flex flex-col">
+                              {qualityStateArray.map((item, index) => {
+                                return (
+                                  <div
+                                    className="flex"
+                                    style={{
+                                      borderBottom:
+                                        index === qualityStateArray.length - 1
+                                          ? ""
+                                          : `1px solid #ffffff33`,
+                                    }}
+                                  >
+                                    <div className="flex flex-1 items-center w-[120px]">
+                                      {index !== 0 && (
+                                        <p className="text-xs text-white my-[6px] ml-2">
+                                          {item.label}
+                                        </p>
+                                      )}
+                                    </div>
+                                    <div
+                                      className="flex flex-1 items-center justify-center"
+                                      style={{
+                                        borderLeft: `1px solid #ffffff33`,
+                                      }}
+                                    >
+                                      <p className="text-xs text-white my-[6px] w-[80px] text-center">
+                                        {item.audio}
+                                      </p>
+                                    </div>
+                                    <div
+                                      className="flex flex-1 items-center justify-center"
+                                      style={{
+                                        borderLeft: `1px solid #ffffff33`,
+                                      }}
+                                    >
+                                      <p className="text-xs text-white my-[6px] w-[80px] text-center">
+                                        {item.video}
+                                      </p>
+                                    </div>
+                                  </div>
+                                );
+                              })}
+                            </div>
                           </div>
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
+                      </div>
+                    </Popover.Panel>
+                  </Transition>
+                </>
+              )}
             </Popover>
           </div>
         </div>

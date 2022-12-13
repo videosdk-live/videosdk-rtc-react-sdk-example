@@ -1,26 +1,11 @@
-import {
-  Box,
-  Button,
-  Dialog,
-  FormControl,
-  Grid,
-  IconButton,
-  makeStyles,
-  MenuItem,
-  Select,
-  ThemeProvider,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
-import React, { useEffect, useRef, useState } from "react";
-import useResponsiveSize from "../hooks/useResponsiveSize";
+import { Dialog, Popover } from "@headlessui/react";
+import { Transition } from "@headlessui/react";
+import { ChevronDownIcon, XIcon } from "@heroicons/react/outline";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import useWindowSize from "../hooks/useWindowSize";
 import ConfirmBox from "./ConfirmBox";
 
 const AudioAnalyser = ({ audioTrack }) => {
-  const theme = useTheme();
   const audioTrackRef = useRef();
   const audioAnalyserIntervalRef = useRef();
 
@@ -68,13 +53,7 @@ const AudioAnalyser = ({ audioTrack }) => {
   }, [audioTrack]);
 
   return (
-    <Box
-      style={{
-        width: 80,
-        height: 100,
-        position: "relative",
-      }}
-    >
+    <div className="relative w-20 h-[100px]">
       {[
         {
           borderBottomLeftRadius: 0,
@@ -104,63 +83,33 @@ const AudioAnalyser = ({ audioTrack }) => {
           },
           i
         ) => (
-          <Box
+          <div
             key={`audio_analyzer_i_${i}`}
-            style={{
-              height: "50%",
-              display: "flex",
-              justifyContent: "space-evenly",
-              alignItems,
-              position: "absolute",
-              top,
-              left: 0,
-              right: 0,
-            }}
+            className={`h-1/2 flex justify-evenly left-0 right-0 absolute`}
+            style={{ alignItems, top }}
           >
             {[40, 70, 100, 100, 70, 40].map((height, j) => (
-              <Box
+              <div
                 key={`audio_analyzer_j_${j}`}
                 style={{
                   borderBottomLeftRadius,
                   borderBottomRightRadius,
                   borderTopLeftRadius,
                   borderTopRightRadius,
-                  backgroundColor: theme.palette.primary.main,
+                  backgroundColor: "#1178F8",
                   width: 80 / 12,
                   height: `${(volume / 256) * height}%`,
                   transition: "all 50ms",
                   transitionTimingFunction: "ease-in",
                 }}
-              ></Box>
+              ></div>
             ))}
-          </Box>
+          </div>
         )
       )}
-    </Box>
+    </div>
   );
 };
-
-const useStyles = makeStyles((theme) => ({
-  selectIcon: {
-    color: "#404B53",
-  },
-  paperDark: {
-    background: "#232830",
-    color: "#fff",
-  },
-  video: {
-    borderRadius: "6px",
-    backgroundColor: "#1c1c1c",
-    height: "100%",
-    width: "100%",
-    objectFit: "cover",
-  },
-  buttonLight: {
-    "&:hover": {
-      backgroundColor: "#596BFF",
-    },
-  },
-}));
 
 export default function SettingDialogueBox({
   open,
@@ -177,12 +126,9 @@ export default function SettingDialogueBox({
   videoTrack,
   audioTrack,
 }) {
-  const theme = useTheme();
-  const classes = useStyles();
+  const [selectedMicLabel, setSelectedMicLabel] = useState(null);
+  const [selectedWebcamLabel, setSelectedWebcamLabel] = useState(null);
 
-  const isXStoSM = useMediaQuery(theme.breakpoints.between("xs", "sm"));
-  const isXSOnly = useMediaQuery(theme.breakpoints.only("xs"));
-  const isSMONly = useMediaQuery(theme.breakpoints.only("sm"));
   const [dlgDevices, setDlgDevices] = useState(false);
 
   const [boxHeight, setBoxHeight] = useState(0);
@@ -204,345 +150,347 @@ export default function SettingDialogueBox({
     onClose();
   };
 
-  const internalPadding = useResponsiveSize({
-    xl: 3,
-    lg: 5,
-    md: 2,
-    sm: 2,
-    xs: 2,
-  });
-
   return (
-    <ThemeProvider theme={theme}>
-      <Grid container>
-        <Box>
-          <Dialog onClose={handleClose} open={open} maxWidth={"xl"}>
-            <Box
-              p={internalPadding}
-              style={{
-                width: isXSOnly ? "100vw" : isSMONly ? "50vw" : "55vw",
-                display: "flex",
-                flex: 1,
-                flexDirection: "column",
-                overflow: "hidden",
-                borderRadius: "4px",
-                backgroundColor: theme.palette.darkTheme.slightLighter,
-              }}
-            >
-              <Box
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
+    <>
+      <Transition appear show={open} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={handleClose}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
               >
-                <Box position={"absolute"} top={0} right={0}>
-                  <IconButton
-                    onClick={() => {
-                      handleClose();
-                    }}
+                <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded bg-gray-750 p-6 text-center align-middle shadow-xl transition-all">
+                  <Dialog.Title
+                    as="h5"
+                    className="text-lg font-medium leading-6 text-white"
                   >
-                    <CloseIcon></CloseIcon>
-                  </IconButton>
-                </Box>
-                <Typography
-                  variant="h5"
-                  style={{
-                    fontWeight: "bold",
-                  }}
-                >
-                  Settings
-                </Typography>
-              </Box>
-              <Box
-                style={{
-                  display: "flex",
-                  flex: 1,
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Box mt={5}>
-                  <Box>
-                    {[
-                      { value: "audio", label: "Audio" },
-                      { value: "video", label: "Video" },
-                    ].map(({ value, label }) =>
-                      label === "Audio" || label === "Video" ? (
-                        <Button
-                          classes={{
-                            root:
-                              setting === value
-                                ? classes.buttonLight
-                                : undefined,
-                          }}
-                          style={{
-                            borderRadius: 0,
-                            color: "white",
-                            borderColor: "white",
-                          }}
-                          variant={setting === value ? "contained" : "outlined"}
-                          disableElevation
-                          disableRipple
-                          color={setting === value ? "primary" : "white"}
-                          size={"large"}
+                    Settings
+                  </Dialog.Title>
+                  <div className="flex flex-1  flex-col overflow-hidden bg-gray-750  xl:p-[2px] lg:p-[5px] p-[2px]">
+                    <div className="flex items-center justify-center">
+                      <div className="absolute top-2 right-2 focus-visible:border-none">
+                        <button
                           onClick={() => {
-                            handleSetting(null, value);
+                            handleClose();
                           }}
+                          className="focus-visible:border-none"
                         >
-                          {label}
-                        </Button>
-                      ) : null
-                    )}
-                  </Box>
-                </Box>
-              </Box>
-              {setting === "audio" ? (
-                <Box ref={boxRef}>
-                  <Box style={{ width: "100%" }}>
-                    <Grid
-                      spacing={3}
-                      container
-                      style={{
-                        display: "flex",
-                        flexDirection: isXSOnly ? "column-reverse" : "row",
-                      }}
-                    >
-                      <Grid item xs={12} md={7}>
-                        <Box>
-                          <Box
-                            style={{ display: "flex", flexDirection: "column" }}
-                            mt={isXStoSM ? 0 : 3}
-                          >
-                            <Box ml={2}>
-                              <Typography
-                                variant="subtitle1"
-                                style={{
-                                  fontWeight: "bold",
+                          <XIcon className="h-6 w-6 text-white" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-1 flex-col items-center justify-center">
+                      <div className="mt-10">
+                        <div>
+                          {[
+                            { value: "audio", label: "Audio" },
+                            { value: "video", label: "Video" },
+                          ].map(({ value, label }) =>
+                            label === "Audio" || label === "Video" ? (
+                              <button
+                                className={`inline-flex items-center justify-center px-4 py-2 border ${
+                                  setting === value
+                                    ? "bg-blue-500 border-transparent"
+                                    : "border-gray-100"
+                                }  text-sm font-medium rounded-sm text-white bg-gray-750`}
+                                onClick={() => {
+                                  handleSetting(null, value);
                                 }}
                               >
-                                Microphone
-                              </Typography>
-                            </Box>
+                                {label}
+                              </button>
+                            ) : null
+                          )}
+                        </div>
+                      </div>
+                    </div>
 
-                            <FormControl
-                              style={{ width: "100%", marginTop: 8 }}
-                            >
-                              <Select
-                                fullWidth
-                                variant="outlined"
-                                value={audioTrack?.getSettings()?.deviceId}
-                                MenuProps={{
-                                  classes: {
-                                    paper: classes.paperDark,
-                                  },
-                                }}
-                                classes={{
-                                  icon: classes.selectIcon,
-                                }}
-                                style={{
-                                  border: `1px solid ${"white"}`,
-                                }}
-                                onChange={(e) => {
-                                  changeMic(e.target.value);
-                                }}
-                              >
-                                {mics?.map((item, index) => {
-                                  return item?.kind === "audioinput" ? (
-                                    <MenuItem
-                                      value={item?.deviceId}
-                                      onClick={(e) => {
-                                        setSelectedMic((s) => ({
-                                          ...s,
-                                          id: item?.deviceId,
-                                        }));
-                                      }}
-                                    >
-                                      {item?.label
-                                        ? item?.label
-                                        : `Mic ${index + 1}`}
-                                    </MenuItem>
-                                  ) : null;
-                                })}
-                              </Select>
-                            </FormControl>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={12} md={5}>
-                        <Box
-                          style={{ position: "relative" }}
-                          mt={isXStoSM ? 0 : 5}
-                          p={2}
-                        >
-                          <Box
-                            style={{
-                              flex: 1,
-                              display: "flex",
-                              width: isXStoSM ? "50%" : "100%",
-                              height: isXStoSM ? "50%" : undefined,
-                              paddingTop: !isXSOnly ? "56.25%" : "auto",
-                              position: "relative",
-                              borderRadius: theme.spacing(1 / 4),
-                              overflow: "hidden",
-                            }}
-                          >
-                            <Box
-                              style={{
-                                position: !isXSOnly ? "absolute" : "unset",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                display: "flex",
-                                alignItems: "flex-start",
-                                flexDirection: "column",
-                                borderRadius: theme.spacing(1),
-                                overflow: "hidden",
-                              }}
-                            >
-                              <AudioAnalyser audioTrack={audioTrack} />
-                            </Box>
-                          </Box>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Box>
-              ) : setting === "video" ? (
-                <Box ref={boxRef}>
-                  <Box style={{ width: "100%" }}>
-                    <Grid
-                      spacing={3}
-                      container
-                      style={{
-                        display: "flex",
-                        flexDirection: isXSOnly ? "column-reverse" : "row",
-                      }}
-                    >
-                      <Grid item xs={12} md={7}>
-                        <Box>
-                          <Box
-                            style={{ display: "flex", flexDirection: "column" }}
-                            mt={isXStoSM ? 0 : 3}
-                          >
-                            <Box ml={2}>
-                              <Typography
-                                variant="subtitle1"
-                                style={{
-                                  fontWeight: "bold",
-                                }}
-                              >
-                                Camera
-                              </Typography>
-                            </Box>
-                            <FormControl
-                              style={{ width: "100%", marginTop: 8 }}
-                            >
-                              <Select
-                                fullWidth
-                                variant="outlined"
-                                value={videoTrack?.getSettings()?.deviceId}
-                                onChange={(e) => {
-                                  changeWebcam(e.target.value);
-                                }}
-                                MenuProps={{
-                                  classes: {
-                                    paper: classes.paperDark,
-                                  },
-                                }}
-                                classes={{
-                                  icon: classes.selectIcon,
-                                }}
-                                style={{
-                                  border: `1px solid ${"white"}`,
-                                }}
-                              >
-                                {webcams?.map((item, index) => {
-                                  return item?.kind === "videoinput" ? (
-                                    <MenuItem
-                                      value={item?.deviceId}
-                                      onClick={() => {
-                                        setSelectedWebcam((s) => ({
-                                          ...s,
-                                          id: item?.deviceId,
-                                        }));
-                                      }}
-                                    >
-                                      {item?.label === ""
-                                        ? `Webcam ${index + 1}`
-                                        : item?.label}
-                                    </MenuItem>
-                                  ) : null;
-                                })}
-                              </Select>
-                            </FormControl>
-                          </Box>
-                        </Box>
-                      </Grid>
-                      <Grid item xs={12} md={5}>
-                        <Box
-                          style={{ position: "relative" }}
-                          mt={isXStoSM ? 0 : 5}
-                          p={2}
-                        >
-                          <Box
-                            style={{
-                              flex: 1,
-                              display: "flex",
-                              width: isXStoSM ? "50%" : "100%",
-                              height: isXStoSM ? "50%" : undefined,
-                              paddingTop: !isXSOnly ? "56.25%" : "auto",
-                              position: "relative",
-                              borderRadius: theme.spacing(1 / 4),
-                              overflow: "hidden",
-                            }}
-                          >
-                            <Box
-                              style={{
-                                position: !isXSOnly ? "absolute" : "unset",
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                bottom: 0,
-                                backgroundColor: theme.palette.primary.light,
-                                display: "flex",
-                                flexDirection: "column",
-                                borderRadius: theme.spacing(1),
-                                overflow: "hidden",
-                              }}
-                            >
-                              <video
-                                autoPlay
-                                playsInline
-                                muted
-                                ref={popupVideoPlayerRef}
-                                controls={false}
-                                className={classes.video + " flip"}
-                              />
-                            </Box>
-                          </Box>
-                        </Box>
-                      </Grid>
-                    </Grid>
-                  </Box>
-                </Box>
-              ) : null}
-            </Box>
-          </Dialog>
+                    {setting === "audio" ? (
+                      <div ref={boxRef}>
+                        <div className="w-full">
+                          <div className="grid container grid-flow-col">
+                            <div className="grid grid-cols-12">
+                              <div class="col-span-7">
+                                <div className="flex flex-col mt-6">
+                                  <p className="text-sm text-left text-white font-bold">
+                                    Microphone
+                                  </p>
 
-          <ConfirmBox
-            open={dlgDevices}
-            title="Mic or webcam not available"
-            subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
-            successText="DISMISS"
-            onSuccess={() => {
-              setDlgDevices(false);
-            }}
-          />
-        </Box>
-      </Grid>
-    </ThemeProvider>
+                                  <div className="w-full mt-4 text-left">
+                                    <Popover className="relative">
+                                      {({ close }) => (
+                                        <>
+                                          <Popover.Button className="flex  w-full ">
+                                            <button
+                                              onClick={(e) => {
+                                                changeMic(e.target.value);
+                                              }}
+                                              className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2"
+                                            >
+                                              {selectedMicLabel
+                                                ? selectedMicLabel
+                                                : "Select"}
+                                              <ChevronDownIcon
+                                                className="h-4 w-4"
+                                                style={{
+                                                  color: "white",
+                                                }}
+                                              />
+                                            </button>
+                                          </Popover.Button>
+                                          <Transition
+                                            as={Fragment}
+                                            enter="transition ease-out duration-200"
+                                            enterFrom="opacity-0 translate-y-1"
+                                            enterTo="opacity-100 translate-y-0"
+                                            leave="transition ease-in duration-150"
+                                            leaveFrom="opacity-100 translate-y-0"
+                                            leaveTo="opacity-0 translate-y-1"
+                                          >
+                                            <Popover.Panel className="absolute left-1/2  z-10 mt-2 w-full -translate-x-1/2 transform px-4 sm:px-0 pb-4">
+                                              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                                <div
+                                                  className={"bg-gray-800 py-1"}
+                                                >
+                                                  <div>
+                                                    <div className="flex flex-col">
+                                                      {mics.map(
+                                                        (item, index) => {
+                                                          return (
+                                                            item?.kind ===
+                                                              "audioinput" && (
+                                                              <div
+                                                                className={`px-3 py-1 my-1 pl-6 text-white text-left 
+                                                            `}
+                                                              >
+                                                                <button
+                                                                  className={`flex flex-1 w-full 
+                                                              `}
+                                                                  key={`mics_${index}`}
+                                                                  value={
+                                                                    item?.deviceId
+                                                                  }
+                                                                  onClick={() => {
+                                                                    setSelectedMicLabel(
+                                                                      item?.label
+                                                                    );
+                                                                    setSelectedMic(
+                                                                      (s) => ({
+                                                                        ...s,
+                                                                        id: item?.deviceId,
+                                                                      })
+                                                                    );
+                                                                    close();
+                                                                  }}
+                                                                >
+                                                                  {item?.label
+                                                                    ? item?.label
+                                                                    : `Mic ${
+                                                                        index +
+                                                                        1
+                                                                      }`}
+                                                                </button>
+                                                              </div>
+                                                            )
+                                                          );
+                                                        }
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </Popover.Panel>
+                                          </Transition>
+                                        </>
+                                      )}
+                                    </Popover>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="col-span-5">
+                                <div className="p-4 relative mt-0 md:mt-10 ">
+                                  <div
+                                    className="flex flex-1 relative w-1/2 md:w-full h-1/2 md:h-auto overflow-hidden rounded"
+                                    style={{ paddingTop: "56.25%" }}
+                                  >
+                                    <div className="md:absolute top-0 bottom-0 left-0 right-0 flex items-start flex-col rounded-sm overflow-hidden">
+                                      <AudioAnalyser audioTrack={audioTrack} />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : setting === "video" ? (
+                      <div ref={boxRef}>
+                        <div className="w-full">
+                          <div className="grid container grid-flow-col">
+                            <div className="grid grid-cols-12">
+                              <div className="col-span-7">
+                                <div className="flex flex-col mt-6">
+                                  <p className="text-sm text-left text-white font-bold">
+                                    Camera
+                                  </p>
+
+                                  <div className="w-full mt-4 text-left">
+                                    <Popover className="relative">
+                                      {({ close }) => (
+                                        <>
+                                          <Popover.Button className="flex  w-full ">
+                                            <button
+                                              onClick={(e) => {
+                                                changeWebcam(e.target.value);
+                                              }}
+                                              className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2"
+                                            >
+                                              {selectedWebcamLabel
+                                                ? selectedWebcamLabel
+                                                : "Select"}
+                                              <ChevronDownIcon
+                                                className="h-4 w-4"
+                                                style={{
+                                                  color: "white",
+                                                }}
+                                              />
+                                            </button>
+                                          </Popover.Button>
+                                          <Transition
+                                            as={Fragment}
+                                            enter="transition ease-out duration-200"
+                                            enterFrom="opacity-0 translate-y-1"
+                                            enterTo="opacity-100 translate-y-0"
+                                            leave="transition ease-in duration-150"
+                                            leaveFrom="opacity-100 translate-y-0"
+                                            leaveTo="opacity-0 translate-y-1"
+                                          >
+                                            <Popover.Panel className="absolute left-1/2  z-10 mt-2 w-full -translate-x-1/2 transform px-4 sm:px-0 pb-4">
+                                              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                                <div
+                                                  className={"bg-gray-800 py-1"}
+                                                >
+                                                  <div>
+                                                    <div className="flex flex-col">
+                                                      {webcams.map(
+                                                        (item, index) => {
+                                                          return (
+                                                            item?.kind ===
+                                                              "videoinput" && (
+                                                              <div
+                                                                className={`px-3 py-1 my-1 pl-6 text-white text-left 
+                                                            `}
+                                                              >
+                                                                <button
+                                                                  className={`flex flex-1 w-full 
+                                                              `}
+                                                                  key={`webcam_${index}`}
+                                                                  value={
+                                                                    item?.deviceId
+                                                                  }
+                                                                  onClick={() => {
+                                                                    setSelectedWebcamLabel(
+                                                                      item?.label
+                                                                    );
+
+                                                                    setSelectedWebcam(
+                                                                      (s) => ({
+                                                                        ...s,
+                                                                        id: item?.deviceId,
+                                                                      })
+                                                                    );
+                                                                    close();
+                                                                  }}
+                                                                >
+                                                                  {item?.label ===
+                                                                  ""
+                                                                    ? `Webcam ${
+                                                                        index +
+                                                                        1
+                                                                      }`
+                                                                    : item?.label}
+                                                                </button>
+                                                              </div>
+                                                            )
+                                                          );
+                                                        }
+                                                      )}
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </Popover.Panel>
+                                          </Transition>
+                                        </>
+                                      )}
+                                    </Popover>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="col-span-5">
+                                <div className="p-4 relative mt-0 md:mt-10 ">
+                                  <div
+                                    className="flex flex-1 relative w-1/2 md:w-full h-1/2 md:h-auto overflow-hidden rounded"
+                                    style={{ paddingTop: "56.25%" }}
+                                  >
+                                    <div className="md:absolute top-0 bottom-0 left-0 right-0 flex items-start flex-col rounded-sm overflow-hidden">
+                                      <video
+                                        autoPlay
+                                        playsInline
+                                        muted
+                                        ref={popupVideoPlayerRef}
+                                        controls={false}
+                                        style={{
+                                          backgroundColor: "#1c1c1c",
+                                        }}
+                                        className={
+                                          "rounded-md h-full w-full object-cover flip"
+                                        }
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+      <ConfirmBox
+        open={dlgDevices}
+        title="Mic or webcam not available"
+        subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
+        successText="DISMISS"
+        onSuccess={() => {
+          setDlgDevices(false);
+        }}
+      />
+    </>
   );
 }
