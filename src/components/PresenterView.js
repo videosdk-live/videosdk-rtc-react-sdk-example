@@ -78,7 +78,13 @@ export function PresenterView({ height }) {
       }}
       className={"video-cover"}
     >
-      <audio autoPlay playsInline controls={false} ref={audioPlayer} />
+      <audio
+        autoPlay
+        playsInline
+        controls={false}
+        ref={audioPlayer}
+        muted={isLocal}
+      />
       <div
         style={{
           height: "100%",
