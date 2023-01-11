@@ -15,6 +15,7 @@ import ConfirmBox from "../components/ConfirmBox";
 import useIsMobile from "../hooks/useIsMobile";
 import useIsTab from "../hooks/useIsTab";
 import { useMediaQuery } from "react-responsive";
+import { toast } from "react-toastify";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -89,11 +90,23 @@ export function MeetingContainer({
       status === Constants.recordingEvents.RECORDING_STARTED ||
       status === Constants.recordingEvents.RECORDING_STOPPED
     ) {
-      // enqueueSnackbar(
-      //   status === Constants.recordingEvents.RECORDING_STARTED
-      //     ? "Meeting recording is started."
-      //     : "Meeting recording is stopped."
-      // );
+      toast(
+        `${
+          status === Constants.recordingEvents.RECORDING_STARTED
+            ? "Meeting recording is started"
+            : "Meeting recording is stopped."
+        }`,
+        {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
     }
   };
 
@@ -203,9 +216,16 @@ export function MeetingContainer({
         `https://static.videosdk.live/prebuilt/notification.mp3`
       ).play();
 
-      // enqueueSnackbar(
-      //   `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
-      // );
+      toast(`${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`, {
+        position: "bottom-left",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeButton: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
 
       participantRaisedHand(senderId);
     },
@@ -224,9 +244,21 @@ export function MeetingContainer({
           `https://static.videosdk.live/prebuilt/notification.mp3`
         ).play();
 
-        // enqueueSnackbar(
-        //   trimSnackBarText(`${nameTructed(senderName, 15)} says: ${message}`)
-        // );
+        toast(
+          `${trimSnackBarText(
+            `${nameTructed(senderName, 15)} says: ${message}`
+          )}`,
+          {
+            position: "bottom-left",
+            autoClose: 4000,
+            hideProgressBar: true,
+            closeButton: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
+        );
       }
     },
   });

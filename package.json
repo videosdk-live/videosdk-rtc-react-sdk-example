@@ -16,6 +16,7 @@
     "react-player": "^2.10.1",
     "react-responsive": "^9.0.0",
     "react-scripts": "^5.0.1",
+    "react-toastify": "^9.1.1",
     "web-vitals": "^1.0.1"
   },
   "devDependencies": {

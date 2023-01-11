@@ -20,6 +20,7 @@ import LocalParticipantListner from "./components/LocalParticipantListner";
 import ConfirmBox from "../components/ConfirmBox";
 import useIsMobile from "../hooks/useIsMobile";
 import { useMediaQuery } from "react-responsive";
+import { toast } from "react-toastify";
 
 export function ILSContainer({
   onMeetingLeave,
@@ -107,11 +108,23 @@ export function ILSContainer({
       (status === Constants.recordingEvents.RECORDING_STARTED ||
         status === Constants.recordingEvents.RECORDING_STOPPED)
     ) {
-      // enqueueSnackbar(
-      //   status === Constants.recordingEvents.RECORDING_STARTED
-      //     ? "Meeting recording is started."
-      //     : "Meeting recording is stopped."
-      // );
+      toast(
+        `${
+          status === Constants.recordingEvents.RECORDING_STARTED
+            ? "Meeting recording is started."
+            : "Meeting recording is stopped."
+        }`,
+        {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
     }
   };
 
@@ -122,11 +135,23 @@ export function ILSContainer({
       (data.status === Constants.hlsEvents.HLS_STARTED ||
         data.status === Constants.hlsEvents.HLS_STOPPED)
     ) {
-      //  enqueueSnackbar (
-      //     data.status === Constants.hlsEvents.HLS_STARTED
-      //       ? "Meeting HLS is started."
-      //       : "Meeting HLS is stopped."
-      //   );
+      toast(
+        `${
+          data.status === Constants.hlsEvents.HLS_STARTED
+            ? "Meeting HLS is started."
+            : "Meeting HLS is stopped."
+        }`,
+        {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
+      );
     }
 
     if (
@@ -257,9 +282,16 @@ export function ILSContainer({
         `https://static.videosdk.live/prebuilt/notification.mp3`
       ).play();
 
-      // enqueueSnackbar(
-      //   `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
-      // );
+      toast(`${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`, {
+        position: "bottom-left",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeButton: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
 
       participantRaisedHand(senderId);
     },
@@ -278,9 +310,21 @@ export function ILSContainer({
           `https://static.videosdk.live/prebuilt/notification.mp3`
         ).play();
 
-        // enqueueSnackbar(
-        //   trimSnackBarText(`${nameTructed(senderName, 15)} says: ${message}`)
-        // );
+        toast(
+          `${trimSnackBarText(
+            `${nameTructed(senderName, 15)} says: ${message}`
+          )}`,
+          {
+            position: "bottom-left",
+            autoClose: 4000,
+            hideProgressBar: true,
+            closeButton: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
+        );
       }
     },
   });

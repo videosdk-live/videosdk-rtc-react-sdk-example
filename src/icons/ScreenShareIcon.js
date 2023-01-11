@@ -8,6 +8,7 @@ const ScreenShareIcon = (props) => (
     style={{
       height: 48,
       width: 48,
+      color: "white",
     }}
     {...props}
   >
