@@ -245,13 +245,19 @@ export function JoiningScreen({
     startMuteListener();
   }, [audioTrack]);
 
+  useEffect(() => {
+    if (mode === "viewer") {
+      setMeetingMode(Constants.modes.VIEWER);
+    }
+  }, [mode]);
+
   // commented by reviewer
-  // useEffect(() => {
-  //   if (meetingMode === Constants.modes.VIEWER) {
-  //     _handleTurnOffMic();
-  //     _handleTurnOffWebcam();
-  //   }
-  // }, [meetingMode]);
+  useEffect(() => {
+    if (meetingMode === Constants.modes.VIEWER) {
+      _handleTurnOffMic();
+      _handleTurnOffWebcam();
+    }
+  }, [meetingMode]);
 
   useEffect(() => {
     videoTrackRef.current = videoTrack;
