@@ -38,7 +38,7 @@ export function JoiningScreen({
     mics: [],
   });
 
-  const { id, mode } = useParams();
+  const { mode } = useParams();
 
   const [videoTrack, setVideoTrack] = useState(null);
 
@@ -56,15 +56,6 @@ export function JoiningScreen({
   const [settingDialogueOpen, setSettingDialogueOpen] = useState(false);
 
   const [audioTrack, setAudioTrack] = useState(null);
-
-  setTimeout(() => {
-    if (mode === "viewer") {
-      setMeetingMode(Constants.modes.VIEWER);
-      setMeetingType(meetingTypes.ILS);
-      _handleTurnOffMic();
-      _handleTurnOffWebcam();
-    }
-  }, 10);
 
   const handleClickOpen = () => {
     setSettingDialogueOpen(true);
@@ -254,12 +245,13 @@ export function JoiningScreen({
     startMuteListener();
   }, [audioTrack]);
 
-  useEffect(() => {
-    if (meetingMode === Constants.modes.VIEWER) {
-      _handleTurnOffMic();
-      _handleTurnOffWebcam();
-    }
-  }, [meetingMode]);
+  // commented by reviewer
+  // useEffect(() => {
+  //   if (meetingMode === Constants.modes.VIEWER) {
+  //     _handleTurnOffMic();
+  //     _handleTurnOffWebcam();
+  //   }
+  // }, [meetingMode]);
 
   useEffect(() => {
     videoTrackRef.current = videoTrack;
@@ -289,8 +281,12 @@ export function JoiningScreen({
   }, [videoTrack, setting, settingDialogueOpen]);
 
   useEffect(() => {
-    getDevices({ micEnabled, webcamEnabled });
-  }, []);
+    if (mode === "viewer") {
+      // do nothing
+    } else {
+      getDevices({ micEnabled, webcamEnabled });
+    }
+  }, [mode]);
 
   const ButtonWithTooltip = ({ onClick, onState, OnIcon, OffIcon, mic }) => {
     const [tooltipShow, setTooltipShow] = useState(false);
