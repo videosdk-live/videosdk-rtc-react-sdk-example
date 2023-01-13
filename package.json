@@ -31,7 +31,8 @@
     "kill-start": "sudo kill -9 `sudo lsof -t -i:3000` && yarn start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "serve": "serve -s build -l 3004"
   },
   "eslintConfig": {
     "extends": [
