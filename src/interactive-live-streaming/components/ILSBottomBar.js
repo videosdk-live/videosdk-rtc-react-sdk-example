@@ -10,6 +10,7 @@ import {
   CheckIcon,
   ChevronDownIcon,
   DotsHorizontalIcon,
+  XIcon,
 } from "@heroicons/react/outline";
 import recordingBlink from "../../static/animations/recording-blink.json";
 import liveHLS from "../../static/animations/live-hls.json";
@@ -36,6 +37,7 @@ import ReactionIcon from "../../icons/Bottombar/ReactionIcon";
 import { sideBarModes } from "../../utils/common";
 import ECommerceIcon from "../../icons/Bottombar/ECommerceIcon";
 import { Dialog, Popover, Transition } from "@headlessui/react";
+import OutlineIconTextButton from "../../components/buttons/OutlineIconTextButton";
 
 export function ILSBottomBar({
   bottomBarHeight,
@@ -791,31 +793,79 @@ export function ILSBottomBar({
     );
   };
 
-  const MeetingIdCopyBTN = () => {
+  const MeetingUrlCopyBTN = () => {
     const { meetingId } = useMeeting();
     const [isCopied, setIsCopied] = useState(false);
+
     return (
-      <div className="flex items-center justify-center lg:ml-0 ml-4 mt-4 xl:mt-0">
-        <div className="flex border-2 border-gray-850 p-2 rounded-md items-center justify-center">
-          <h1 className="text-white text-base ">{meetingId}</h1>
-          <button
-            className="ml-2"
-            onClick={() => {
-              navigator.clipboard.writeText(meetingId);
-              setIsCopied(true);
-              setTimeout(() => {
-                setIsCopied(false);
-              }, 3000);
-            }}
-          >
-            {isCopied ? (
-              <CheckIcon className="h-5 w-5 text-green-400" />
-            ) : (
-              <ClipboardIcon className="h-5 w-5 text-white" />
-            )}
-          </button>
-        </div>
-      </div>
+      <Popover className="relative">
+        {({ close }) => (
+          <>
+            <Popover.Button>
+              <OutlineIconTextButton
+                bgColor={"bg-white"}
+                textColor={"text-black"}
+                tooltipTitle="Invite more people"
+                buttonText={"Invite more people"}
+                tooltipPlacement="top"
+              />
+            </Popover.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
+            >
+              <Popover.Panel className="absolute left-full bottom-full z-10 mt-3 w-80 -translate-x-1/2 transform px-4 sm:px-0 pb-2">
+                <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className={"bg-white p-3"}>
+                    <div className="flex items-end flex-1 justify-end">
+                      <button onClick={close}>
+                        <XIcon className="w-5 h-5 text-black" />
+                      </button>
+                    </div>
+                    <p className=" text-lg text-black font-medium">
+                      {"Invite other to demo"}
+                    </p>
+                    <div className="flex flex-col mt-3">
+                      <div className="flex bg-gray-300 py-3 rounded items-center justify-center">
+                        <p className="text-black text-base">
+                          {window.location.href.length > 32
+                            ? window.location.href.slice(0, 32) + "..."
+                            : window.location.href}
+                        </p>
+                        <button
+                          className="ml-2"
+                          onClick={() => {
+                            navigator.clipboard.writeText(window.location.href);
+                            setIsCopied(true);
+                            setTimeout(() => {
+                              setIsCopied(false);
+                            }, 3000);
+                          }}
+                        >
+                          {isCopied ? (
+                            <CheckIcon className="h-5 w-5 text-green-400" />
+                          ) : (
+                            <ClipboardIcon className="h-5 w-5 text-black" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-black text-base mt-4 text-justify">
+                        Share this meeting link with others you want in the
+                        meeting.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Popover.Panel>
+            </Transition>
+          </>
+        )}
+      </Popover>
     );
   };
 
@@ -941,7 +991,7 @@ export function ILSBottomBar({
                               />
                             ) : icon ===
                               BottomBarButtonTypes.MEETING_ID_COPY ? (
-                              <MeetingIdCopyBTN
+                              <MeetingUrlCopyBTN
                                 isMobile={isMobile}
                                 isTab={isTab}
                               />
@@ -992,7 +1042,7 @@ export function ILSBottomBar({
                 ) : icon === BottomBarButtonTypes.PARTICIPANTS ? (
                   <ParticipantsBTN isMobile={isMobile} isTab={isTab} />
                 ) : icon === BottomBarButtonTypes.MEETING_ID_COPY ? (
-                  <MeetingIdCopyBTN isMobile={isMobile} isTab={isTab} />
+                  <MeetingUrlCopyBTN isMobile={isMobile} isTab={isTab} />
                 ) : icon === BottomBarButtonTypes.HLS ? (
                   <HLSBTN isMobile={isMobile} isTab={isTab} />
                 ) : icon === BottomBarButtonTypes.POLL ? (
@@ -1011,7 +1061,7 @@ export function ILSBottomBar({
     </div>
   ) : (
     <div className="md:flex lg:px-2 xl:px-6 pb-2 px-2 hidden">
-      <MeetingIdCopyBTN />
+      <MeetingUrlCopyBTN />
 
       <div className="flex flex-1 items-center justify-center" ref={tollTipEl}>
         {meetingMode === Constants.modes.CONFERENCE && (

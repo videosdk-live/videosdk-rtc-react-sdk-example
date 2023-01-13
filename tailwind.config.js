@@ -5,7 +5,6 @@ module.exports = windmill({
   mode: "jit",
   purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: false, // or 'media' or 'class'
-  mode: "jit",
   theme: {
     colors: {
       rose: colors.rose,
@@ -89,11 +88,13 @@ module.exports = windmill({
           100: "#252A34",
           150: "#31353B",
           200: "#1E1E1E",
+          250: "#2B3034",
           300: "#454545",
           400: "#282828",
           500: "#848484",
           600: "#C4C4C4",
           700: "#272727",
+          750: "#9A9FA5",
           800: "#343434",
           850: "#9E9DA6",
           900: "#373C43",
@@ -104,5 +105,5 @@ module.exports = windmill({
   variants: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [require("@tailwindcss/typography"), require("@tailwindcss/forms")],
 });

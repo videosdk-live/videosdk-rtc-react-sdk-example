@@ -12,6 +12,7 @@ import WebcamOffIcon from "../../icons/WebcamOffIcon";
 import WebcamOnIcon from "../../icons/Bottombar/WebcamOnIcon";
 import MicOffIcon from "../../icons/MicOffIcon";
 import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
+import { useParams } from "react-router-dom";
 
 export function JoiningScreen({
   participantName,
@@ -37,6 +38,8 @@ export function JoiningScreen({
     mics: [],
   });
 
+  const { id, mode } = useParams();
+
   const [videoTrack, setVideoTrack] = useState(null);
 
   const [dlgMuted, setDlgMuted] = useState(false);
@@ -53,6 +56,15 @@ export function JoiningScreen({
   const [settingDialogueOpen, setSettingDialogueOpen] = useState(false);
 
   const [audioTrack, setAudioTrack] = useState(null);
+
+  setTimeout(() => {
+    if (mode === "viewer") {
+      setMeetingMode(Constants.modes.VIEWER);
+      setMeetingType(meetingTypes.ILS);
+      _handleTurnOffMic();
+      _handleTurnOffWebcam();
+    }
+  }, 10);
 
   const handleClickOpen = () => {
     setSettingDialogueOpen(true);

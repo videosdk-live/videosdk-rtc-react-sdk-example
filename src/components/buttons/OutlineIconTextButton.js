@@ -13,6 +13,7 @@ const OutlineIconTextButton = ({
   fillcolor,
   lottieOption,
   tooltipTitle,
+  tooltipPlacement,
   btnID,
   buttonText,
   large,
@@ -30,7 +31,7 @@ const OutlineIconTextButton = ({
 
   const openTooltip = () => {
     createPopper(btnRef.current, tooltipRef.current, {
-      placement: "bottom",
+      placement: tooltipPlacement ? tooltipPlacement : "bottom",
     });
     setTooltipShow(true);
   };

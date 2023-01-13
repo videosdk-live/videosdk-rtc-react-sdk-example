@@ -16,6 +16,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import useIsTab from "../hooks/useIsTab";
 import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
+import { TopBar } from "./TopBar";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -32,6 +33,7 @@ export function MeetingContainer({
   webcamEnabled,
 }) {
   const bottomBarHeight = 60;
+  const topBarHeight = 60;
 
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -272,10 +274,21 @@ export function MeetingContainer({
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: isTab || isMobile ? "" : "column",
+                height: topBarHeight,
+              }}
+            >
+              <TopBar />
+            </div>
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
               <div className={`flex flex-1 `}>
                 {isPresenting ? (
-                  <PresenterView height={containerHeight - bottomBarHeight} />
+                  <PresenterView
+                    height={containerHeight - topBarHeight - bottomBarHeight}
+                  />
                 ) : null}
                 {isPresenting && isMobile ? null : (
                   <MemorizedParticipantView
@@ -286,7 +299,7 @@ export function MeetingContainer({
               </div>
 
               <SidebarConatiner
-                height={containerHeight - bottomBarHeight}
+                height={containerHeight - topBarHeight - bottomBarHeight}
                 sideBarContainerWidth={sideBarContainerWidth}
                 setSideBarMode={setSideBarMode}
                 sideBarMode={sideBarMode}
