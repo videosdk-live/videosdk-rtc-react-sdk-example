@@ -60,7 +60,13 @@ export function PresenterView({ height }) {
         height - "xl:p-6 lg:p-[52px] md:p-[26px] p-1"
       }] `}
     >
-      <audio autoPlay playsInline controls={false} ref={audioPlayer} />
+      <audio
+        autoPlay
+        playsInline
+        controls={false}
+        ref={audioPlayer}
+        muted={isLocal}
+      />
       <div className={"video-contain relative h-full w-full"}>
         <ReactPlayer
           ref={videoPlayer}

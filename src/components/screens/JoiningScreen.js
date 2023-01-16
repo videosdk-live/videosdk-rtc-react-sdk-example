@@ -251,7 +251,6 @@ export function JoiningScreen({
     }
   }, [mode]);
 
-  // commented by reviewer
   useEffect(() => {
     if (meetingMode === Constants.modes.VIEWER) {
       _handleTurnOffMic();

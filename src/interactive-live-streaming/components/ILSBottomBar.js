@@ -795,7 +795,21 @@ export function ILSBottomBar({
 
   const MeetingUrlCopyBTN = () => {
     const { meetingId } = useMeeting();
-    const [isCopied, setIsCopied] = useState(false);
+    const [isCopied, setIsCopied] = useState({ index: null, copied: false });
+    let interactiveMeetigUrlArray = [
+      {
+        role: "Host",
+        url: `${window.location.origin}/interactive-meeting/host/${meetingId}`,
+      },
+      {
+        role: "Co-host",
+        url: `${window.location.origin}/interactive-meeting/co-host/${meetingId}`,
+      },
+      {
+        role: "Viewer",
+        url: `${window.location.origin}/interactive-meeting/viewer/${meetingId}`,
+      },
+    ];
 
     return (
       <Popover className="relative">
@@ -831,30 +845,38 @@ export function ILSBottomBar({
                       {"Invite other to demo"}
                     </p>
                     <div className="flex flex-col mt-3">
-                      <div className="flex bg-gray-300 py-3 rounded items-center justify-center">
-                        <p className="text-black text-base">
-                          {window.location.href.length > 32
-                            ? window.location.href.slice(0, 32) + "..."
-                            : window.location.href}
-                        </p>
-                        <button
-                          className="ml-2"
-                          onClick={() => {
-                            navigator.clipboard.writeText(window.location.href);
-                            setIsCopied(true);
-                            setTimeout(() => {
-                              setIsCopied(false);
-                            }, 3000);
-                          }}
-                        >
-                          {isCopied ? (
-                            <CheckIcon className="h-5 w-5 text-green-400" />
-                          ) : (
-                            <ClipboardIcon className="h-5 w-5 text-black" />
-                          )}
-                        </button>
-                      </div>
-                      <p className="text-black text-base mt-4 text-justify">
+                      {interactiveMeetigUrlArray.map(({ role, url }, i) => (
+                        <>
+                          <p>{`${role} Meeting Link`}</p>
+                          <div
+                            className={
+                              "flex bg-gray-300 py-3 rounded items-center justify-center mt-1 mb-3"
+                            }
+                          >
+                            <p className="text-black text-base">
+                              {url.length > 32 ? url.slice(0, 32) + "..." : url}
+                            </p>
+                            <button
+                              className="ml-2"
+                              onClick={() => {
+                                navigator.clipboard.writeText(url);
+                                setIsCopied({ index: i, copied: true });
+                                setTimeout(() => {
+                                  setIsCopied({ index: null, copied: false });
+                                }, 3000);
+                              }}
+                            >
+                              {isCopied.copied && isCopied.index === i ? (
+                                <CheckIcon className="h-5 w-5 text-green-400" />
+                              ) : (
+                                <ClipboardIcon className="h-5 w-5 text-black" />
+                              )}
+                            </button>
+                          </div>
+                        </>
+                      ))}
+
+                      <p className="text-black text-base mt-1 text-justify">
                         Share this meeting link with others you want in the
                         meeting.
                       </p>

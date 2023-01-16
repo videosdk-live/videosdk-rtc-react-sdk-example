@@ -1,7 +1,6 @@
-import { CheckIcon, ClipboardIcon } from "@heroicons/react/outline";
 import { Constants } from "@videosdk.live/react-sdk";
 import React, { useEffect, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import ConferencingIcon from "../icons/ConferencingIcon";
 import LiveStreamingIcon from "../icons/LiveStreamingIcon";
 
@@ -20,15 +19,8 @@ export function MeetingDetailsScreen({
   setMeetingMode,
   meetingMode,
 }) {
-  function useQuery() {
-    const { search } = useLocation();
+  const { id, mode, type } = useParams();
 
-    return React.useMemo(() => new URLSearchParams(search), [search]);
-  }
-  let query = useQuery();
-  let routerMeetingType = query.get("meetingType");
-  console.log("meetingType", routerMeetingType);
-  const { id, mode } = useParams();
   const navigate = useNavigate();
 
   const [meetingId, setMeetingId] = useState(id || "");
@@ -64,18 +56,18 @@ export function MeetingDetailsScreen({
   }, [mode]);
 
   useEffect(async () => {
-    if (routerMeetingType === "conference") {
+    if (type === "conference") {
       setIscreateMeetingClicked(true);
       setMeetingType(meetingTypes.MEETING);
       const meetingId = await _handleOnCreateMeeting();
       setMeetingId(meetingId);
-    } else if (routerMeetingType === "interactive") {
+    } else if (type === "interactive") {
       setMeetingType(meetingTypes.ILS);
       setIscreateMeetingClicked(true);
       const meetingId = await _handleOnCreateMeeting();
       setMeetingId(meetingId);
     }
-  }, [routerMeetingType]);
+  }, [type]);
 
   return (
     <div

@@ -50,7 +50,7 @@ export function ParticipantView({ participantId }) {
       }}
       className={`h-full w-full  bg-gray-750 relative overflow-hidden rounded-lg video-cover`}
     >
-      <audio ref={micRef} autoPlay />
+      <audio ref={micRef} autoPlay muted={isLocal} />
       {webcamOn ? (
         <ReactPlayer
           //

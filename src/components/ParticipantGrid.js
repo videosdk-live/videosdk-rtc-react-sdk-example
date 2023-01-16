@@ -15,6 +15,7 @@ function ParticipantGrid({ participantIds, isPresenting, sideBarMode }) {
     "only screen and (max-width: 768px)"
   ).matches;
   const [isCopied, setIsCopied] = useState({ index: null, copied: false });
+  const [isConfereceUrlCopied, setIsConfereceUrlCopied] = useState(false);
 
   if (participantIds.length === 1) participantIds.push("");
 
@@ -178,14 +179,16 @@ function ParticipantGrid({ participantIds, isPresenting, sideBarMode }) {
                                         navigator.clipboard.writeText(
                                           `${window.location.href}`
                                         );
-                                        setIsCopied(true);
+                                        setIsConfereceUrlCopied(true);
                                         setTimeout(() => {
-                                          setIsCopied(false);
+                                          setIsConfereceUrlCopied(false);
                                         }, 5000);
                                       }}
                                       className="bg-white text-black text-base font-medium py-2.5 w-full rounded"
                                     >
-                                      {isCopied ? "Link Copied" : "Copy Link"}
+                                      {isConfereceUrlCopied
+                                        ? "Link Copied"
+                                        : "Copy Link"}
                                     </button>
                                   </div>
                                 </div>
