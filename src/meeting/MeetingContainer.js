@@ -14,7 +14,7 @@ import { nameTructed, trimSnackBarText } from "../utils/helper";
 import useResponsiveSize from "../hooks/useResponsiveSize";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import ConfirmBox from "../components/ConfirmBox";
-
+import VideoSDKTelemetry from "../utils/Opentelemetry";
 export function MeetingContainer({
   onMeetingLeave,
   setIsMeetingLeft,
@@ -109,6 +109,8 @@ export function MeetingContainer({
   }
 
   async function onMeetingJoined() {
+    VideoSDKTelemetry.init("ahmed@videosdk.live");
+    
     // console.log("onMeetingJoined");
     const { changeWebcam, changeMic, muteMic, disableWebcam } =
       mMeetingRef.current;
@@ -141,6 +143,8 @@ export function MeetingContainer({
     }
   }
   function onMeetingLeft() {
+    VideoSDKTelemetry.trace("Meeting Left");
+
     // console.log("onMeetingLeft");
     onMeetingLeave();
   }
