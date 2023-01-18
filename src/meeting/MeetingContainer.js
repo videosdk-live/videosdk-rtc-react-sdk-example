@@ -17,6 +17,7 @@ import useIsTab from "../hooks/useIsTab";
 import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { TopBar } from "./TopBar";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -27,17 +28,16 @@ export function MeetingContainer({
   setSelectWebcamDeviceId,
   selectMicDeviceId,
   setSelectMicDeviceId,
-  useRaisedHandParticipants,
-  raisedHandsParticipants,
+
   micEnabled,
   webcamEnabled,
 }) {
+  const { useRaisedHandParticipants } = useMeetingAppContext();
   const bottomBarHeight = 60;
   const topBarHeight = 60;
 
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [sideBarMode, setSideBarMode] = useState(null);
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
   const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
@@ -291,26 +291,18 @@ export function MeetingContainer({
                   />
                 ) : null}
                 {isPresenting && isMobile ? null : (
-                  <MemorizedParticipantView
-                    isPresenting={isPresenting}
-                    sideBarMode={sideBarMode}
-                  />
+                  <MemorizedParticipantView isPresenting={isPresenting} />
                 )}
               </div>
 
               <SidebarConatiner
                 height={containerHeight - topBarHeight - bottomBarHeight}
                 sideBarContainerWidth={sideBarContainerWidth}
-                setSideBarMode={setSideBarMode}
-                sideBarMode={sideBarMode}
-                raisedHandsParticipants={raisedHandsParticipants}
               />
             </div>
 
             <BottomBar
               bottomBarHeight={bottomBarHeight}
-              sideBarMode={sideBarMode}
-              setSideBarMode={setSideBarMode}
               setIsMeetingLeft={setIsMeetingLeft}
               selectWebcamDeviceId={selectWebcamDeviceId}
               setSelectWebcamDeviceId={setSelectWebcamDeviceId}

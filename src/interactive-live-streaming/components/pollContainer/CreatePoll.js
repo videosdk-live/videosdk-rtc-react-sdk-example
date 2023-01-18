@@ -4,6 +4,7 @@ import { usePubSub } from "@videosdk.live/react-sdk";
 import { sideBarModes } from "../../../utils/common";
 import { Input, Label } from "@windmill/react-ui";
 import { XIcon } from "@heroicons/react/outline";
+import { useMeetingAppContext } from "../../../MeetingAppContextDef";
 
 const CreatePollPart = ({
   isMarkAsCorrectChecked,
@@ -319,9 +320,8 @@ const PollButtonPart = ({
   setCorrectAnswerErr,
   setMinOptionErr,
   setOptionErr,
-  polls,
-  setSideBarMode,
 }) => {
+  const { polls, setSideBarMode } = useMeetingAppContext();
   const singleOption = options?.map((option) => {
     return option.option;
   });
@@ -465,7 +465,7 @@ const PollButtonPart = ({
   );
 };
 
-const CreatePoll = ({ panelHeight, polls, setSideBarMode }) => {
+const CreatePoll = ({ panelHeight }) => {
   const [isMarkAsCorrectChecked, setIsMarkAsCorrectChecked] = useState(false);
   const [isSetTimerChecked, setIsSetTimerChecked] = useState(false);
   const [question, setQuestion] = useState("");
@@ -540,8 +540,6 @@ const CreatePoll = ({ panelHeight, polls, setSideBarMode }) => {
           setCorrectAnswerErr={setCorrectAnswerErr}
           setMinOptionErr={setMinOptionErr}
           setOptionErr={setOptionErr}
-          polls={polls}
-          setSideBarMode={setSideBarMode}
         />
       </div>
     </div>

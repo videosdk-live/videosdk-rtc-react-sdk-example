@@ -13,6 +13,7 @@ import WebcamOnIcon from "../../icons/Bottombar/WebcamOnIcon";
 import MicOffIcon from "../../icons/MicOffIcon";
 import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
 import { useParams } from "react-router-dom";
+import { useMeetingAppContext } from "../../MeetingAppContextDef";
 
 export function JoiningScreen({
   participantName,
@@ -26,11 +27,10 @@ export function JoiningScreen({
   webcamEnabled,
   setWebcamOn,
   setMicOn,
-  meetingType,
-  setMeetingType,
   setMeetingMode,
   meetingMode,
 }) {
+  const { meetingType } = useMeetingAppContext();
   const [setting, setSetting] = useState("video");
   const [{ webcams, mics }, setDevices] = useState({
     devices: [],
@@ -241,8 +241,12 @@ export function JoiningScreen({
 
   useEffect(() => {
     audioTrackRef.current = audioTrack;
-
     startMuteListener();
+    return () => {
+      const currentAudioTrack = audioTrackRef.current;
+      currentAudioTrack && currentAudioTrack.stop();
+      audioTrackRef.current = null;
+    };
   }, [audioTrack]);
 
   useEffect(() => {
@@ -454,9 +458,7 @@ export function JoiningScreen({
                     videoTrack={videoTrack}
                     setVideoTrack={setVideoTrack}
                     meetingType={meetingType}
-                    setMeetingType={setMeetingType}
                     setMeetingMode={setMeetingMode}
-                    meetingMode={meetingMode}
                     onClickStartMeeting={onClickStartMeeting}
                     onClickJoin={async (id) => {
                       const token = await getToken();

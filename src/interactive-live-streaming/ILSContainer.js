@@ -21,6 +21,7 @@ import ConfirmBox from "../components/ConfirmBox";
 import useIsMobile from "../hooks/useIsMobile";
 import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 
 export function ILSContainer({
   onMeetingLeave,
@@ -31,25 +32,20 @@ export function ILSContainer({
   setSelectWebcamDeviceId,
   selectMicDeviceId,
   setSelectMicDeviceId,
-  useRaisedHandParticipants,
-  raisedHandsParticipants,
   micEnabled,
   webcamEnabled,
   meetingMode,
-  polls,
-  draftPolls,
-  setDraftPolls,
-  setCreatedPolls,
-  setEndedPolls,
-  downstreamUrl,
-  setDownstreamUrl,
-  afterMeetingJoinedHLSState,
-  setAfterMeetingJoinedHLSState,
 }) {
+  const {
+    setDownstreamUrl,
+    setAfterMeetingJoinedHLSState,
+    useRaisedHandParticipants,
+    sideBarMode,
+  } = useMeetingAppContext();
+
   const bottomBarHeight = 60;
   const topBarHeight = 60;
 
-  const [sideBarMode, setSideBarMode] = useState(null);
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const [meetingError, setMeetingError] = useState(false);
@@ -195,7 +191,6 @@ export function ILSContainer({
   }
 
   async function onMeetingJoined() {
-    // console.log("onMeetingJoined");
     const { changeWebcam, changeMic, muteMic, disableWebcam } =
       mMeetingRef.current;
 
@@ -339,13 +334,7 @@ export function ILSContainer({
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
-            <PollsListner
-              polls={polls}
-              setDraftPolls={setDraftPolls}
-              setCreatedPolls={setCreatedPolls}
-              setEndedPolls={setEndedPolls}
-              setSideBarMode={setSideBarMode}
-            />
+            <PollsListner />
 
             {mMeeting?.localParticipant?.id && (
               <LocalParticipantListner
@@ -377,17 +366,12 @@ export function ILSContainer({
                     />
                   ) : null}
                   {isPresenting && isMobile ? null : (
-                    <MemorizedILSParticipantView
-                      isPresenting={isPresenting}
-                      sideBarMode={sideBarMode}
-                    />
+                    <MemorizedILSParticipantView isPresenting={isPresenting} />
                   )}
                 </div>
               ) : (
                 <HLSContainer
                   {...{
-                    downstreamUrl,
-                    afterMeetingJoinedHLSState,
                     width:
                       containerWidth -
                       (isTab || isMobile
@@ -407,19 +391,12 @@ export function ILSContainer({
                     : containerHeight - topBarHeight - bottomBarHeight
                 }
                 sideBarContainerWidth={sideBarContainerWidth}
-                setSideBarMode={setSideBarMode}
-                sideBarMode={sideBarMode}
-                raisedHandsParticipants={raisedHandsParticipants}
                 meetingMode={meetingMode}
-                polls={polls}
-                draftPolls={draftPolls}
               />
             </div>
 
             <ILSBottomBar
               bottomBarHeight={bottomBarHeight}
-              sideBarMode={sideBarMode}
-              setSideBarMode={setSideBarMode}
               setIsMeetingLeft={setIsMeetingLeft}
               selectWebcamDeviceId={selectWebcamDeviceId}
               setSelectWebcamDeviceId={setSelectWebcamDeviceId}

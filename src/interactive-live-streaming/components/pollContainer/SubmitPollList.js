@@ -7,6 +7,7 @@ import WrongOptionSelectedIcon from "../../../icons/Poll/WrongOptionSelectedIcon
 import { secondsToMinutes } from "./PollList";
 import { createPopper } from "@popperjs/core";
 import { Input } from "@windmill/react-ui";
+import { useMeetingAppContext } from "../../../MeetingAppContextDef";
 
 const SubmitPollListItem = ({ poll }) => {
   const timerIntervalRef = useRef();
@@ -287,7 +288,8 @@ const SubmitPollListItem = ({ poll }) => {
   );
 };
 
-const SubmitPollList = ({ panelHeight, polls }) => {
+const SubmitPollList = ({ panelHeight }) => {
+  const { polls } = useMeetingAppContext();
   return (
     <div
       className="overflow-y-auto overflow-x-hidden"

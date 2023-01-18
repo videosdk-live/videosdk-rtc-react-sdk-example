@@ -1,8 +1,10 @@
 import { Dialog, Popover } from "@headlessui/react";
 import { Transition } from "@headlessui/react";
 import { ChevronDownIcon, XIcon } from "@heroicons/react/outline";
+import { Select } from "@windmill/react-ui";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import useWindowSize from "../hooks/useWindowSize";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 import ConfirmBox from "./ConfirmBox";
 
 const AudioAnalyser = ({ audioTrack }) => {
@@ -126,6 +128,7 @@ export default function SettingDialogueBox({
   videoTrack,
   audioTrack,
 }) {
+  // const { setSelectedMic, setSelectedWebcam } = useMeetingAppContext();
   const [selectedMicLabel, setSelectedMicLabel] = useState(null);
   const [selectedWebcamLabel, setSelectedWebcamLabel] = useState(null);
 
@@ -235,7 +238,44 @@ export default function SettingDialogueBox({
                                   </p>
 
                                   <div className="w-full mt-4 text-left">
-                                    <Popover className="relative">
+                                    <Select
+                                      className="flex w-full bg-gray-800 py-3 text-white rounded  focus:ring-0"
+                                      value={
+                                        audioTrack?.getSettings()?.deviceId
+                                      }
+                                      onChange={(e) => {
+                                        changeMic(e.target.value);
+                                      }}
+                                      style={{
+                                        border: `1px solid white`,
+                                      }}
+                                    >
+                                      {mics.map((item, index) => {
+                                        return (
+                                          item?.kind === "audioinput" && (
+                                            <option
+                                              className={`px-3 py-3 my-1 pl-6 text-white text-left hover:bg-purple-300`}
+                                              key={`webcam_${index}`}
+                                              value={item?.deviceId}
+                                              onClick={() => {
+                                                setSelectedMicLabel(
+                                                  item?.label
+                                                );
+                                                setSelectedMic((s) => ({
+                                                  ...s,
+                                                  id: item?.deviceId,
+                                                }));
+                                              }}
+                                            >
+                                              {item?.label
+                                                ? item?.label
+                                                : `Mic ${index + 1}`}
+                                            </option>
+                                          )
+                                        );
+                                      })}
+                                    </Select>
+                                    {/* <Popover className="relative">
                                       {({ close }) => (
                                         <>
                                           <Popover.Button className="flex  w-full ">
@@ -321,7 +361,7 @@ export default function SettingDialogueBox({
                                           </Transition>
                                         </>
                                       )}
-                                    </Popover>
+                                    </Popover> */}
                                   </div>
                                 </div>
                               </div>
@@ -354,7 +394,44 @@ export default function SettingDialogueBox({
                                   </p>
 
                                   <div className="w-full mt-4 text-left">
-                                    <Popover className="relative">
+                                    <Select
+                                      className="flex w-full bg-gray-800 py-3 text-white rounded  focus:ring-0"
+                                      value={
+                                        videoTrack?.getSettings()?.deviceId
+                                      }
+                                      onChange={(e) => {
+                                        changeWebcam(e.target.value);
+                                      }}
+                                      style={{
+                                        border: `1px solid white`,
+                                      }}
+                                    >
+                                      {webcams.map((item, index) => {
+                                        return (
+                                          item?.kind === "videoinput" && (
+                                            <option
+                                              className={`px-3 py-3 my-1 pl-6 text-white text-left hover:bg-purple-300`}
+                                              key={`webcam_${index}`}
+                                              value={item?.deviceId}
+                                              onClick={() => {
+                                                setSelectedWebcamLabel(
+                                                  item?.label
+                                                );
+                                                setSelectedWebcam((s) => ({
+                                                  ...s,
+                                                  id: item?.deviceId,
+                                                }));
+                                              }}
+                                            >
+                                              {item?.label === ""
+                                                ? `Webcam ${index + 1}`
+                                                : item?.label}
+                                            </option>
+                                          )
+                                        );
+                                      })}
+                                    </Select>
+                                    {/* <Popover className="relative">
                                       {({ close }) => (
                                         <>
                                           <Popover.Button className="flex  w-full ">
@@ -442,7 +519,7 @@ export default function SettingDialogueBox({
                                           </Transition>
                                         </>
                                       )}
-                                    </Popover>
+                                    </Popover> */}
                                   </div>
                                 </div>
                               </div>

@@ -5,6 +5,7 @@ import MicOnIcon from "../../icons/ParticipantTabPanel/MicOnIcon";
 import RaiseHand from "../../icons/ParticipantTabPanel/RaiseHand";
 import VideoCamOffIcon from "../../icons/ParticipantTabPanel/VideoCamOffIcon";
 import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
+import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { nameTructed } from "../../utils/helper";
 
 function ParticipantListItem({ participantId, raisedHand }) {
@@ -42,7 +43,8 @@ function ParticipantListItem({ participantId, raisedHand }) {
   );
 }
 
-export function ParticipantPanel({ panelHeight, raisedHandsParticipants }) {
+export function ParticipantPanel({ panelHeight }) {
+  const { raisedHandsParticipants } = useMeetingAppContext();
   const mMeeting = useMeeting();
   const participants = mMeeting.participants;
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import InvitePeopleIcon from "../icons/InvitePeopleIcon";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 import { ParticipantView } from "./ParticipantView";
 
 const MemoizedParticipant = React.memo(
@@ -10,7 +11,8 @@ const MemoizedParticipant = React.memo(
   }
 );
 
-function ParticipantGrid({ participantIds, isPresenting, sideBarMode }) {
+function ParticipantGrid({ participantIds, isPresenting }) {
+  const { sideBarMode } = useMeetingAppContext();
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
   ).matches;
@@ -216,8 +218,7 @@ export const MemoizedParticipantGrid = React.memo(
     return (
       JSON.stringify(prevProps.participantIds) ===
         JSON.stringify(nextProps.participantIds) &&
-      prevProps.isPresenting === nextProps.isPresenting &&
-      prevProps.sideBarMode === nextProps.sideBarMode
+      prevProps.isPresenting === nextProps.isPresenting
     );
   }
 );

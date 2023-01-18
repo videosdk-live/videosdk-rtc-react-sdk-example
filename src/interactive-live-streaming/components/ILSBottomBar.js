@@ -38,11 +38,10 @@ import { sideBarModes } from "../../utils/common";
 import ECommerceIcon from "../../icons/Bottombar/ECommerceIcon";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import OutlineIconTextButton from "../../components/buttons/OutlineIconTextButton";
+import { useMeetingAppContext } from "../../MeetingAppContextDef";
 
 export function ILSBottomBar({
   bottomBarHeight,
-  sideBarMode,
-  setSideBarMode,
   setIsMeetingLeft,
   selectWebcamDeviceId,
   setSelectWebcamDeviceId,
@@ -50,6 +49,7 @@ export function ILSBottomBar({
   setSelectMicDeviceId,
   meetingMode,
 }) {
+  const { sideBarMode, setSideBarMode } = useMeetingAppContext();
   const RaiseHandBTN = ({ isMobile, isTab }) => {
     const { publish } = usePubSub("RAISE_HAND");
     const RaiseHand = () => {
