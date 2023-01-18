@@ -302,13 +302,16 @@ export function ILSBottomBar({
         <OutlinedButton
           Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
           onClick={async () => {
-            const track = await createCameraVideoTrack({
-              optimizationMode: "motion",
-              encoderConfig: "h1080p_w1920p",
-              facingMode: "environment",
-              multiStream: false,
-              cameraId: selectWebcamDeviceId,
-            });
+            let track;
+            if (!localWebcamOn) {
+              track = await createCameraVideoTrack({
+                optimizationMode: "motion",
+                encoderConfig: "h1080p_w1920p",
+                facingMode: "environment",
+                multiStream: false,
+                cameraId: selectWebcamDeviceId,
+              });
+            }
             mMeeting.toggleWebcam(track);
           }}
           bgColor={localWebcamOn ? "bg-gray-750" : "bg-white"}
