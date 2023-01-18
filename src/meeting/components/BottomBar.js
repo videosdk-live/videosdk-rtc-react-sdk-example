@@ -424,16 +424,20 @@ export function BottomBar({
                 key={`output_webcams_${deviceId}`}
                 selected={deviceId === selectWebcamDeviceId}
                 onClick={async () => {
+                  let track;
                   handleCloseWebCam();
                   setSelectWebcamDeviceId(deviceId);
-                  const track = await createCameraVideoTrack({
-                    cameraId: deviceId,
-                    optimizationMode: "motion",
-                    encoderConfig: "h1080p_w1920p",
-                    facingMode: "environment",
-                    multiStream: false,
-                  });
-                  changeWebcam(track);
+                  if (!localWebcamOn) {
+                    track = await createCameraVideoTrack({
+                      cameraId: deviceId,
+                      optimizationMode: "motion",
+                      encoderConfig: "h1080p_w1920p",
+                      facingMode: "environment",
+                      multiStream: false,
+                    });
+                  }
+                  // changeWebcam(track);
+                  mMeeting.toggleWebcam(track);
                 }}
                 classes={{
                   root: classes.popoverHoverDark,
