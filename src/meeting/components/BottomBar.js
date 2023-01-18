@@ -40,6 +40,7 @@ import useIsTab from "../../hooks/useIsTab";
 import useIsMobile from "../../hooks/useIsMobile";
 import { MobileIconButton } from "../../components/buttons/MobileIconButton";
 import { sideBarModes } from "../../utils/common";
+import VideoSDKTelemetry from "../../utils/Opentelemetry";
 
 const useStyles = makeStyles({
   popoverHoverDark: {
@@ -70,6 +71,8 @@ export function BottomBar({
   const RaiseHandBTN = ({ isMobile, isTab }) => {
     const { publish } = usePubSub("RAISE_HAND");
     const RaiseHand = () => {
+      VideoSDKTelemetry.trace("RaiseHandBTN");
+
       publish("Raise Hand");
     };
 
@@ -120,6 +123,8 @@ export function BottomBar({
     );
 
     const _handleClick = () => {
+      VideoSDKTelemetry.trace("RecordingBTN");
+
       const isRecording = isRecordingRef.current;
 
       if (isRecording) {
@@ -285,6 +290,8 @@ export function BottomBar({
     };
 
     const handleClick = (event) => {
+      VideoSDKTelemetry.trace("MicBTN");
+
       setDownArrow(event.currentTarget);
     };
 
@@ -364,6 +371,8 @@ export function BottomBar({
         <OutlinedButton
           Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
           onClick={async () => {
+            VideoSDKTelemetry.trace("WebCamBTN");
+
             const track = await createCameraVideoTrack({
               optimizationMode: "motion",
               encoderConfig: "h1080p_w1920p",
@@ -487,6 +496,8 @@ export function BottomBar({
       <OutlinedButton
         Icon={ScreenShareIcon}
         onClick={() => {
+          VideoSDKTelemetry.trace("ScreenShareBTN");
+
           toggleScreenShare();
         }}
         isFocused={localScreenShareOn}

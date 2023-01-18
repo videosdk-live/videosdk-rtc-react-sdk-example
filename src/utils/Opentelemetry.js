@@ -13,7 +13,7 @@ export default class VideoSDKTelemetry {
 
   static init(peerId) {
     const exporter = new OTLPTraceExporter({
-      url: "http://192.168.0.185:4318",
+      url: "http://192.168.0.185:4318/v1/traces",
       headers: {
         anyHeader: "anyValue",
       },
@@ -45,47 +45,17 @@ export default class VideoSDKTelemetry {
   }
 
   static trace(spanName) {
-    return (_target, _propertyKey, descriptor) => {
-      const originalMethod = descriptor.value;
+    const immmediateParentSpan = VideoSDKTelemetry.getCurrentSpan();
 
-      /*
-                opentelemetryValueDescriptorFunc must be a named function for this propagation,
-                It shouldn't be changed to lambda/fat-arrow
-            */
-      // eslint-disable-next-line no-param-reassign
-      descriptor.value = function opentelemetryValueDescriptorFunc(...args) {
-        const immmediateParentSpan = VideoSDKTelemetry.getCurrentSpan();
+    const ctx = opentelemetry.trace.setSpan(ROOT_CONTEXT, immmediateParentSpan);
 
-        const ctx = opentelemetry.trace.setSpan(
-          ROOT_CONTEXT,
-          immmediateParentSpan
-        );
+    VideoSDKTelemetry.tracer.startActiveSpan(spanName, {}, ctx, (span) => {
+      span.setAttributes({
+        [SemanticAttributes.CODE_FUNCTION]: spanName,
+      });
 
-        return VideoSDKTelemetry.tracer.startActiveSpan(
-          spanName,
-          {},
-          ctx,
-          (span) => {
-            span.setAttributes({
-              [SemanticAttributes.CODE_FUNCTION]: spanName,
-            });
-
-            const result = originalMethod.apply(this, args);
-            // if decorated around an async function, wait for it to resolve to end the span
-            Promise.resolve(result)
-              .then(() => {
-                span.end();
-              })
-              .catch(() => {
-                span.end();
-              });
-            return result;
-          }
-        );
-      };
-
-      return descriptor;
-    };
+      span.end();
+    });
   }
 
   static getCurrentSpan() {
