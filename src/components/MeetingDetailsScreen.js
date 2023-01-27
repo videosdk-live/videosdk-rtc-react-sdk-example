@@ -90,7 +90,7 @@ export function MeetingDetailsScreen({
               className={`w-full ${
                 participantName.length < 3 ? "bg-gray-650" : "bg-purple-350"
               }  text-white px-2 py-3 rounded-xl mt-5`}
-              onClick={(e) => {
+              onClick={async (e) => {
                 if (iscreateMeetingClicked) {
                   if (videoTrack) {
                     videoTrack.stop();
@@ -101,12 +101,30 @@ export function MeetingDetailsScreen({
                     replace: true,
                   });
                 } else {
-                  if (meetingId.match("\\w{4}\\-\\w{4}\\-\\w{4}")) {
+                  const BASE_URL = "https://api.videosdk.live";
+
+                  const urlMeetingId = `${BASE_URL}/v1/prebuilt/meetings/${meetingId}`;
+
+                  const resMeetingId = await fetch(urlMeetingId, {
+                    method: "POST",
+                    headers: {
+                      "Content-type": "application/json",
+                      Authorization: process.env.REACT_APP_VIDEOSDK_TOKEN,
+                    },
+                    body: JSON.stringify({ region: "sg001" }),
+                  });
+
+                  const meetingIdJson = await resMeetingId.json();
+
+                  const validatedMeetingId = meetingIdJson.meetingId;
+
+                  // if (meetingId.match("\\w{4}\\-\\w{4}\\-\\w{4}")) {
+                  if (validatedMeetingId) {
                     navigate(`/conference-meeting/${meetingId}`, {
                       replace: true,
                     });
                     setMeetingMode(Constants.modes.CONFERENCE);
-                    onClickJoin(meetingId);
+                    onClickJoin(validatedMeetingId);
                   } else setMeetingIdError(true);
                 }
               }}
