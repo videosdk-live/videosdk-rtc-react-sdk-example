@@ -299,7 +299,7 @@ export function BottomBar({
             if (!localWebcamOn) {
               track = await createCameraVideoTrack({
                 optimizationMode: "motion",
-                encoderConfig: "h1080p_w1920p",
+                encoderConfig: "h540p_w960p",
                 facingMode: "environment",
                 multiStream: false,
                 cameraId: selectWebcamDeviceId,
@@ -375,7 +375,7 @@ export function BottomBar({
                                           const track =
                                             await createCameraVideoTrack({
                                               optimizationMode: "motion",
-                                              encoderConfig: "h1080p_w1920p",
+                                              encoderConfig: "h540p_w960p",
                                               facingMode: "environment",
                                               multiStream: false,
                                               cameraId: deviceId,

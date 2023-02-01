@@ -143,7 +143,7 @@ export function MeetingContainer({
           const track = await createCameraVideoTrack({
             cameraId: selectedWebcam.id,
             optimizationMode: "motion",
-            encoderConfig: "h1080p_w1920p",
+            encoderConfig: "h540p_w960p",
             facingMode: "environment",
             multiStream: false,
           });
