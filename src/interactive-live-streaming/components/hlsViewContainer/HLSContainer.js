@@ -4,26 +4,17 @@ import useIsMobile from "../../../hooks/useIsMobile";
 import useIsTab from "../../../hooks/useIsTab";
 import PlayerViewer from "./PlayerViewer";
 
-const MotionPlayer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
+const MotionPlayer = () => {
   return (
     <div style={{ height: `100%`, width: `100%` }}>
-      <PlayerViewer
-        downstreamUrl={downstreamUrl}
-        afterMeetingJoinedHLSState={afterMeetingJoinedHLSState}
-      />
+      <PlayerViewer />
     </div>
   );
 };
 
-export const MemoizedMotionPlayer = React.memo(
-  MotionPlayer,
-  (prevProps, nextProps) =>
-    prevProps.downstreamUrl === nextProps.downstreamUrl &&
-    prevProps.afterMeetingJoinedHLSState ===
-      nextProps.afterMeetingJoinedHLSState
-);
+export const MemoizedMotionPlayer = React.memo(MotionPlayer);
 
-const HLSContainer = ({ width, downstreamUrl, afterMeetingJoinedHLSState }) => {
+const HLSContainer = ({ width }) => {
   const isMobile = useIsMobile();
   const isTab = useIsTab();
   const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
@@ -54,12 +45,7 @@ const HLSContainer = ({ width, downstreamUrl, afterMeetingJoinedHLSState }) => {
         position: "relative",
       }}
     >
-      <MemoizedMotionPlayer
-        {...{
-          downstreamUrl,
-          afterMeetingJoinedHLSState,
-        }}
-      />
+      <MemoizedMotionPlayer />
     </div>
   );
 };

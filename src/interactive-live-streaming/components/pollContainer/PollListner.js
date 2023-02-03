@@ -1,5 +1,6 @@
 import { usePubSub } from "@videosdk.live/react-sdk";
 import { toast } from "react-toastify";
+import { useMeetingAppContext } from "../../../MeetingAppContextDef";
 import { sideBarModes } from "../../../utils/common";
 
 const PollListner = ({ pollId, setCreatedPolls }) => {
@@ -47,13 +48,15 @@ const PollListner = ({ pollId, setCreatedPolls }) => {
   return <></>;
 };
 
-const PollsListner = ({
-  polls,
-  setDraftPolls,
-  setCreatedPolls,
-  setEndedPolls,
-  setSideBarMode,
-}) => {
+const PollsListner = () => {
+  const {
+    polls,
+    setDraftPolls,
+    setCreatedPolls,
+    setEndedPolls,
+    setSideBarMode,
+  } = useMeetingAppContext();
+
   usePubSub(`CREATE_POLL`, {
     onMessageReceived: ({ message, timestamp }) => {
       setCreatedPolls((s) => [

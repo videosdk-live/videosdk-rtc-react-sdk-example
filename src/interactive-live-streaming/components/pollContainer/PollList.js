@@ -4,6 +4,7 @@ import { useMediaQuery } from "react-responsive";
 import { v4 as uuid } from "uuid";
 import useIsMobile from "../../../hooks/useIsMobile";
 import useIsTab from "../../../hooks/useIsTab";
+import { useMeetingAppContext } from "../../../MeetingAppContextDef";
 import { sideBarModes } from "../../../utils/common";
 
 export const secondsToMinutes = (time) => {
@@ -252,7 +253,8 @@ const Poll = ({ poll, isDraft, publishDraftPoll }) => {
   );
 };
 
-const PollList = ({ panelHeight, polls, draftPolls, setSideBarMode }) => {
+const PollList = ({ panelHeight }) => {
+  const { polls, draftPolls, setSideBarMode } = useMeetingAppContext();
   const { publish: RemoveFromDraftPublish } = usePubSub(
     `REMOVE_POLL_FROM_DRAFT`
   );

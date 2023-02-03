@@ -12,12 +12,12 @@ export function MeetingDetailsScreen({
   videoTrack,
   setVideoTrack,
   onClickStartMeeting,
-  meetingType,
-  setMeetingType,
   setMeetingMode,
   meetingMode,
+  meetingType,
+  setMeetingType,
 }) {
-  const [meetingId, setMeetingId] = useState("");
+  const [meetingId, setMeetingId] = useState("qygi-snnu-2hvd");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);

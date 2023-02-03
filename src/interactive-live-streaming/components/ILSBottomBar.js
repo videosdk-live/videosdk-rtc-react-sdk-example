@@ -36,11 +36,10 @@ import ReactionIcon from "../../icons/Bottombar/ReactionIcon";
 import { sideBarModes } from "../../utils/common";
 import ECommerceIcon from "../../icons/Bottombar/ECommerceIcon";
 import { Dialog, Popover, Transition } from "@headlessui/react";
+import { useMeetingAppContext } from "../../MeetingAppContextDef";
 
 export function ILSBottomBar({
   bottomBarHeight,
-  sideBarMode,
-  setSideBarMode,
   setIsMeetingLeft,
   selectWebcamDeviceId,
   setSelectWebcamDeviceId,
@@ -48,6 +47,7 @@ export function ILSBottomBar({
   setSelectMicDeviceId,
   meetingMode,
 }) {
+  const { sideBarMode, setSideBarMode } = useMeetingAppContext();
   const RaiseHandBTN = ({ isMobile, isTab }) => {
     const { publish } = usePubSub("RAISE_HAND");
     const RaiseHand = () => {
@@ -300,13 +300,16 @@ export function ILSBottomBar({
         <OutlinedButton
           Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
           onClick={async () => {
-            const track = await createCameraVideoTrack({
-              optimizationMode: "motion",
-              encoderConfig: "h1080p_w1920p",
-              facingMode: "environment",
-              multiStream: false,
-              cameraId: selectWebcamDeviceId,
-            });
+            let track;
+            if (!localWebcamOn) {
+              track = await createCameraVideoTrack({
+                optimizationMode: "motion",
+                encoderConfig: "h540p_w960p",
+                facingMode: "environment",
+                multiStream: false,
+                cameraId: selectWebcamDeviceId,
+              });
+            }
             mMeeting.toggleWebcam(track);
           }}
           bgColor={localWebcamOn ? "bg-gray-750" : "bg-white"}
@@ -377,7 +380,7 @@ export function ILSBottomBar({
                                           const track =
                                             await createCameraVideoTrack({
                                               optimizationMode: "motion",
-                                              encoderConfig: "h1080p_w1920p",
+                                              encoderConfig: "h540p_w960p",
                                               facingMode: "environment",
                                               multiStream: false,
                                               cameraId: deviceId,

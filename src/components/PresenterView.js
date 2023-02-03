@@ -56,12 +56,12 @@ export function PresenterView({ height }) {
 
   return (
     <div
-      className={`video-cover bg-gray-750 rounded m-2 relative overflow-hidden w-full h-[${
+      className={` bg-gray-750 rounded m-2 relative overflow-hidden w-full h-[${
         height - "xl:p-6 lg:p-[52px] md:p-[26px] p-1"
       }] `}
     >
       <audio autoPlay playsInline controls={false} ref={audioPlayer} />
-      <div className={"video-contain relative h-full w-full"}>
+      <div className={"video-contain absolute h-full w-full"}>
         <ReactPlayer
           ref={videoPlayer}
           //

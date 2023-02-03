@@ -239,12 +239,7 @@ export default function SettingDialogueBox({
                                       {({ close }) => (
                                         <>
                                           <Popover.Button className="flex  w-full ">
-                                            <button
-                                              onClick={(e) => {
-                                                changeMic(e.target.value);
-                                              }}
-                                              className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2"
-                                            >
+                                            <button className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2">
                                               {selectedMicLabel
                                                 ? selectedMicLabel
                                                 : "Select"}
@@ -298,6 +293,10 @@ export default function SettingDialogueBox({
                                                                         id: item?.deviceId,
                                                                       })
                                                                     );
+                                                                    changeMic(
+                                                                      item?.deviceId
+                                                                    );
+
                                                                     close();
                                                                   }}
                                                                 >
@@ -358,12 +357,7 @@ export default function SettingDialogueBox({
                                       {({ close }) => (
                                         <>
                                           <Popover.Button className="flex  w-full ">
-                                            <button
-                                              onClick={(e) => {
-                                                changeWebcam(e.target.value);
-                                              }}
-                                              className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2"
-                                            >
+                                            <button className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2">
                                               {selectedWebcamLabel
                                                 ? selectedWebcamLabel
                                                 : "Select"}
@@ -418,6 +412,10 @@ export default function SettingDialogueBox({
                                                                         id: item?.deviceId,
                                                                       })
                                                                     );
+                                                                    changeWebcam(
+                                                                      item?.deviceId
+                                                                    );
+
                                                                     close();
                                                                   }}
                                                                 >

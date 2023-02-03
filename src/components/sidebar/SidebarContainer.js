@@ -12,23 +12,20 @@ import { ChatPanel } from "./ChatPanel";
 import { ParticipantPanel } from "./ParticipantPanel";
 import { Dialog, Transition } from "@headlessui/react";
 import { useMediaQuery } from "react-responsive";
+import { useMeetingAppContext } from "../../MeetingAppContextDef";
 
 const SideBarTabView = ({
   height,
   sideBarContainerWidth,
   panelHeight,
-  sideBarMode,
-  raisedHandsParticipants,
   panelHeaderHeight,
   panelHeaderPadding,
   panelPadding,
   handleClose,
   meetingMode,
-  polls,
-  draftPolls,
-  setSideBarMode,
 }) => {
   const { participants } = useMeeting();
+  const { sideBarMode, draftPolls, polls } = useMeetingAppContext();
 
   return (
     <div
@@ -94,24 +91,19 @@ const SideBarTabView = ({
               </div>
             )}
             {sideBarMode === "PARTICIPANTS" ? (
-              <ParticipantPanel
-                panelHeight={panelHeight}
-                raisedHandsParticipants={raisedHandsParticipants}
-              />
+              <ParticipantPanel panelHeight={panelHeight} />
             ) : sideBarMode === "CHAT" ? (
               <ChatPanel panelHeight={panelHeight} />
             ) : sideBarMode === "POLLS" && meetingMode !== "VIEWER" ? (
               polls.length === 0 && draftPolls.length === 0 ? (
-                <CreatePoll {...{ panelHeight, polls }} />
+                <CreatePoll {...{ panelHeight }} />
               ) : (
-                <PollList
-                  {...{ panelHeight, polls, draftPolls, setSideBarMode }}
-                />
+                <PollList {...{ panelHeight }} />
               )
             ) : sideBarMode === "POLLS" && meetingMode === "VIEWER" ? (
-              <SubmitPollList {...{ panelHeight, polls }} />
+              <SubmitPollList {...{ panelHeight }} />
             ) : sideBarMode === "CREATE_POLL" ? (
-              <CreatePoll {...{ panelHeight, polls, setSideBarMode }} />
+              <CreatePoll {...{ panelHeight }} />
             ) : sideBarMode === "ECOMMERCE" ? (
               <ECommercePanel {...{ panelHeight }} />
             ) : null}
@@ -125,13 +117,10 @@ const SideBarTabView = ({
 export function SidebarConatiner({
   height,
   sideBarContainerWidth,
-  sideBarMode,
-  setSideBarMode,
-  raisedHandsParticipants,
   meetingMode,
-  polls,
-  draftPolls,
 }) {
+  const { raisedHandsParticipants, sideBarMode, setSideBarMode } =
+    useMeetingAppContext();
   const isMobile = useIsMobile();
   const isTab = useIsTab();
   const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
@@ -202,14 +191,11 @@ export function SidebarConatiner({
                     height={"100%"}
                     sideBarContainerWidth={"100%"}
                     panelHeight={height}
-                    sideBarMode={sideBarMode}
                     raisedHandsParticipants={raisedHandsParticipants}
                     panelHeaderHeight={panelHeaderHeight}
                     panelHeaderPadding={panelHeaderPadding}
                     panelPadding={panelPadding}
                     handleClose={handleClose}
-                    polls={polls}
-                    draftPolls={draftPolls}
                   />
                 </Dialog.Panel>
               </div>
@@ -222,16 +208,12 @@ export function SidebarConatiner({
         height={paddedHeight}
         sideBarContainerWidth={sideBarContainerWidth}
         panelHeight={paddedHeight - panelHeaderHeight - panelHeaderPadding}
-        sideBarMode={sideBarMode}
         raisedHandsParticipants={raisedHandsParticipants}
         panelHeaderHeight={panelHeaderHeight}
         panelHeaderPadding={panelHeaderPadding}
         panelPadding={panelPadding}
         handleClose={handleClose}
         meetingMode={meetingMode}
-        polls={polls}
-        draftPolls={draftPolls}
-        setSideBarMode={setSideBarMode}
       />
     )
   ) : (

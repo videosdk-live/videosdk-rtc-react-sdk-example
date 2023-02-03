@@ -6,6 +6,7 @@ import Hls from "hls.js";
 import useIsMobile from "../../../hooks/useIsMobile";
 import useIsTab from "../../../hooks/useIsTab";
 import { useMediaQuery } from "react-responsive";
+import { useMeetingAppContext } from "../../../MeetingAppContextDef";
 
 export async function sleep(ms) {
   return new Promise((resolve) => {
@@ -13,7 +14,8 @@ export async function sleep(ms) {
   });
 }
 
-const PlayerViewer = ({ downstreamUrl, afterMeetingJoinedHLSState }) => {
+const PlayerViewer = () => {
+  const { downstreamUrl, afterMeetingJoinedHLSState } = useMeetingAppContext();
   const [canPlay, setCanPlay] = useState(false);
   const playerRef = useRef();
 

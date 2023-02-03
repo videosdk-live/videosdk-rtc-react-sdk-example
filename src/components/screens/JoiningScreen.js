@@ -240,6 +240,12 @@ export function JoiningScreen({
     audioTrackRef.current = audioTrack;
 
     startMuteListener();
+
+    return () => {
+      const currentAudioTrack = audioTrackRef.current;
+      currentAudioTrack && currentAudioTrack.stop();
+      audioTrackRef.current = null;
+    };
   }, [audioTrack]);
 
   useEffect(() => {

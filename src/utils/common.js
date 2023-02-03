@@ -313,13 +313,12 @@ export const CornerDisplayName = ({
       {(webcamStream || micStream || screenShareStream) && (
         <div>
           <div
-            style={{
-              position: "absolute",
-              top: isMobile ? 4 : isTab ? 8 : 12,
-              right: isMobile ? 4 : isTab ? 8 : 12,
+            onClick={(e) => {
+              e.stopPropagation();
             }}
+            className="absolute top-2 right-2 rounded-md  p-2 cursor-pointer "
           >
-            <Popover className="relative ">
+            <Popover className="absolute">
               {({ close }) => (
                 <>
                   <Popover.Button
@@ -355,95 +354,93 @@ export const CornerDisplayName = ({
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 translate-y-1"
                   >
-                    <Popover.Panel
-                      style={{ zIndex: 999 }}
-                      className="absolute left-1/2 mt-0 -translate-x-full transform "
-                    >
-                      <div
-                        className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 "
-                        // style={{ maxHeight: "calc(100% - 32px)" }}
+                    <div className="fixed" style={{ zIndex: 999 }}>
+                      <Popover.Panel
+                        className={`absolute left-1/2  mt-0 -translate-x-full transform `}
                       >
-                        <div className="bg-gray-800">
-                          <div
-                            className={`p-[9px] flex items-center justify-between `}
-                            style={{
-                              backgroundColor:
-                                score > 7
-                                  ? "#3BA55D"
-                                  : score > 4
-                                  ? "#faa713"
-                                  : "#FF5D5D",
-                            }}
-                          >
-                            <p className="text-sm text-white font-semibold">{`Quality Score : ${
-                              score > 7
-                                ? "Good"
-                                : score > 4
-                                ? "Average"
-                                : "Poor"
-                            }`}</p>
-
-                            <button
-                              className="cursor-pointer text-white hover:bg-[#ffffff33] rounded-full px-1 text-center"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                close();
+                        <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 ">
+                          <div className="bg-gray-800 rounded-lg">
+                            <div
+                              className={`p-[9px] flex items-center justify-between rounded-t-lg `}
+                              style={{
+                                backgroundColor:
+                                  score > 7
+                                    ? "#3BA55D"
+                                    : score > 4
+                                    ? "#faa713"
+                                    : "#FF5D5D",
                               }}
                             >
-                              <XIcon
-                                className="text-white"
-                                style={{ height: 16, width: 16 }}
-                              />
-                            </button>
-                          </div>
-                          <div className="flex">
-                            <div className="flex flex-col">
-                              {qualityStateArray.map((item, index) => {
-                                return (
-                                  <div
-                                    className="flex"
-                                    style={{
-                                      borderBottom:
-                                        index === qualityStateArray.length - 1
-                                          ? ""
-                                          : `1px solid #ffffff33`,
-                                    }}
-                                  >
-                                    <div className="flex flex-1 items-center w-[120px]">
-                                      {index !== 0 && (
-                                        <p className="text-xs text-white my-[6px] ml-2">
-                                          {item.label}
+                              <p className="text-sm text-white font-semibold">{`Quality Score : ${
+                                score > 7
+                                  ? "Good"
+                                  : score > 4
+                                  ? "Average"
+                                  : "Poor"
+                              }`}</p>
+
+                              <button
+                                className="cursor-pointer text-white hover:bg-[#ffffff33] rounded-full px-1 text-center"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  close();
+                                }}
+                              >
+                                <XIcon
+                                  className="text-white"
+                                  style={{ height: 16, width: 16 }}
+                                />
+                              </button>
+                            </div>
+                            <div className="flex">
+                              <div className="flex flex-col">
+                                {qualityStateArray.map((item, index) => {
+                                  return (
+                                    <div
+                                      className="flex"
+                                      style={{
+                                        borderBottom:
+                                          index === qualityStateArray.length - 1
+                                            ? ""
+                                            : `1px solid #ffffff33`,
+                                      }}
+                                    >
+                                      <div className="flex flex-1 items-center w-[120px]">
+                                        {index !== 0 && (
+                                          <p className="text-xs text-white my-[6px] ml-2">
+                                            {item.label}
+                                          </p>
+                                        )}
+                                      </div>
+                                      <div
+                                        className="flex flex-1 items-center justify-center"
+                                        style={{
+                                          borderLeft: `1px solid #ffffff33`,
+                                        }}
+                                      >
+                                        <p className="text-xs text-white my-[6px] w-[80px] text-center">
+                                          {item.audio}
                                         </p>
-                                      )}
+                                      </div>
+                                      <div
+                                        className="flex flex-1 items-center justify-center"
+                                        style={{
+                                          borderLeft: `1px solid #ffffff33`,
+                                        }}
+                                      >
+                                        <p className="text-xs text-white my-[6px] w-[80px] text-center">
+                                          {item.video}
+                                        </p>
+                                      </div>
                                     </div>
-                                    <div
-                                      className="flex flex-1 items-center justify-center"
-                                      style={{
-                                        borderLeft: `1px solid #ffffff33`,
-                                      }}
-                                    >
-                                      <p className="text-xs text-white my-[6px] w-[80px] text-center">
-                                        {item.audio}
-                                      </p>
-                                    </div>
-                                    <div
-                                      className="flex flex-1 items-center justify-center"
-                                      style={{
-                                        borderLeft: `1px solid #ffffff33`,
-                                      }}
-                                    >
-                                      <p className="text-xs text-white my-[6px] w-[80px] text-center">
-                                        {item.video}
-                                      </p>
-                                    </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                })}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    </Popover.Panel>
+                      </Popover.Panel>
+                    </div>
                   </Transition>
                 </>
               )}

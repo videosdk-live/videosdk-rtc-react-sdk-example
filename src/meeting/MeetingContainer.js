@@ -16,6 +16,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import useIsTab from "../hooks/useIsTab";
 import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -26,16 +27,15 @@ export function MeetingContainer({
   setSelectWebcamDeviceId,
   selectMicDeviceId,
   setSelectMicDeviceId,
-  useRaisedHandParticipants,
-  raisedHandsParticipants,
   micEnabled,
   webcamEnabled,
 }) {
+  const { useRaisedHandParticipants, raisedHandsParticipants } =
+    useMeetingAppContext();
   const bottomBarHeight = 60;
 
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [sideBarMode, setSideBarMode] = useState(null);
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
   const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
@@ -141,7 +141,7 @@ export function MeetingContainer({
           const track = await createCameraVideoTrack({
             cameraId: selectedWebcam.id,
             optimizationMode: "motion",
-            encoderConfig: "h1080p_w1920p",
+            encoderConfig: "h540p_w960p",
             facingMode: "environment",
             multiStream: false,
           });
@@ -278,26 +278,18 @@ export function MeetingContainer({
                   <PresenterView height={containerHeight - bottomBarHeight} />
                 ) : null}
                 {isPresenting && isMobile ? null : (
-                  <MemorizedParticipantView
-                    isPresenting={isPresenting}
-                    sideBarMode={sideBarMode}
-                  />
+                  <MemorizedParticipantView isPresenting={isPresenting} />
                 )}
               </div>
 
               <SidebarConatiner
                 height={containerHeight - bottomBarHeight}
                 sideBarContainerWidth={sideBarContainerWidth}
-                setSideBarMode={setSideBarMode}
-                sideBarMode={sideBarMode}
-                raisedHandsParticipants={raisedHandsParticipants}
               />
             </div>
 
             <BottomBar
               bottomBarHeight={bottomBarHeight}
-              sideBarMode={sideBarMode}
-              setSideBarMode={setSideBarMode}
               setIsMeetingLeft={setIsMeetingLeft}
               selectWebcamDeviceId={selectWebcamDeviceId}
               setSelectWebcamDeviceId={setSelectWebcamDeviceId}
