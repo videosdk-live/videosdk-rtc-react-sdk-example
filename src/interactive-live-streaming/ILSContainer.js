@@ -7,9 +7,7 @@ import {
 } from "@videosdk.live/react-sdk";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import { PresenterView } from "../components/PresenterView";
-import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
-import useResponsiveSize from "../hooks/useResponsiveSize";
 import { ILSBottomBar } from "./components/ILSBottomBar";
 import { TopBar } from "./components/TopBar";
 import useIsTab from "../hooks/useIsTab";
@@ -20,6 +18,10 @@ import MemorizedILSParticipantView from "./components/ILSParticipantView";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import LocalParticipantListner from "./components/LocalParticipantListner";
 import ConfirmBox from "../components/ConfirmBox";
+import useIsMobile from "../hooks/useIsMobile";
+import { useMediaQuery } from "react-responsive";
+import { toast } from "react-toastify";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 
 export function ILSContainer({
   onMeetingLeave,
@@ -30,28 +32,23 @@ export function ILSContainer({
   setSelectWebcamDeviceId,
   selectMicDeviceId,
   setSelectMicDeviceId,
-  useRaisedHandParticipants,
-  raisedHandsParticipants,
   micEnabled,
   webcamEnabled,
   meetingMode,
-  polls,
-  draftPolls,
-  setDraftPolls,
-  setCreatedPolls,
-  setEndedPolls,
-  downstreamUrl,
-  setDownstreamUrl,
-  afterMeetingJoinedHLSState,
-  setAfterMeetingJoinedHLSState,
 }) {
+  const {
+    setDownstreamUrl,
+    setAfterMeetingJoinedHLSState,
+    useRaisedHandParticipants,
+    sideBarMode,
+  } = useMeetingAppContext();
   const bottomBarHeight = 60;
   const topBarHeight = 60;
 
-  const [sideBarMode, setSideBarMode] = useState(null);
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
   const [meetingError, setMeetingError] = useState(false);
+  const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
   const mMeetingRef = useRef();
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
@@ -60,20 +57,26 @@ export function ILSContainer({
   const containerHeightRef = useRef();
   const containerWidthRef = useRef();
   const meetingModeRef = useRef(meetingMode);
-  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     containerHeightRef.current = containerHeight;
     containerWidthRef.current = containerWidth;
   }, [containerHeight, containerWidth]);
 
-  const sideBarContainerWidth = useResponsiveSize({
-    xl: 400,
-    lg: 360,
-    md: 320,
-    sm: 280,
-    xs: 240,
-  });
+  const isMobile = useIsMobile();
+  const isTab = useIsTab();
+  const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
+  const isXLDesktop = useMediaQuery({ minWidth: 1440 });
+
+  const sideBarContainerWidth = isXLDesktop
+    ? 400
+    : isLGDesktop
+    ? 360
+    : isTab
+    ? 320
+    : isMobile
+    ? 280
+    : 240;
 
   useEffect(() => {
     const boundingRect = containerRef.current.getBoundingClientRect();
@@ -100,10 +103,22 @@ export function ILSContainer({
       (status === Constants.recordingEvents.RECORDING_STARTED ||
         status === Constants.recordingEvents.RECORDING_STOPPED)
     ) {
-      enqueueSnackbar(
-        status === Constants.recordingEvents.RECORDING_STARTED
-          ? "Meeting recording is started."
-          : "Meeting recording is stopped."
+      toast(
+        `${
+          status === Constants.recordingEvents.RECORDING_STARTED
+            ? "Meeting recording is started."
+            : "Meeting recording is stopped."
+        }`,
+        {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
       );
     }
   };
@@ -115,10 +130,22 @@ export function ILSContainer({
       (data.status === Constants.hlsEvents.HLS_STARTED ||
         data.status === Constants.hlsEvents.HLS_STOPPED)
     ) {
-      enqueueSnackbar(
-        data.status === Constants.hlsEvents.HLS_STARTED
-          ? "Meeting HLS is started."
-          : "Meeting HLS is stopped."
+      toast(
+        `${
+          data.status === Constants.hlsEvents.HLS_STARTED
+            ? "Meeting HLS is started."
+            : "Meeting HLS is stopped."
+        }`,
+        {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
       );
     }
 
@@ -173,7 +200,7 @@ export function ILSContainer({
         setTimeout(async () => {
           const track = await createCameraVideoTrack({
             optimizationMode: "motion",
-            encoderConfig: "h1080p_w1920p",
+            encoderConfig: "h540p_w960p",
             facingMode: "environment",
             cameraId: selectedWebcam.id,
             multiStream: false,
@@ -215,6 +242,7 @@ export function ILSContainer({
         : `https://static.videosdk.live/prebuilt/notification_err.mp3`
     ).play();
 
+    setMeetingErrorVisible(true);
     setMeetingError({
       code,
       message: isJoiningError ? "Unable to join meeting!" : message,
@@ -249,9 +277,16 @@ export function ILSContainer({
         `https://static.videosdk.live/prebuilt/notification.mp3`
       ).play();
 
-      enqueueSnackbar(
-        `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
-      );
+      toast(`${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`, {
+        position: "bottom-left",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeButton: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
 
       participantRaisedHand(senderId);
     },
@@ -270,17 +305,24 @@ export function ILSContainer({
           `https://static.videosdk.live/prebuilt/notification.mp3`
         ).play();
 
-        enqueueSnackbar(
-          trimSnackBarText(`${nameTructed(senderName, 15)} says: ${message}`)
+        toast(
+          `${trimSnackBarText(
+            `${nameTructed(senderName, 15)} says: ${message}`
+          )}`,
+          {
+            position: "bottom-left",
+            autoClose: 4000,
+            hideProgressBar: true,
+            closeButton: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
         );
       }
     },
   });
-
-  const isMobile = window.matchMedia(
-    "only screen and (max-width: 768px)"
-  ).matches;
-  const isTab = useIsTab();
 
   return (
     <div
@@ -292,13 +334,7 @@ export function ILSContainer({
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
-            <PollsListner
-              polls={polls}
-              setDraftPolls={setDraftPolls}
-              setCreatedPolls={setCreatedPolls}
-              setEndedPolls={setEndedPolls}
-              setSideBarMode={setSideBarMode}
-            />
+            <PollsListner />
 
             {mMeeting?.localParticipant?.id && (
               <LocalParticipantListner
@@ -306,17 +342,20 @@ export function ILSContainer({
                 meetingMode={meetingMode}
               />
             )}
-            {meetingMode === Constants.modes.CONFERENCE && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: isTab || isMobile ? "" : "column",
-                  height: topBarHeight,
-                }}
-              >
-                <TopBar topBarHeight={topBarHeight} />
-              </div>
-            )}
+            {meetingMode === Constants.modes.CONFERENCE &&
+              (isMobile || isTab ? (
+                <></>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: isTab || isMobile ? "" : "column",
+                    height: topBarHeight,
+                  }}
+                >
+                  <TopBar topBarHeight={topBarHeight} />
+                </div>
+              ))}
 
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
               {meetingMode === Constants.modes.CONFERENCE ? (
@@ -327,17 +366,12 @@ export function ILSContainer({
                     />
                   ) : null}
                   {isPresenting && isMobile ? null : (
-                    <MemorizedILSParticipantView
-                      isPresenting={isPresenting}
-                      sideBarMode={sideBarMode}
-                    />
+                    <MemorizedILSParticipantView isPresenting={isPresenting} />
                   )}
                 </div>
               ) : (
                 <HLSContainer
                   {...{
-                    downstreamUrl,
-                    afterMeetingJoinedHLSState,
                     width:
                       containerWidth -
                       (isTab || isMobile
@@ -352,22 +386,17 @@ export function ILSContainer({
                 height={
                   meetingMode === Constants.modes.VIEWER
                     ? containerHeight - bottomBarHeight
+                    : isMobile || isTab
+                    ? containerHeight - bottomBarHeight
                     : containerHeight - topBarHeight - bottomBarHeight
                 }
                 sideBarContainerWidth={sideBarContainerWidth}
-                setSideBarMode={setSideBarMode}
-                sideBarMode={sideBarMode}
-                raisedHandsParticipants={raisedHandsParticipants}
                 meetingMode={meetingMode}
-                polls={polls}
-                draftPolls={draftPolls}
               />
             </div>
 
             <ILSBottomBar
               bottomBarHeight={bottomBarHeight}
-              sideBarMode={sideBarMode}
-              setSideBarMode={setSideBarMode}
               setIsMeetingLeft={setIsMeetingLeft}
               selectWebcamDeviceId={selectWebcamDeviceId}
               setSelectWebcamDeviceId={setSelectWebcamDeviceId}
@@ -383,10 +412,10 @@ export function ILSContainer({
         !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
       )}
       <ConfirmBox
-        open={meetingError}
+        open={meetingErrorVisible}
         successText="OKAY"
         onSuccess={() => {
-          setMeetingError(false);
+          setMeetingErrorVisible(false);
         }}
         title={`Error Code: ${meetingError.code}`}
         subTitle={meetingError.message}

@@ -1,7 +1,10 @@
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useMediaQuery } from "react-responsive";
 import { v4 as uuid } from "uuid";
-import useResponsiveSize from "../../../hooks/useResponsiveSize";
+import useIsMobile from "../../../hooks/useIsMobile";
+import useIsTab from "../../../hooks/useIsTab";
+import { useMeetingAppContext } from "../../../MeetingAppContextDef";
 import { sideBarModes } from "../../../utils/common";
 
 export const secondsToMinutes = (time) => {
@@ -16,29 +19,20 @@ export const secondsToMinutes = (time) => {
 
 const Poll = ({ poll, isDraft, publishDraftPoll }) => {
   const timerIntervalRef = useRef();
+  const isMobile = useIsMobile();
+  const isTab = useIsTab();
+  const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
+  const isXLDesktop = useMediaQuery({ minWidth: 1440 });
 
-  const padding = useResponsiveSize({
-    xl: 12,
-    lg: 16,
-    md: 8,
-    sm: 6,
-    xs: 4,
-  });
-  const marginY = useResponsiveSize({
-    xl: 18,
-    lg: 16,
-    md: 14,
-    sm: 12,
-    xs: 10,
-  });
-
-  const equalSpacing = useResponsiveSize({
-    xl: 18,
-    lg: 16,
-    md: 14,
-    sm: 12,
-    xs: 10,
-  });
+  const equalSpacing = isXLDesktop
+    ? 18
+    : isLGDesktop
+    ? 16
+    : isTab
+    ? 14
+    : isMobile
+    ? 12
+    : 10;
 
   const { publish: EndPublish } = usePubSub(`END_POLL`);
 
@@ -152,18 +146,8 @@ const Poll = ({ poll, isDraft, publishDraftPoll }) => {
   }, []);
 
   return (
-    <div
-      style={{
-        borderBottom: "1px solid #70707033",
-      }}
-    >
-      <div
-        style={{
-          margin: padding,
-          marginTop: marginY,
-          marginBottom: marginY,
-        }}
-      >
+    <div style={{ borderBottom: "1px solid #70707033" }}>
+      <div className="xl:m-4 m-2 xl:my-[18px] lg:my-4 md:my-[14px] sm:my-3 my-[10px]">
         <div className="flex items-center p-0 m-0">
           <p className="text-sm text-gray-900 font-medium my-0">{`Poll ${
             index || ""
@@ -269,34 +253,17 @@ const Poll = ({ poll, isDraft, publishDraftPoll }) => {
   );
 };
 
-const PollList = ({ panelHeight, polls, draftPolls, setSideBarMode }) => {
+const PollList = ({ panelHeight }) => {
+  const { polls, draftPolls, setSideBarMode } = useMeetingAppContext();
   const { publish: RemoveFromDraftPublish } = usePubSub(
     `REMOVE_POLL_FROM_DRAFT`
   );
   const { publish: publishCreatePoll } = usePubSub(`CREATE_POLL`);
 
-  const padding = useResponsiveSize({
-    xl: 12,
-    lg: 10,
-    md: 8,
-    sm: 6,
-    xs: 4,
-  });
-
-  const equalSpacing = useResponsiveSize({
-    xl: 18,
-    lg: 16,
-    md: 14,
-    sm: 12,
-    xs: 10,
-  });
-
   return (
     <div
       className="overflow-y-auto overflow-x-hidden"
-      style={{
-        height: panelHeight - 14,
-      }}
+      style={{ height: panelHeight - 14 }}
     >
       <div className="flex flex-1 flex-col justify-between h-full">
         <div className="flex flex-col overflow-y-auto ">
@@ -339,7 +306,6 @@ const PollList = ({ panelHeight, polls, draftPolls, setSideBarMode }) => {
               return (
                 <Poll
                   key={`creator_polls_${poll.id}`}
-                  // totalPolls={totalPolls}
                   poll={poll}
                   panelHeight={panelHeight}
                   index={index}
@@ -347,12 +313,11 @@ const PollList = ({ panelHeight, polls, draftPolls, setSideBarMode }) => {
               );
             })}
         </div>
-        <div style={{ padding: padding, marginTop: equalSpacing }}>
+        <div className="xl:p-3 p-2 xl:mt-[18px] lg:mt-4 md:mt-[14px] sm:mt-3 mt-[10px]">
           <button
             className="w-full text-white p-3 bg-purple-550"
             onClick={() => {
               setSideBarMode(sideBarModes.CREATE_POLL);
-              // setSideBarNestedMode(sideBarNestedModes.CREATE_POLL);
             }}
           >
             Create new poll

@@ -1,5 +1,6 @@
 import { usePubSub } from "@videosdk.live/react-sdk";
-import { useSnackbar } from "notistack";
+import { toast } from "react-toastify";
+import { useMeetingAppContext } from "../../../MeetingAppContextDef";
 import { sideBarModes } from "../../../utils/common";
 
 const PollListner = ({ pollId, setCreatedPolls }) => {
@@ -47,14 +48,14 @@ const PollListner = ({ pollId, setCreatedPolls }) => {
   return <></>;
 };
 
-const PollsListner = ({
-  polls,
-  setDraftPolls,
-  setCreatedPolls,
-  setEndedPolls,
-  setSideBarMode,
-}) => {
-  const { enqueueSnackbar } = useSnackbar();
+const PollsListner = () => {
+  const {
+    polls,
+    setDraftPolls,
+    setCreatedPolls,
+    setEndedPolls,
+    setSideBarMode,
+  } = useMeetingAppContext();
 
   usePubSub(`CREATE_POLL`, {
     onMessageReceived: ({ message, timestamp }) => {
@@ -66,8 +67,16 @@ const PollsListner = ({
       new Audio(
         `https://static.videosdk.live/prebuilt/notification.mp3`
       ).play();
-
-      enqueueSnackbar("New Poll Asked 📊");
+      toast("New Poll Asked 📊", {
+        position: "bottom-left",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeButton: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
       setSideBarMode(sideBarModes.POLLS);
     },
     onOldMessagesReceived: (messages) => {
@@ -152,9 +161,6 @@ const PollsListner = ({
           setCreatedPolls={setCreatedPolls}
         />
       ))}
-      {/* {draftPolls?.map((poll) => {
-        return <PollListner poll={poll} />;
-      })} */}
     </>
   );
 };

@@ -1,23 +1,13 @@
-import { Box, Button, Typography, useTheme } from "@material-ui/core";
-import { MicOff, ScreenShare } from "@material-ui/icons";
 import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
+import MicOffSmallIcon from "../icons/MicOffSmallIcon";
+import ScreenShareIcon from "../icons/ScreenShareIcon";
 import { nameTructed } from "../utils/helper";
-import useResponsiveSize from "../hooks/useResponsiveSize";
 
 export function PresenterView({ height }) {
   const mMeeting = useMeeting();
   const presenterId = mMeeting?.presenterId;
-  const theme = useTheme();
-
-  const padding = useResponsiveSize({
-    xs: 4,
-    sm: 4,
-    md: 26,
-    lg: 52,
-    xl: 24,
-  });
 
   const videoPlayer = useRef();
 
@@ -66,33 +56,12 @@ export function PresenterView({ height }) {
 
   return (
     <div
-      style={{
-        height: height - padding,
-        // width: "700px",
-        width: "100%",
-        backgroundColor: theme.palette.darkTheme.slightLighter,
-        position: "relative",
-        overflow: "hidden",
-        borderRadius: theme.spacing(1),
-        margin: theme.spacing(1),
-      }}
-      className={"video-cover"}
+      className={` bg-gray-750 rounded m-2 relative overflow-hidden w-full h-[${
+        height - "xl:p-6 lg:p-[52px] md:p-[26px] p-1"
+      }] `}
     >
-      <audio
-        autoPlay
-        playsInline
-        controls={false}
-        ref={audioPlayer}
-        muted={isLocal}
-      />
-      <div
-        style={{
-          height: "100%",
-          width: "100%",
-          position: "relative",
-        }}
-        className={"video-contain"}
-      >
+      <audio autoPlay playsInline controls={false} ref={audioPlayer} />
+      <div className={"video-contain absolute h-full w-full"}>
         <ReactPlayer
           ref={videoPlayer}
           //
@@ -117,78 +86,42 @@ export function PresenterView({ height }) {
           }}
         />
         <div
+          className="bottom-2 left-2 bg-gray-750 p-2 absolute rounded-md flex items-center justify-center"
           style={{
-            position: "absolute",
-            bottom: theme.spacing(1),
-            left: theme.spacing(1),
-            backgroundColor: theme.palette.darkTheme.main,
-            borderRadius: 6,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
             transition: "all 200ms",
             transitionTimingFunction: "linear",
-            padding: theme.spacing(1),
           }}
         >
-          {!micOn ? <MicOff fontSize="small" color="primary"></MicOff> : <></>}
+          {!micOn ? <MicOffSmallIcon fillcolor="white" /> : <></>}
 
-          <Typography variant="subtitle2">
+          <p className="text-sm text-white">
             {isLocal
               ? `You are presenting`
               : `${nameTructed(displayName, 15)} is presenting`}
-          </Typography>
+          </p>
         </div>
         {isLocal ? (
-          <Box
-            p={5}
-            style={{
-              borderRadius: theme.spacing(2),
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              flexDirection: "column",
-              position: "absolute",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%,-50%)",
-              backgroundColor: theme.palette.darkTheme.slightLighter,
-            }}
-          >
-            <ScreenShare
-              style={{
-                color: theme.palette.common.white,
-                height: theme.spacing(6),
-                width: theme.spacing(6),
-              }}
+          <div className="p-10 rounded-2xl flex flex-col items-center justify-center absolute top-1/2 left-1/2 bg-gray-750 transform -translate-x-1/2 -translate-y-1/2">
+            <ScreenShareIcon
+              style={{ height: 48, width: 48, color: "white" }}
             />
-            <Box mt={2}>
-              <Typography
-                variant="h6"
-                style={{
-                  fontWeight: "bold",
-                  color: theme.palette.common.white,
-                }}
-              >
+            <div className="mt-4">
+              <p className="text-white text-xl font-semibold">
                 You are presenting to everyone
-              </Typography>
-            </Box>
-            <Box mt={4}>
-              <Button
-                variant="contained"
-                color="primary"
+              </p>
+            </div>
+            <div className="mt-8">
+              <button
+                className="bg-purple-550 text-white px-4 py-2 rounded text-sm text-center font-medium"
                 onClick={(e) => {
                   e.stopPropagation();
                   mMeeting.toggleScreenShare();
                 }}
-                style={{
-                  backgroundColor: theme.palette.primary.primaryMain,
-                }}
               >
-                Stop presenting
-              </Button>
-            </Box>
-          </Box>
+                STOP PRESENTING
+              </button>
+            </div>
+          </div>
         ) : (
           <></>
         )}

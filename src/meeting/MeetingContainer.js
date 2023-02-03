@@ -9,11 +9,14 @@ import { BottomBar } from "./components/BottomBar";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import MemorizedParticipantView from "./components/ParticipantView";
 import { PresenterView } from "../components/PresenterView";
-import { useSnackbar } from "notistack";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
-import useResponsiveSize from "../hooks/useResponsiveSize";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import ConfirmBox from "../components/ConfirmBox";
+import useIsMobile from "../hooks/useIsMobile";
+import useIsTab from "../hooks/useIsTab";
+import { useMediaQuery } from "react-responsive";
+import { toast } from "react-toastify";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -24,38 +27,44 @@ export function MeetingContainer({
   setSelectWebcamDeviceId,
   selectMicDeviceId,
   setSelectMicDeviceId,
-  useRaisedHandParticipants,
-  raisedHandsParticipants,
   micEnabled,
   webcamEnabled,
 }) {
+  const { useRaisedHandParticipants, raisedHandsParticipants } =
+    useMeetingAppContext();
   const bottomBarHeight = 60;
 
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [sideBarMode, setSideBarMode] = useState(null);
   const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
     useState(null);
+  const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
   const [meetingError, setMeetingError] = useState(false);
 
   const mMeetingRef = useRef();
   const containerRef = createRef();
   const containerHeightRef = useRef();
   const containerWidthRef = useRef();
-  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     containerHeightRef.current = containerHeight;
     containerWidthRef.current = containerWidth;
   }, [containerHeight, containerWidth]);
 
-  const sideBarContainerWidth = useResponsiveSize({
-    xl: 400,
-    lg: 360,
-    md: 320,
-    sm: 280,
-    xs: 240,
-  });
+  const isMobile = useIsMobile();
+  const isTab = useIsTab();
+  const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
+  const isXLDesktop = useMediaQuery({ minWidth: 1440 });
+
+  const sideBarContainerWidth = isXLDesktop
+    ? 400
+    : isLGDesktop
+    ? 360
+    : isTab
+    ? 320
+    : isMobile
+    ? 280
+    : 240;
 
   useEffect(() => {
     const boundingRect = containerRef.current.getBoundingClientRect();
@@ -81,10 +90,22 @@ export function MeetingContainer({
       status === Constants.recordingEvents.RECORDING_STARTED ||
       status === Constants.recordingEvents.RECORDING_STOPPED
     ) {
-      enqueueSnackbar(
-        status === Constants.recordingEvents.RECORDING_STARTED
-          ? "Meeting recording is started."
-          : "Meeting recording is stopped."
+      toast(
+        `${
+          status === Constants.recordingEvents.RECORDING_STARTED
+            ? "Meeting recording is started"
+            : "Meeting recording is stopped."
+        }`,
+        {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        }
       );
     }
   };
@@ -120,7 +141,7 @@ export function MeetingContainer({
           const track = await createCameraVideoTrack({
             cameraId: selectedWebcam.id,
             optimizationMode: "motion",
-            encoderConfig: "h1080p_w1920p",
+            encoderConfig: "h540p_w960p",
             facingMode: "environment",
             multiStream: false,
           });
@@ -161,6 +182,7 @@ export function MeetingContainer({
         : `https://static.videosdk.live/prebuilt/notification_err.mp3`
     ).play();
 
+    setMeetingErrorVisible(true);
     setMeetingError({
       code,
       message: isJoiningError ? "Unable to join meeting!" : message,
@@ -194,9 +216,16 @@ export function MeetingContainer({
         `https://static.videosdk.live/prebuilt/notification.mp3`
       ).play();
 
-      enqueueSnackbar(
-        `${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`
-      );
+      toast(`${isLocal ? "You" : nameTructed(senderName, 15)} raised hand 🖐🏼`, {
+        position: "bottom-left",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeButton: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
 
       participantRaisedHand(senderId);
     },
@@ -215,16 +244,24 @@ export function MeetingContainer({
           `https://static.videosdk.live/prebuilt/notification.mp3`
         ).play();
 
-        enqueueSnackbar(
-          trimSnackBarText(`${nameTructed(senderName, 15)} says: ${message}`)
+        toast(
+          `${trimSnackBarText(
+            `${nameTructed(senderName, 15)} says: ${message}`
+          )}`,
+          {
+            position: "bottom-left",
+            autoClose: 4000,
+            hideProgressBar: true,
+            closeButton: false,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          }
         );
       }
     },
   });
-
-  const isMobile = window.matchMedia(
-    "only screen and (max-width: 768px)"
-  ).matches;
 
   return (
     <div
@@ -241,26 +278,18 @@ export function MeetingContainer({
                   <PresenterView height={containerHeight - bottomBarHeight} />
                 ) : null}
                 {isPresenting && isMobile ? null : (
-                  <MemorizedParticipantView
-                    isPresenting={isPresenting}
-                    sideBarMode={sideBarMode}
-                  />
+                  <MemorizedParticipantView isPresenting={isPresenting} />
                 )}
               </div>
 
               <SidebarConatiner
                 height={containerHeight - bottomBarHeight}
                 sideBarContainerWidth={sideBarContainerWidth}
-                setSideBarMode={setSideBarMode}
-                sideBarMode={sideBarMode}
-                raisedHandsParticipants={raisedHandsParticipants}
               />
             </div>
 
             <BottomBar
               bottomBarHeight={bottomBarHeight}
-              sideBarMode={sideBarMode}
-              setSideBarMode={setSideBarMode}
               setIsMeetingLeft={setIsMeetingLeft}
               selectWebcamDeviceId={selectWebcamDeviceId}
               setSelectWebcamDeviceId={setSelectWebcamDeviceId}
@@ -275,10 +304,10 @@ export function MeetingContainer({
         !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
       )}
       <ConfirmBox
-        open={meetingError}
+        open={meetingErrorVisible}
         successText="OKAY"
         onSuccess={() => {
-          setMeetingError(false);
+          setMeetingErrorVisible(false);
         }}
         title={`Error Code: ${meetingError.code}`}
         subTitle={meetingError.message}

@@ -1,7 +1,7 @@
 import { CheckIcon, ClipboardIcon } from "@heroicons/react/outline";
 import { Constants } from "@videosdk.live/react-sdk";
 import React, { useState } from "react";
-import useResponsiveSize from "../hooks/useResponsiveSize";
+
 import { meetingTypes } from "../utils/common";
 
 export function MeetingDetailsScreen({
@@ -12,35 +12,24 @@ export function MeetingDetailsScreen({
   videoTrack,
   setVideoTrack,
   onClickStartMeeting,
-  meetingType,
-  setMeetingType,
   setMeetingMode,
   meetingMode,
+  meetingType,
+  setMeetingType,
 }) {
-  const [meetingId, setMeetingId] = useState("");
+  const [meetingId, setMeetingId] = useState("qygi-snnu-2hvd");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);
   const [isJoinMeetingClicked, setIsJoinMeetingClicked] = useState(false);
-  const padding = useResponsiveSize({
-    xl: 6,
-    lg: 6,
-    md: 6,
-    sm: 4,
-    xs: 1.5,
-  });
+
   const selectType = [
     { label: "Meeting", value: meetingTypes.MEETING },
     { label: "Interactive Live Streaming", value: meetingTypes.ILS },
   ];
 
   return (
-    <div
-      className={`flex flex-1 flex-col w-full `}
-      style={{
-        padding: padding,
-      }}
-    >
+    <div className={`flex flex-1 flex-col w-full md:p-[6px] sm:p-1 p-1.5`}>
       {iscreateMeetingClicked ? (
         <div className="border border-solid border-gray-400 rounded-xl px-4 py-3  flex items-center justify-center">
           <p className="text-white text-base">

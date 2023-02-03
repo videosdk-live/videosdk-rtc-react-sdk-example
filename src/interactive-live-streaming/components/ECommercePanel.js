@@ -1,14 +1,13 @@
-import useResponsiveSize from "../../hooks/useResponsiveSize";
 import {
   product1Image,
   product2Image,
   product3Image,
 } from "../../static/images";
 
-const ProductPart = ({ padding }) => {
+const ProductPart = () => {
   return (
     <div>
-      <div style={{ margin: padding }} className="flex flex-col">
+      <div className="flex flex-col xl:m-4 m-2">
         <div class="carousel">
           <div class="carousel-inner">
             <input
@@ -121,17 +120,9 @@ const ProductPart = ({ padding }) => {
   );
 };
 
-const BuyNowButtonPart = ({ padding }) => {
+const BuyNowButtonPart = () => {
   return (
-    <div
-      className="flex"
-      style={{
-        paddingTop: padding,
-        paddingLeft: padding,
-        paddingRight: padding,
-        paddingBottom: padding / 2,
-      }}
-    >
+    <div className="flex xl:pt-4 xl:pb-2 xl:pl-4 xl:pr-4 pt-2 pb-1 pl-2 pr-2 ">
       <button
         className="w-full  bg-purple-550 text-white p-2 rounded"
         onClick={() => {
@@ -146,21 +137,15 @@ const BuyNowButtonPart = ({ padding }) => {
 
 const ECommercePanel = ({ panelHeight }) => {
   const Height = panelHeight;
-  const padding = useResponsiveSize({
-    xl: 12,
-    lg: 16,
-    md: 8,
-    sm: 6,
-    xs: 4,
-  });
+
   return (
     <div
       className="overflow-y-auto overflow-x-hidden"
       style={{ height: Height }}
     >
       <div className="flex flex-col justify-between flex-1 h-full">
-        <ProductPart padding={padding} />
-        <BuyNowButtonPart padding={padding} />
+        <ProductPart />
+        <BuyNowButtonPart />
       </div>
     </div>
   );
