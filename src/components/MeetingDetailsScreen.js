@@ -17,7 +17,7 @@ export function MeetingDetailsScreen({
   meetingType,
   setMeetingType,
 }) {
-  const [meetingId, setMeetingId] = useState("qygi-snnu-2hvd");
+  const [meetingId, setMeetingId] = useState("");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);
