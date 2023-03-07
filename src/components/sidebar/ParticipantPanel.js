@@ -1,16 +1,46 @@
-import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
-import React, { useMemo } from "react";
+import {
+  useMeeting,
+  useParticipant,
+  usePubSub,
+} from "@videosdk.live/react-sdk";
+import React, { useMemo, useState } from "react";
+import useIsHls from "../../hooks/useIsHls";
 import MicOffIcon from "../../icons/ParticipantTabPanel/MicOffIcon";
 import MicOnIcon from "../../icons/ParticipantTabPanel/MicOnIcon";
 import RaiseHand from "../../icons/ParticipantTabPanel/RaiseHand";
 import VideoCamOffIcon from "../../icons/ParticipantTabPanel/VideoCamOffIcon";
 import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
+import ToggleModeContainer from "../../interactive-live-streaming/components/ToggleModeListner";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { nameTructed } from "../../utils/helper";
 
 function ParticipantListItem({ participantId, raisedHand }) {
   const { micOn, webcamOn, displayName, isLocal } =
     useParticipant(participantId);
+  const [participantMode, setParticipantMode] = useState(null);
+
+  const isHls = useIsHls();
+
+  usePubSub(`CURRENT_MODE_${participantId}`, {
+    onMessageReceived: (data) => {
+      setParticipantMode(data.message);
+    },
+    onOldMessagesReceived: (messages) => {
+      const latestMessage = messages.sort((a, b) => {
+        if (a.timestamp > b.timestamp) {
+          return -1;
+        }
+        if (a.timestamp < b.timestamp) {
+          return 1;
+        }
+        return 0;
+      })[0];
+
+      if (latestMessage) {
+        setParticipantMode(latestMessage.message);
+      }
+    },
+  });
 
   return (
     <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg mb-0">
@@ -38,6 +68,12 @@ function ParticipantListItem({ participantId, raisedHand }) {
         <div className="m-1 p-1">
           {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
         </div>
+        {isHls && (
+          <ToggleModeContainer
+            participantId={participantId}
+            participantMode={participantMode}
+          />
+        )}
       </div>
     </div>
   );

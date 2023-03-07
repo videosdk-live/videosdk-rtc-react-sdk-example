@@ -22,6 +22,7 @@ import useIsMobile from "../hooks/useIsMobile";
 import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
+import ModeListner from "./components/ModeListner";
 
 export function ILSContainer({
   onMeetingLeave,
@@ -35,6 +36,7 @@ export function ILSContainer({
   micEnabled,
   webcamEnabled,
   meetingMode,
+  setMeetingMode,
 }) {
   const {
     setDownstreamUrl,
@@ -334,6 +336,10 @@ export function ILSContainer({
       {typeof localParticipantAllowedJoin === "boolean" ? (
         localParticipantAllowedJoin ? (
           <>
+            <ModeListner
+              setMeetingMode={setMeetingMode}
+              meetingMode={meetingMode}
+            />
             <PollsListner />
 
             {mMeeting?.localParticipant?.id && (
