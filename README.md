@@ -125,10 +125,6 @@ Token is used to create and validate a meeting using API and also initialise a m
 
 - You must set up an authentication server to authorise users for production. To set up an authentication server, refer to our official example repositories. [videosdk-rtc-api-server-examples](https://github.com/videosdk-live/videosdk-rtc-api-server-examples)
 
-> **Note** :
->
-> Development environment tokens have a 7-day expiration period.
-
 <br/>
 
 ## API: Create and Validate meeting
@@ -149,10 +145,6 @@ Token is used to create and validate a meeting using API and also initialise a m
     micEnabled: true,
     webcamEnabled: true,
     name: "Participant Name",
-    notification: {
-      title: "Code Sample",
-      message: "Meeting is running.",
-    },
     participantId: "xyz",
     // For Interactive Live Streaming we can provide mode, `CONFERENCE` for Host and  `VIEWER` for remote participant.
     mode: "CONFERENCE", // "CONFERENCE" || "VIEWER"
