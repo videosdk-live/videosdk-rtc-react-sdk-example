@@ -45,9 +45,7 @@ Check out demo [here](https://videosdk.live/prebuilt/demo)
 
 - Sign up on [VideoSDK](https://app.videosdk.live/) and visit [API Keys](https://app.videosdk.live/api-keys) section to get your API key and Secret key.
 
-- Get familiarized with [API key and Secret key](https://docs.videosdk.live/android/guide/video-and-audio-calling-api-sdk/signup-and-create-api)
-
-- Get familiarized with [Token](https://docs.videosdk.live/android/guide/video-and-audio-calling-api-sdk/server-setup)
+- Get familiarized with [Token](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/authentication-and-token)
 
 <br/>
 
@@ -101,7 +99,7 @@ npm run start
 
 <br/>
 
-## Key Concepts
+## [Key Concepts](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/concept-and-architecture)
 
 - `Meeting` - A Meeting represents Real time audio and video communication.
 
@@ -134,7 +132,7 @@ Token is used to create and validate a meeting using API and also initialise a m
 
 <br/>
 
-## [Initialize a Meeting](https://docs.videosdk.live/react/api/sdk-reference/meeting-provider)
+## [Initialize a Meeting](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/setup-call/initialise-meeting)
 
 - You can initialize the meeting using `MeetingProvider`. Meeting Provider simplifies configuration of meeting with by wrapping up core logic with `react-context`.
 
@@ -156,7 +154,7 @@ Token is used to create and validate a meeting using API and also initialise a m
 
 <br/>
 
-## [Enable/Disable Local Webcam](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/camera-controls)
+## [Enable/Disable Local Webcam](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/handling-media/on-off-camera)
 
 ```js
 const onPress = () => {
@@ -170,7 +168,7 @@ const onPress = () => {
 
 <br/>
 
-## [Change Local Webcam](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/camera-controls)
+## [Change Local Webcam](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/handling-media/change-input-device#changing-camera-input-device)
 
 ```js
 const onPress = () => {
@@ -184,7 +182,7 @@ meeting?.changeWebcam(deviceId);
 
 <br/>
 
-## [Mute/Unmute Local Audio](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/mic-controls)
+## [Mute/Unmute Local Audio](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/handling-media/mute-unmute-mic)
 
 ```js
 const onPress = () => {
@@ -198,7 +196,7 @@ const onPress = () => {
 
 <br/>
 
-## [Change Local Mic](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/mic-controls)
+## [Change Local Mic](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/handling-media/change-input-device#changing-audio-input-device)
 
 ```js
 const onPress = () => {
@@ -212,7 +210,7 @@ meeting?.changeMic(deviceId);
 
 <br/>
 
-## [Chat](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/send-messages)
+## [Chat](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/collaboration-in-meeting/chat-using-pubsub)
 
 - The chat feature allows participants to send and receive messages about specific topics to which they have subscribed.
 
@@ -235,7 +233,7 @@ console.log("Messages : ", messages);
 
 <br/>
 
-## [Raise Hand](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/send-messages)
+## [Raise Hand](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/collaboration-in-meeting/pubsub)
 
 - This feature allows participants to raise hand during the meeting.
 
@@ -254,7 +252,7 @@ const RaiseHand = () => {
 
 <br/>
 
-## [Share Your Screen](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/screenshare)
+## [Share Your Screen](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/handling-media/screen-share)
 
 - This featute allows participant to share either the complete screen, a specific window or, a browser tab.
 
@@ -270,7 +268,7 @@ const onPress = () => {
 
 <br/>
 
-## [Recording](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/recording-meeting)
+## [Recording](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/recording-and-live-streaming/record-meeting)
 
 - Record meeting allows participants to record video & audio during the meeting. The recording files are available in developer dashboard. Any participant can start / stop recording any time during the meeting.
 
@@ -286,7 +284,7 @@ const onPress = () => {
 
 <br/>
 
-## [Interactive Live Streaming](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/recording-meeting)
+## [Interactive Live Streaming](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/recording-and-live-streaming/interactive-livestream)
 
 - Interactive Live Streaming allows participants to to broadcast live streaming to other participants. Host can start / stop HLS any time during the meeting.
 
@@ -308,7 +306,7 @@ const onPress = () => {
 
 <br/>
 
-## [Leave or End Meeting](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/features/leave-end-meeting)
+## [Leave or End Meeting](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/setup-call/leave-end-meeting)
 
 ```js
 const onPress = () => {
