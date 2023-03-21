@@ -15,32 +15,10 @@ import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { nameTructed } from "../../utils/helper";
 
 function ParticipantListItem({ participantId, raisedHand }) {
-  const { micOn, webcamOn, displayName, isLocal } =
+  const { micOn, webcamOn, displayName, isLocal, mode } =
     useParticipant(participantId);
-  const [participantMode, setParticipantMode] = useState(null);
 
   const isHls = useIsHls();
-
-  usePubSub(`CURRENT_MODE_${participantId}`, {
-    onMessageReceived: (data) => {
-      setParticipantMode(data.message);
-    },
-    onOldMessagesReceived: (messages) => {
-      const latestMessage = messages.sort((a, b) => {
-        if (a.timestamp > b.timestamp) {
-          return -1;
-        }
-        if (a.timestamp < b.timestamp) {
-          return 1;
-        }
-        return 0;
-      })[0];
-
-      if (latestMessage) {
-        setParticipantMode(latestMessage.message);
-      }
-    },
-  });
 
   return (
     <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg mb-0">
@@ -71,7 +49,7 @@ function ParticipantListItem({ participantId, raisedHand }) {
         {isHls && (
           <ToggleModeContainer
             participantId={participantId}
-            participantMode={participantMode}
+            participantMode={mode}
           />
         )}
       </div>

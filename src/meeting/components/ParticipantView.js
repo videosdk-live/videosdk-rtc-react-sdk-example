@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { useMeeting } from "@videosdk.live/react-sdk";
+import { Constants, useMeeting } from "@videosdk.live/react-sdk";
 import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
 
 function ParticipantsViewer({ isPresenting }) {
@@ -22,7 +22,8 @@ function ParticipantsViewer({ isPresenting }) {
       (participantId) => {
         return (
           ![...pinnedParticipants.keys()].includes(participantId) &&
-          localParticipant.id != participantId
+          localParticipant.id != participantId &&
+          participants.get(participantId).mode == Constants.modes.CONFERENCE
         );
       }
     );

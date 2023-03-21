@@ -57,12 +57,14 @@ const ToggleModeContainer = ({ participantId, participantMode }) => {
                 <div
                   onClick={(e) => {
                     e.stopPropagation();
-                    publish({
-                      mode:
-                        participantMode === Constants.modes.CONFERENCE
-                          ? Constants.modes.VIEWER
-                          : Constants.modes.CONFERENCE,
-                    });
+                    publish(
+                      JSON.stringify({
+                        mode:
+                          participantMode === Constants.modes.CONFERENCE
+                            ? Constants.modes.VIEWER
+                            : Constants.modes.CONFERENCE,
+                      })
+                    );
                     close();
                   }}
                   className=""

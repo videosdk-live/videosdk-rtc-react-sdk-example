@@ -26,16 +26,9 @@ const ModeListner = ({ setMeetingMode, meetingMode }) => {
   const mMeeting = useMeeting();
   const localParticipantId = mMeeting?.localParticipant?.id;
   const participant = useParticipant(localParticipantId);
-  const { publish } = usePubSub(
-    `CURRENT_MODE_${mMeeting?.localParticipant?.id}`
-  );
 
   const participantRef = useRef();
   const publishRef = useRef();
-
-  useEffect(() => {
-    publishRef.current = publish;
-  }, [publish]);
 
   useEffect(() => {
     mMeetingRef.current = mMeeting;
@@ -47,7 +40,8 @@ const ModeListner = ({ setMeetingMode, meetingMode }) => {
 
   usePubSub(`CHANGE_MODE_${mMeeting?.localParticipant?.id}`, {
     onMessageReceived: (data) => {
-      if (data.message.mode === Constants.modes.CONFERENCE) {
+      const message = JSON.parse(data.message);
+      if (message.mode === Constants.modes.CONFERENCE) {
         const muteMic = mMeetingRef.current?.muteMic;
         const disableWebcam = mMeetingRef.current?.disableWebcam;
         const disableScreenShare = mMeetingRef.current?.disableScreenShare;
@@ -58,13 +52,12 @@ const ModeListner = ({ setMeetingMode, meetingMode }) => {
         setReqModeInfo({
           enabled: true,
           senderId: data.senderId,
-          mode: data.message.mode,
+          mode: message.mode,
           accept: () => {},
           reject: () => {},
         });
       } else {
-        mMeeting.changeMode(data.message.mode);
-        publishRef.current(data.message.mode, { persist: true });
+        mMeeting.changeMode(message.mode);
 
         const muteMic = mMeetingRef.current?.muteMic;
         const disableWebcam = mMeetingRef.current?.disableWebcam;
@@ -133,12 +126,6 @@ const ModeListner = ({ setMeetingMode, meetingMode }) => {
       onOldMessagesReceived: (messages) => {},
     }
   );
-
-  useEffect(() => {
-    setTimeout(() => {
-      publishRef.current(meetingMode, { persist: true });
-    }, 2000);
-  }, []);
 
   useMeeting({
     onParticipantModeChanged: ({ mode, participantId }) => {
