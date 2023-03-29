@@ -2,9 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Constants, MeetingProvider } from "@videosdk.live/react-sdk";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { JoiningScreen } from "./components/screens/JoiningScreen";
-import { meetingTypes } from "./utils/common";
 import { MeetingContainer } from "./meeting/MeetingContainer";
-import { ILSContainer } from "./interactive-live-streaming/ILSContainer";
 import { MeetingAppProvider } from "./MeetingAppContextDef";
 
 const App = () => {
@@ -22,7 +20,6 @@ const App = () => {
   const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
-  const [meetingType, setMeetingType] = useState(meetingTypes.MEETING);
 
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
@@ -52,55 +49,31 @@ const App = () => {
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
               mode: meetingMode,
-              multiStream: meetingType === meetingTypes.MEETING ? true : false,
+              multiStream: true,
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
             joinWithoutUserInteraction={true}
           >
-            {meetingType === meetingTypes.MEETING ? (
-              <MeetingContainer
-                onMeetingLeave={() => {
-                  setToken("");
-                  setMeetingId("");
-                  setParticipantName("");
-                  setWebcamOn(false);
-                  setMicOn(false);
-                  setMeetingStarted(false);
-                }}
-                setIsMeetingLeft={setIsMeetingLeft}
-                selectedMic={selectedMic}
-                selectedWebcam={selectedWebcam}
-                selectWebcamDeviceId={selectWebcamDeviceId}
-                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-                selectMicDeviceId={selectMicDeviceId}
-                setSelectMicDeviceId={setSelectMicDeviceId}
-                micEnabled={micOn}
-                webcamEnabled={webcamOn}
-              />
-            ) : (
-              <ILSContainer
-                onMeetingLeave={() => {
-                  setToken("");
-                  setMeetingId("");
-                  setParticipantName("");
-                  setWebcamOn(false);
-                  setMicOn(false);
-                  setMeetingStarted(false);
-                }}
-                setIsMeetingLeft={setIsMeetingLeft}
-                selectedMic={selectedMic}
-                selectedWebcam={selectedWebcam}
-                selectWebcamDeviceId={selectWebcamDeviceId}
-                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-                selectMicDeviceId={selectMicDeviceId}
-                setSelectMicDeviceId={setSelectMicDeviceId}
-                micEnabled={micOn}
-                webcamEnabled={webcamOn}
-                meetingMode={meetingMode}
-                setMeetingMode={setMeetingMode}
-              />
-            )}
+            <MeetingContainer
+              onMeetingLeave={() => {
+                setToken("");
+                setMeetingId("");
+                setParticipantName("");
+                setWebcamOn(false);
+                setMicOn(false);
+                setMeetingStarted(false);
+              }}
+              setIsMeetingLeft={setIsMeetingLeft}
+              selectedMic={selectedMic}
+              selectedWebcam={selectedWebcam}
+              selectWebcamDeviceId={selectWebcamDeviceId}
+              setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+              selectMicDeviceId={selectMicDeviceId}
+              setSelectMicDeviceId={setSelectMicDeviceId}
+              micEnabled={micOn}
+              webcamEnabled={webcamOn}
+            />
           </MeetingProvider>
         </MeetingAppProvider>
       ) : isMeetingLeft ? (
@@ -124,8 +97,6 @@ const App = () => {
           setIsMeetingLeft={setIsMeetingLeft}
           meetingMode={meetingMode}
           setMeetingMode={setMeetingMode}
-          meetingType={meetingType}
-          setMeetingType={setMeetingType}
         />
       )}
     </>

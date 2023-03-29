@@ -1,12 +1,8 @@
-import { Constants, useMeeting } from "@videosdk.live/react-sdk";
+import { useMeeting } from "@videosdk.live/react-sdk";
 import React, { Fragment } from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 import useIsTab from "../../hooks/useIsTab";
-import ECommercePanel from "../../interactive-live-streaming/components/ECommercePanel";
-import CreatePoll from "../../interactive-live-streaming/components/pollContainer/CreatePoll";
-import PollList from "../../interactive-live-streaming/components/pollContainer/PollList";
-import SubmitPollList from "../../interactive-live-streaming/components/pollContainer/SubmitPollList";
-import { sideBarModes } from "../../utils/common";
+
 import { XIcon } from "@heroicons/react/outline";
 import { ChatPanel } from "./ChatPanel";
 import { ParticipantPanel } from "./ParticipantPanel";
@@ -25,7 +21,7 @@ const SideBarTabView = ({
   meetingMode,
 }) => {
   const { participants } = useMeeting();
-  const { sideBarMode, draftPolls, polls } = useMeetingAppContext();
+  const { sideBarMode } = useMeetingAppContext();
 
   return (
     <div
@@ -64,20 +60,6 @@ const SideBarTabView = ({
                         sideBarMode.charAt(0).toUpperCase() +
                           sideBarMode.slice(1).toLowerCase() || ""
                       } (${new Map(participants)?.size})`
-                    : sideBarMode === sideBarModes.CREATE_POLL
-                    ? "Create a poll"
-                    : sideBarMode === sideBarModes.POLLS
-                    ? polls?.length >= 1 || draftPolls?.length >= 1
-                      ? `Polls ${
-                          polls?.length || draftPolls?.length
-                            ? `(${polls?.length || draftPolls?.length})`
-                            : ""
-                        }`
-                      : meetingMode === Constants.modes.VIEWER
-                      ? `Polls ${polls?.length ? `(${polls?.length})` : ""}`
-                      : "Create a poll"
-                    : sideBarMode === sideBarModes.ECOMMERCE
-                    ? "Products"
                     : sideBarMode.charAt(0).toUpperCase() +
                         sideBarMode.slice(1).toLowerCase() || ""}
                 </p>
@@ -94,18 +76,6 @@ const SideBarTabView = ({
               <ParticipantPanel panelHeight={panelHeight} />
             ) : sideBarMode === "CHAT" ? (
               <ChatPanel panelHeight={panelHeight} />
-            ) : sideBarMode === "POLLS" && meetingMode !== "VIEWER" ? (
-              polls.length === 0 && draftPolls.length === 0 ? (
-                <CreatePoll {...{ panelHeight }} />
-              ) : (
-                <PollList {...{ panelHeight }} />
-              )
-            ) : sideBarMode === "POLLS" && meetingMode === "VIEWER" ? (
-              <SubmitPollList {...{ panelHeight }} />
-            ) : sideBarMode === "CREATE_POLL" ? (
-              <CreatePoll {...{ panelHeight }} />
-            ) : sideBarMode === "ECOMMERCE" ? (
-              <ECommercePanel {...{ panelHeight }} />
             ) : null}
           </>
         </div>

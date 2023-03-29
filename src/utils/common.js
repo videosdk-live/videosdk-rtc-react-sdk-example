@@ -60,22 +60,6 @@ export const nameTructed = (name, tructedLength) => {
 export const sideBarModes = {
   PARTICIPANTS: "PARTICIPANTS",
   CHAT: "CHAT",
-  LAYOUT: "LAYOUT",
-  POLLS: "POLLS",
-  CREATE_POLL: "CREATE_POLL",
-  ECOMMERCE: "ECOMMERCE",
-};
-
-export const meetingTypes = {
-  MEETING: "MEETING",
-  ILS: "ILS",
-};
-
-export const meetingLayoutTopics = {
-  MEETING_LAYOUT: "MEETING_LAYOUT",
-  RECORDING_LAYOUT: "RECORDING_LAYOUT",
-  LIVE_STREAM_LAYOUT: "LIVE_STREAM_LAYOUT",
-  HLS_LAYOUT: "HLS_LAYOUT",
 };
 
 export function debounce(func, wait, immediate) {

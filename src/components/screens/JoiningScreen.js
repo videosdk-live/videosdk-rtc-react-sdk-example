@@ -4,7 +4,6 @@ import { createMeeting, getToken, validateMeeting } from "../../api";
 import { CheckCircleIcon } from "@heroicons/react/outline";
 import SettingDialogueBox from "../SettingDialogueBox";
 import ConfirmBox from "../ConfirmBox";
-import { meetingTypes } from "../../utils/common";
 import { Constants } from "@videosdk.live/react-sdk";
 import useIsMobile from "../../hooks/useIsMobile";
 import { createPopper } from "@popperjs/core";
@@ -25,8 +24,6 @@ export function JoiningScreen({
   webcamEnabled,
   setWebcamOn,
   setMicOn,
-  meetingType,
-  setMeetingType,
   setMeetingMode,
   meetingMode,
 }) {
@@ -418,8 +415,7 @@ export function JoiningScreen({
                     </div>
 
                     {!isMobile &&
-                      (meetingMode === Constants.modes.CONFERENCE ||
-                        meetingType === meetingTypes.MEETING) && (
+                      meetingMode === Constants.modes.CONFERENCE && (
                         <div
                           className="m-4 absolute md:left-12 lg:left-24 xl:left-44 md:right-12 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
                           onClick={(e) => {
@@ -446,10 +442,6 @@ export function JoiningScreen({
                     setParticipantName={setParticipantName}
                     videoTrack={videoTrack}
                     setVideoTrack={setVideoTrack}
-                    meetingType={meetingType}
-                    setMeetingType={setMeetingType}
-                    setMeetingMode={setMeetingMode}
-                    meetingMode={meetingMode}
                     onClickStartMeeting={onClickStartMeeting}
                     onClickJoin={async (id) => {
                       const token = await getToken();

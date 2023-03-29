@@ -6,32 +6,14 @@ import {
   useRef,
   useMemo,
 } from "react";
-import { meetingTypes } from "./utils/common";
 
 export const MeetingAppContext = createContext();
 
 export const useMeetingAppContext = () => useContext(MeetingAppContext);
 
 export const MeetingAppProvider = ({ children }) => {
-  const [meetingType, setMeetingType] = useState(meetingTypes.MEETING);
   const [raisedHandsParticipants, setRaisedHandsParticipants] = useState([]);
   const [sideBarMode, setSideBarMode] = useState(null);
-  const [draftPolls, setDraftPolls] = useState([]);
-  const [createdPolls, setCreatedPolls] = useState([]);
-  const [endedPolls, setEndedPolls] = useState([]);
-  const [downstreamUrl, setDownstreamUrl] = useState(null);
-  const [afterMeetingJoinedHLSState, setAfterMeetingJoinedHLSState] =
-    useState(null);
-
-  const polls = useMemo(
-    () =>
-      createdPolls.map((poll) => ({
-        ...poll,
-        isActive:
-          endedPolls.findIndex(({ pollId }) => pollId === poll.id) === -1,
-      })),
-    [createdPolls, endedPolls]
-  );
 
   const useRaisedHandParticipants = () => {
     const raisedHandsParticipantsRef = useRef();
@@ -87,25 +69,16 @@ export const MeetingAppProvider = ({ children }) => {
     <MeetingAppContext.Provider
       value={{
         // states
-        meetingType,
+
         raisedHandsParticipants,
-        draftPolls,
-        createdPolls,
-        endedPolls,
-        downstreamUrl,
-        afterMeetingJoinedHLSState,
+
         sideBarMode,
         // setters
-        setMeetingType,
+
         setRaisedHandsParticipants,
-        setDraftPolls,
-        setCreatedPolls,
-        setEndedPolls,
-        setDownstreamUrl,
-        setAfterMeetingJoinedHLSState,
+
         setSideBarMode,
 
-        polls,
         useRaisedHandParticipants,
       }}
     >
