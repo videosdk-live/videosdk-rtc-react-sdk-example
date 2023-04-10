@@ -551,22 +551,22 @@ There are 1 folder :
 ## Examples 
 ### Examples for Conference
 
-- [Prebuilt Conference Examples](https://github.com/videosdk-live/videosdk-rtc-prebuilt-examples)
-- [JavaScript Conference Example](https://github.com/videosdk-live/videosdk-rtc-javascript-sdk-example)
-- [React JS Conference Example](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example)
-- [React Native SDK Conference Example](https://github.com/videosdk-live/videosdk-rtc-react-native-sdk-example)
-- [Flutter Conference Example](https://github.com/videosdk-live/videosdk-rtc-flutter-sdk-example)
-- [Android Conference Example (Java)](https://github.com/videosdk-live/videosdk-rtc-android-java-sdk-example)
-- [Android Conference Example (Kotlin)](https://github.com/videosdk-live/videosdk-rtc-android-kotlin-sdk-example)
-- [iOS Conference Example](https://github.com/videosdk-live/videosdk-rtc-ios-sdk-example)
+- [videosdk-rtc-prebuilt-examples](https://github.com/videosdk-live/videosdk-rtc-prebuilt-examples)
+- [videosdk-rtc-javascript-sdk-example](https://github.com/videosdk-live/videosdk-rtc-javascript-sdk-example)
+- [videosdk-rtc-react-sdk-examplee](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example)
+- [videosdk-rtc-react-native-sdk-example](https://github.com/videosdk-live/videosdk-rtc-react-native-sdk-example)
+- [videosdk-rtc-flutter-sdk-example](https://github.com/videosdk-live/videosdk-rtc-flutter-sdk-example)
+- [videosdk-rtc-android-java-sdk-example](https://github.com/videosdk-live/videosdk-rtc-android-java-sdk-example)
+- [videosdk-rtc-android-kotlin-sdk-example](https://github.com/videosdk-live/videosdk-rtc-android-kotlin-sdk-example)
+- [videosdk-rtc-ios-sdk-example](https://github.com/videosdk-live/videosdk-rtc-ios-sdk-example)
 
 ### Examples for Live Streaming
 
-- [React JS Live Streaming Example](https://github.com/videosdk-live/videosdk-hls-react-sdk-example)
-- [React Native SDK Live Streaming Example](https://github.com/videosdk-live/videosdk-hls-react-native-sdk-example)
-- [Flutter Live Streaming Example](https://github.com/videosdk-live/videosdk-hls-flutter-sdk-example)
-- [Android Live Streaming Example (Java)](https://github.com/videosdk-live/videosdk-hls-android-java-example)
-- [Android Live Streaming Example (Kotlin)](https://github.com/videosdk-live/videosdk-hls-android-kotlin-example)
+- [videosdk-hls-react-sdk-example](https://github.com/videosdk-live/videosdk-hls-react-sdk-example)
+- [videosdk-hls-react-native-sdk-example](https://github.com/videosdk-live/videosdk-hls-react-native-sdk-example)
+- [videosdk-hls-flutter-sdk-example](https://github.com/videosdk-live/videosdk-hls-flutter-sdk-example)
+- [videosdk-hls-android-java-example](https://github.com/videosdk-live/videosdk-hls-android-java-example)
+- [videosdk-hls-android-kotlin-example](https://github.com/videosdk-live/videosdk-hls-android-kotlin-example)
 
 ## Documentation
 
