@@ -546,6 +546,8 @@ There are 1 folder :
 <img width="600" height="338" src="public/participant_view.png"/>
 </p>
 
+<br/>
+
 ## Examples 
 ### Examples for Conference
 
@@ -565,8 +567,6 @@ There are 1 folder :
 - [Flutter Live Streaming Example](https://github.com/videosdk-live/videosdk-hls-flutter-sdk-example)
 - [Android Live Streaming Example (Java)](https://github.com/videosdk-live/videosdk-hls-android-java-example)
 - [Android Live Streaming Example (Kotlin)](https://github.com/videosdk-live/videosdk-hls-android-kotlin-example)
-
-<br/>
 
 ## Documentation
 
