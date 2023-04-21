@@ -69,7 +69,6 @@ export const CornerDisplayName = ({
   const [score, setScore] = useState({});
   const [audioStats, setAudioStats] = useState({});
   const [videoStats, setVideoStats] = useState({});
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
 
   const updateStats = async () => {
     let stats = [];
