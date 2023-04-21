@@ -4,6 +4,7 @@ import ReactPlayer from "react-player";
 import MicOffSmallIcon from "../icons/MicOffSmallIcon";
 import ScreenShareIcon from "../icons/ScreenShareIcon";
 import { nameTructed } from "../utils/helper";
+import { CornerDisplayName } from "./ParticipantView";
 
 export function PresenterView({ height }) {
   const mMeeting = useMeeting();
@@ -13,11 +14,13 @@ export function PresenterView({ height }) {
 
   const {
     micOn,
+    webcamOn,
     isLocal,
     screenShareStream,
     screenShareAudioStream,
     screenShareOn,
     displayName,
+    isActiveSpeaker,
   } = useParticipant(presenterId);
 
   const mediaStream = useMemo(() => {
@@ -101,27 +104,40 @@ export function PresenterView({ height }) {
           </p>
         </div>
         {isLocal ? (
-          <div className="p-10 rounded-2xl flex flex-col items-center justify-center absolute top-1/2 left-1/2 bg-gray-750 transform -translate-x-1/2 -translate-y-1/2">
-            <ScreenShareIcon
-              style={{ height: 48, width: 48, color: "white" }}
+          <>
+            <div className="p-10 rounded-2xl flex flex-col items-center justify-center absolute top-1/2 left-1/2 bg-gray-750 transform -translate-x-1/2 -translate-y-1/2">
+              <ScreenShareIcon
+                style={{ height: 48, width: 48, color: "white" }}
+              />
+              <div className="mt-4">
+                <p className="text-white text-xl font-semibold">
+                  You are presenting to everyone
+                </p>
+              </div>
+              <div className="mt-8">
+                <button
+                  className="bg-purple-550 text-white px-4 py-2 rounded text-sm text-center font-medium"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    mMeeting.toggleScreenShare();
+                  }}
+                >
+                  STOP PRESENTING
+                </button>
+              </div>
+            </div>
+            <CornerDisplayName
+              {...{
+                isLocal,
+                displayName,
+                micOn,
+                webcamOn,
+                isPresenting: false,
+                participantId: presenterId,
+                isActiveSpeaker,
+              }}
             />
-            <div className="mt-4">
-              <p className="text-white text-xl font-semibold">
-                You are presenting to everyone
-              </p>
-            </div>
-            <div className="mt-8">
-              <button
-                className="bg-purple-550 text-white px-4 py-2 rounded text-sm text-center font-medium"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  mMeeting.toggleScreenShare();
-                }}
-              >
-                STOP PRESENTING
-              </button>
-            </div>
-          </div>
+          </>
         ) : (
           <></>
         )}

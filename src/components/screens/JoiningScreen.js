@@ -338,7 +338,7 @@ export function JoiningScreen({
   };
 
   return (
-    <>
+    <div className="fixed inset-0">
       <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gray-800">
         <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16">
           <div className="container grid  md:grid-flow-col grid-flow-row ">
@@ -496,6 +496,6 @@ export function JoiningScreen({
         title="Mic or webcam not available"
         subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
       />
-    </>
+    </div>
   );
 }

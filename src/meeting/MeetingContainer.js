@@ -67,16 +67,17 @@ export function MeetingContainer({
     : 240;
 
   useEffect(() => {
-    const boundingRect = containerRef.current.getBoundingClientRect();
-    const { width, height } = boundingRect;
+    containerRef.current?.offsetHeight &&
+      setContainerHeight(containerRef.current.offsetHeight);
+    containerRef.current?.offsetWidth &&
+      setContainerWidth(containerRef.current.offsetWidth);
 
-    if (height !== containerHeightRef.current) {
-      setContainerHeight(height);
-    }
-
-    if (width !== containerWidthRef.current) {
-      setContainerWidth(width);
-    }
+    window.addEventListener("resize", ({ target }) => {
+      containerRef.current?.offsetHeight &&
+        setContainerHeight(containerRef.current.offsetHeight);
+      containerRef.current?.offsetWidth &&
+        setContainerWidth(containerRef.current.offsetWidth);
+    });
   }, [containerRef]);
 
   const { participantRaisedHand } = useRaisedHandParticipants();
@@ -264,54 +265,52 @@ export function MeetingContainer({
   });
 
   return (
-    <div
-      // style={{ height: windowHeight }}
-      ref={containerRef}
-      className="h-screen flex flex-col bg-gray-800"
-    >
-      {typeof localParticipantAllowedJoin === "boolean" ? (
-        localParticipantAllowedJoin ? (
-          <>
-            <div className={` flex flex-1 flex-row bg-gray-800 `}>
-              <div className={`flex flex-1 `}>
-                {isPresenting ? (
-                  <PresenterView height={containerHeight - bottomBarHeight} />
-                ) : null}
-                {isPresenting && isMobile ? null : (
-                  <MemorizedParticipantView isPresenting={isPresenting} />
-                )}
+    <div className="fixed inset-0">
+      <div ref={containerRef} className="h-full flex flex-col bg-gray-800">
+        {typeof localParticipantAllowedJoin === "boolean" ? (
+          localParticipantAllowedJoin ? (
+            <>
+              <div className={` flex flex-1 flex-row bg-gray-800 `}>
+                <div className={`flex flex-1 `}>
+                  {isPresenting ? (
+                    <PresenterView height={containerHeight - bottomBarHeight} />
+                  ) : null}
+                  {isPresenting && isMobile ? null : (
+                    <MemorizedParticipantView isPresenting={isPresenting} />
+                  )}
+                </div>
+
+                <SidebarConatiner
+                  height={containerHeight - bottomBarHeight}
+                  sideBarContainerWidth={sideBarContainerWidth}
+                />
               </div>
 
-              <SidebarConatiner
-                height={containerHeight - bottomBarHeight}
-                sideBarContainerWidth={sideBarContainerWidth}
+              <BottomBar
+                bottomBarHeight={bottomBarHeight}
+                setIsMeetingLeft={setIsMeetingLeft}
+                selectWebcamDeviceId={selectWebcamDeviceId}
+                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                selectMicDeviceId={selectMicDeviceId}
+                setSelectMicDeviceId={setSelectMicDeviceId}
               />
-            </div>
-
-            <BottomBar
-              bottomBarHeight={bottomBarHeight}
-              setIsMeetingLeft={setIsMeetingLeft}
-              selectWebcamDeviceId={selectWebcamDeviceId}
-              setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-              selectMicDeviceId={selectMicDeviceId}
-              setSelectMicDeviceId={setSelectMicDeviceId}
-            />
-          </>
+            </>
+          ) : (
+            <></>
+          )
         ) : (
-          <></>
-        )
-      ) : (
-        !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
-      )}
-      <ConfirmBox
-        open={meetingErrorVisible}
-        successText="OKAY"
-        onSuccess={() => {
-          setMeetingErrorVisible(false);
-        }}
-        title={`Error Code: ${meetingError.code}`}
-        subTitle={meetingError.message}
-      />
+          !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
+        )}
+        <ConfirmBox
+          open={meetingErrorVisible}
+          successText="OKAY"
+          onSuccess={() => {
+            setMeetingErrorVisible(false);
+          }}
+          title={`Error Code: ${meetingError.code}`}
+          subTitle={meetingError.message}
+        />
+      </div>
     </div>
   );
 }

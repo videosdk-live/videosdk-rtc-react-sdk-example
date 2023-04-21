@@ -266,10 +266,17 @@ export function BottomBar({
     const [webcams, setWebcams] = useState([]);
 
     const localWebcamOn = mMeeting?.localWebcamOn;
-    const changeWebcam = mMeeting?.changeWebcam;
+    const disableWebcam = mMeeting?.disableWebcam;
+    const enableWebcam = mMeeting?.enableWebcam;
 
     const getWebcams = async (mGetWebcams) => {
-      const webcams = await mGetWebcams();
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const webcams = devices.filter(
+        (d) =>
+          d.kind === "videoinput" &&
+          d.deviceId !== "default" &&
+          d.deviceId !== "communications"
+      );
 
       webcams && webcams?.length && setWebcams(webcams);
     };
@@ -370,15 +377,19 @@ export function BottomBar({
                                         key={`output_webcams_${deviceId}`}
                                         onClick={async () => {
                                           setSelectWebcamDeviceId(deviceId);
+                                          disableWebcam();
                                           const track =
                                             await createCameraVideoTrack({
                                               optimizationMode: "motion",
-                                              encoderConfig: "h540p_w960p",
-                                              facingMode: "environment",
+                                              facingMode: label.includes(
+                                                "front"
+                                              )
+                                                ? "front"
+                                                : "environment",
                                               multiStream: false,
                                               cameraId: deviceId,
                                             });
-                                          changeWebcam(track);
+                                          enableWebcam(track);
                                           close();
                                         }}
                                       >
@@ -645,7 +656,7 @@ export function BottomBar({
             leaveTo="translate-y-full opacity-0 scale-95"
           >
             <div className="fixed inset-0 overflow-y-hidden">
-              <div className="flex h-screen items-end justify-end text-center">
+              <div className="flex h-full items-end justify-end text-center">
                 <Dialog.Panel className="w-screen transform overflow-hidden bg-gray-800 shadow-xl transition-all">
                   <div className="grid container bg-gray-800 py-6">
                     <div className="grid grid-cols-12 gap-2">

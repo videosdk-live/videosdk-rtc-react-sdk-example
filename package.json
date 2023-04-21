@@ -9,7 +9,6 @@
     "@popperjs/core": "^2.9.2",
     "@videosdk.live/react-sdk": "^0.1.55",
     "@windmill/react-ui": "^0.6.0",
-    "hls.js": "^1.2.5",
     "lottie-react": "^2.3.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
