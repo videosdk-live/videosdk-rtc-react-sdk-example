@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
 import MicOffSmallIcon from "../icons/MicOffSmallIcon";
 import ScreenShareIcon from "../icons/ScreenShareIcon";
+import SpeakerIcon from "../icons/SpeakerIcon";
 import { nameTructed } from "../utils/helper";
 import { CornerDisplayName } from "./ParticipantView";
 
@@ -95,7 +96,13 @@ export function PresenterView({ height }) {
             transitionTimingFunction: "linear",
           }}
         >
-          {!micOn ? <MicOffSmallIcon fillcolor="white" /> : <></>}
+          {!micOn ? (
+            <MicOffSmallIcon fillcolor="white" />
+          ) : micOn && isActiveSpeaker ? (
+            <SpeakerIcon />
+          ) : (
+            <></>
+          )}
 
           <p className="text-sm text-white">
             {isLocal
@@ -132,7 +139,7 @@ export function PresenterView({ height }) {
                 displayName,
                 micOn,
                 webcamOn,
-                isPresenting: false,
+                isPresenting: true,
                 participantId: presenterId,
                 isActiveSpeaker,
               }}
