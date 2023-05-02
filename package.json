@@ -6,17 +6,17 @@
   "dependencies": {
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.2",
-    "@popperjs/core": "^2.9.2",
-    "@videosdk.live/react-sdk": "^0.1.55",
+    "@popperjs/core": "^2.11.7",
+    "@videosdk.live/react-sdk": "^0.1.71",
     "@windmill/react-ui": "^0.6.0",
-    "lottie-react": "^2.3.1",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
+    "lottie-react": "^2.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-player": "^2.10.1",
-    "react-responsive": "^9.0.0",
+    "react-responsive": "^9.0.2",
     "react-scripts": "^5.0.1",
-    "react-toastify": "^9.1.1",
-    "web-vitals": "^1.0.1"
+    "react-toastify": "^9.1.2",
+    "web-vitals": "^3.3.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "0.5.0-alpha.2",
