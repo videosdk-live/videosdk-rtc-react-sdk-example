@@ -14,6 +14,7 @@ export const useMeetingAppContext = () => useContext(MeetingAppContext);
 export const MeetingAppProvider = ({ children }) => {
   const [raisedHandsParticipants, setRaisedHandsParticipants] = useState([]);
   const [sideBarMode, setSideBarMode] = useState(null);
+  const [pipMode, setPipMode] = useState(false);
 
   const useRaisedHandParticipants = () => {
     const raisedHandsParticipantsRef = useRef();
@@ -73,12 +74,13 @@ export const MeetingAppProvider = ({ children }) => {
         raisedHandsParticipants,
 
         sideBarMode,
+        pipMode,
         // setters
 
         setRaisedHandsParticipants,
 
         setSideBarMode,
-
+        setPipMode,
         useRaisedHandParticipants,
       }}
     >
