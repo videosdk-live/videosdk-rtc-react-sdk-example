@@ -21,7 +21,6 @@ export const getToken = async () => {
 };
 
 export const createMeeting = async ({ token }) => {
-  return "s87z-lvsj-riwb";
   const url = `${API_BASE_URL}/v2/rooms`;
   const options = {
     method: "POST",
