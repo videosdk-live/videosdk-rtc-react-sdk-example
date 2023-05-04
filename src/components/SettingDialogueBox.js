@@ -261,7 +261,7 @@ export default function SettingDialogueBox({
                                             leaveTo="opacity-0 translate-y-1"
                                           >
                                             <Popover.Panel className="absolute left-1/2  z-10 mt-2 w-full -translate-x-1/2 transform px-4 sm:px-0 pb-4">
-                                              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                              <div className="max-h-20 overflow-y-auto rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                                 <div
                                                   className={"bg-gray-800 py-1"}
                                                 >
@@ -379,7 +379,7 @@ export default function SettingDialogueBox({
                                             leaveTo="opacity-0 translate-y-1"
                                           >
                                             <Popover.Panel className="absolute left-1/2  z-10 mt-2 w-full -translate-x-1/2 transform px-4 sm:px-0 pb-4">
-                                              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                                              <div className="overflow-y-auto max-h-20 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
                                                 <div
                                                   className={"bg-gray-800 py-1"}
                                                 >
