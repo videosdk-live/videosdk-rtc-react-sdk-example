@@ -5,7 +5,7 @@
   "homepage": "https://lab.videosdk.live/react-rtc-demo/",
   "dependencies": {
     "@headlessui/react": "^1.4.1",
-    "@heroicons/react": "^1.0.2",
+    "@heroicons/react": "^2.0.17",
     "@popperjs/core": "^2.11.7",
     "@videosdk.live/react-sdk": "^0.1.73",
     "@windmill/react-ui": "^0.6.0",
