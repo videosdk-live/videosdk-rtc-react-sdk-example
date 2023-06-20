@@ -42,16 +42,6 @@ export function MeetingContainer({
   const containerRef = createRef();
   const containerHeightRef = useRef();
   const containerWidthRef = useRef();
-  const selectedWebcamDeviceRef = useRef();
-  const selectedMicDeviceRef = useRef();
-
-  useEffect(() => {
-    selectedWebcamDeviceRef.current = selectedWebcam;
-  }, [selectedWebcam]);
-
-  useEffect(() => {
-    selectedMicDeviceRef.current = selectedMic;
-  }, [selectedMic]);
 
   useEffect(() => {
     containerHeightRef.current = containerHeight;
@@ -148,7 +138,7 @@ export function MeetingContainer({
         disableWebcam();
         setTimeout(async () => {
           track = await getVideoTrack({
-            webcamId: selectedWebcamDeviceRef.current.id,
+            webcamId: selectedWebcam.id,
             encoderConfig: "h540p_w960p",
           });
           changeWebcam(track);

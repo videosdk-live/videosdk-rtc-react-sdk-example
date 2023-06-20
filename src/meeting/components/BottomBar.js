@@ -379,7 +379,8 @@ export function BottomBar({
 
   const WebCamBTN = () => {
     const mMeeting = useMeeting();
-    const { selectedWebcamDevice } = useMeetingAppContext();
+    const { selectWebcamDeviceId } = useMeetingAppContext();
+
     const [webcams, setWebcams] = useState([]);
     const { getVideoTrack } = useMediaStream();
 
@@ -421,7 +422,7 @@ export function BottomBar({
             let track;
             if (!localWebcamOn) {
               track = await getVideoTrack({
-                webcamId: selectedWebcamDevice.id,
+                webcamId: selectWebcamDeviceId,
                 encoderConfig: "h540p_w960p",
               });
             }
