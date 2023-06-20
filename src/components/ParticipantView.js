@@ -19,7 +19,6 @@ export const CornerDisplayName = ({
   displayName,
   isLocal,
   micOn,
-  screenShareStream,
   mouseOver,
   isActiveSpeaker,
 }) => {
@@ -60,6 +59,7 @@ export const CornerDisplayName = ({
   const {
     webcamStream,
     micStream,
+    screenShareStream,
     getVideoStats,
     getAudioStats,
     getShareStats,
@@ -198,7 +198,7 @@ export const CornerDisplayName = ({
   ];
 
   useEffect(() => {
-    if (webcamStream || micStream) {
+    if (webcamStream || micStream || screenShareStream) {
       updateStats();
 
       if (statsIntervalIdRef.current) {
@@ -216,7 +216,7 @@ export const CornerDisplayName = ({
     return () => {
       if (statsIntervalIdRef.current) clearInterval(statsIntervalIdRef.current);
     };
-  }, [webcamStream, micStream]);
+  }, [webcamStream, micStream, screenShareStream]);
 
   return (
     <>

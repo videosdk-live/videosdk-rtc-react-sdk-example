@@ -1,9 +1,4 @@
-import {
-  Constants,
-  createCameraVideoTrack,
-  useMeeting,
-  usePubSub,
-} from "@videosdk.live/react-sdk";
+import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   ClipboardIcon,
@@ -32,6 +27,7 @@ import { sideBarModes } from "../../utils/common";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import { createPopper } from "@popperjs/core";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
+import useMediaStream from "../../hooks/useMediaStream";
 
 function PipBTN({ isMobile, isTab }) {
   const { pipMode, setPipMode } = useMeetingAppContext();
@@ -383,11 +379,13 @@ export function BottomBar({
 
   const WebCamBTN = () => {
     const mMeeting = useMeeting();
+    const { selectedWebcamDevice } = useMeetingAppContext();
     const [webcams, setWebcams] = useState([]);
+    const { getVideoTrack } = useMediaStream();
 
     const localWebcamOn = mMeeting?.localWebcamOn;
     const disableWebcam = mMeeting?.disableWebcam;
-    const enableWebcam = mMeeting?.enableWebcam;
+    const changeWebcam = mMeeting?.changeWebcam;
 
     const getWebcams = async (mGetWebcams) => {
       const devices = await navigator.mediaDevices.enumerateDevices();
@@ -422,12 +420,9 @@ export function BottomBar({
           onClick={async () => {
             let track;
             if (!localWebcamOn) {
-              track = await createCameraVideoTrack({
-                optimizationMode: "motion",
+              track = await getVideoTrack({
+                webcamId: selectedWebcamDevice.id,
                 encoderConfig: "h540p_w960p",
-                facingMode: "environment",
-                multiStream: false,
-                cameraId: selectWebcamDeviceId,
               });
             }
             mMeeting.toggleWebcam(track);
@@ -497,20 +492,18 @@ export function BottomBar({
                                         key={`output_webcams_${deviceId}`}
                                         onClick={async () => {
                                           setSelectWebcamDeviceId(deviceId);
-                                          disableWebcam();
-                                          const track =
-                                            await createCameraVideoTrack({
-                                              optimizationMode: "motion",
-                                              facingMode: label.includes(
-                                                "front"
-                                              )
-                                                ? "front"
-                                                : "environment",
-                                              multiStream: false,
-                                              cameraId: deviceId,
-                                            });
-                                          enableWebcam(track);
-                                          close();
+                                          await disableWebcam();
+                                          let customTrack = await getVideoTrack(
+                                            {
+                                              webcamId: deviceId,
+                                              encoderConfig: "h540p_w960p",
+                                            }
+                                          );
+
+                                          changeWebcam(customTrack);
+                                          setTimeout(() => {
+                                            close();
+                                          }, 200);
                                         }}
                                       >
                                         {label || `Webcam ${index + 1}`}

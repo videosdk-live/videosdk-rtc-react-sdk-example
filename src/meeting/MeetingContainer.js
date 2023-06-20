@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useRef, createRef } from "react";
-import {
-  Constants,
-  createCameraVideoTrack,
-  useMeeting,
-  usePubSub,
-} from "@videosdk.live/react-sdk";
+import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import { BottomBar } from "./components/BottomBar";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import MemorizedParticipantView from "./components/ParticipantView";
@@ -17,6 +12,7 @@ import useIsTab from "../hooks/useIsTab";
 import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
+import useMediaStream from "../hooks/useMediaStream";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -30,8 +26,9 @@ export function MeetingContainer({
   micEnabled,
   webcamEnabled,
 }) {
-  const { useRaisedHandParticipants, raisedHandsParticipants } =
-    useMeetingAppContext();
+  const { useRaisedHandParticipants } = useMeetingAppContext();
+  const { getVideoTrack } = useMediaStream();
+
   const bottomBarHeight = 60;
 
   const [containerHeight, setContainerHeight] = useState(0);
@@ -45,6 +42,16 @@ export function MeetingContainer({
   const containerRef = createRef();
   const containerHeightRef = useRef();
   const containerWidthRef = useRef();
+  const selectedWebcamDeviceRef = useRef();
+  const selectedMicDeviceRef = useRef();
+
+  useEffect(() => {
+    selectedWebcamDeviceRef.current = selectedWebcam;
+  }, [selectedWebcam]);
+
+  useEffect(() => {
+    selectedMicDeviceRef.current = selectedMic;
+  }, [selectedMic]);
 
   useEffect(() => {
     containerHeightRef.current = containerHeight;
@@ -137,14 +144,12 @@ export function MeetingContainer({
 
     if (webcamEnabled && selectedWebcam.id) {
       await new Promise((resolve) => {
+        let track;
         disableWebcam();
         setTimeout(async () => {
-          const track = await createCameraVideoTrack({
-            cameraId: selectedWebcam.id,
-            optimizationMode: "motion",
+          track = await getVideoTrack({
+            webcamId: selectedWebcamDeviceRef.current.id,
             encoderConfig: "h540p_w960p",
-            facingMode: "environment",
-            multiStream: false,
           });
           changeWebcam(track);
           resolve();
