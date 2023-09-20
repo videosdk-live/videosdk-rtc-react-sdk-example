@@ -138,7 +138,7 @@ export function MeetingContainer({
 
     if (webcamEnabled && selectedWebcam.id) {
       await new Promise((resolve) => {
-        disableWebcam();
+        // disableWebcam();
         setTimeout(async () => {
           const track = await createCameraVideoTrack({
             cameraId: selectedWebcam.id,
