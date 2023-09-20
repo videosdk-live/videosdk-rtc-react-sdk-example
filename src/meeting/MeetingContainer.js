@@ -168,6 +168,34 @@ export function MeetingContainer({
     onMeetingLeave();
   }
 
+  function onMeetingStateChanged(data) {
+    const { state } = data;
+    let message = "";
+    if (state == "CONNECTING") {
+      message = "Meeting is Connecting";
+    } else if (state == "CONNECTED") {
+      message = "Meeting is Connected";
+    } else if (state == "FAILED") {
+      message = "Meeting connection failed";
+    } else if (state == "DISCONNECTED") {
+      message = "Meeting connection disconnected abruptly";
+    } else if (state == "CLOSING") {
+      message = "Meeting is closing";
+    } else if (state == "CLOSED") {
+      message = "Meeting connection closed";
+    }
+    toast(message, {
+      position: "bottom-left",
+      autoClose: 4000,
+      hideProgressBar: true,
+      closeButton: false,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "light",
+    });
+  }
+
   const _handleOnError = (data) => {
     const { code, message } = data;
 
@@ -198,6 +226,7 @@ export function MeetingContainer({
     onMeetingLeft,
     onError: _handleOnError,
     onRecordingStateChanged: _handleOnRecordingStateChanged,
+    onMeetingStateChanged,
   });
 
   const isPresenting = mMeeting.presenterId ? true : false;
