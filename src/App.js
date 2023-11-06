@@ -136,11 +136,12 @@ const App = () => {
                   >
                     <MeetingContainer
                       onMeetingLeave={() => {
-                        setToken("");
-                        setMeetingId("");
+                        // setToken("");
+                        // setMeetingId("");
                         setWebcamOn(false);
                         setMicOn(false);
                         setMeetingStarted(false);
+                        setIsMeetingLeft(true);
                       }}
                       setIsMeetingLeft={setIsMeetingLeft}
                       selectedMic={selectedMic}
@@ -200,11 +201,12 @@ const App = () => {
                   >
                     <ILSContainer
                       onMeetingLeave={() => {
-                        setToken("");
-                        setMeetingId("");
+                        // setToken("");
+                        // setMeetingId("");
                         setWebcamOn(false);
                         setMicOn(false);
                         setMeetingStarted(false);
+                        setIsMeetingLeft(true);
                       }}
                       setIsMeetingLeft={setIsMeetingLeft}
                       selectedMic={selectedMic}
