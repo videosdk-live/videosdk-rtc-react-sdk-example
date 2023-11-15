@@ -32,6 +32,14 @@ export const OutlinedButton = ({
   const openTooltip = () => {
     createPopper(btnRef.current, tooltipRef.current, {
       placement: "top",
+      modifiers: [
+        {
+          name: "offset",
+          options: {
+            offset: [-50, 0],
+          },
+        },
+      ],
     });
     setTooltipShow(true);
   };
@@ -203,7 +211,7 @@ export const OutlinedButton = ({
         style={{ zIndex: 999 }}
         className={`${
           tooltipShow && (mouseOver || mouseDown) ? "" : "hidden"
-        } overflow-hidden flex flex-col items-center justify-center`}
+        } overflow-hidden flex flex-col items-center justify-center whitespace-pre-line`}
         ref={tooltipRef}
       >
         <div className={"rounded-md p-1.5 bg-black "}>

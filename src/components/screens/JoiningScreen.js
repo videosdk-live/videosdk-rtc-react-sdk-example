@@ -24,8 +24,6 @@ export function JoiningScreen({
   webcamEnabled,
   setWebcamOn,
   setMicOn,
-  setMeetingMode,
-  meetingMode,
 }) {
   const [setting, setSetting] = useState("video");
   const [{ webcams, mics }, setDevices] = useState({
@@ -246,27 +244,37 @@ export function JoiningScreen({
   }, [audioTrack]);
 
   useEffect(() => {
-    if (meetingMode === Constants.modes.VIEWER) {
-      _handleTurnOffMic();
-      _handleTurnOffWebcam();
-    }
-  }, [meetingMode]);
-
-  useEffect(() => {
     videoTrackRef.current = videoTrack;
+
+    var isPlaying =
+      videoPlayerRef.current.currentTime > 0 &&
+      !videoPlayerRef.current.paused &&
+      !videoPlayerRef.current.ended &&
+      videoPlayerRef.current.readyState >
+        videoPlayerRef.current.HAVE_CURRENT_DATA;
 
     if (videoTrack) {
       const videoSrcObject = new MediaStream([videoTrack]);
 
       if (videoPlayerRef.current) {
         videoPlayerRef.current.srcObject = videoSrcObject;
-        videoPlayerRef.current.play();
+        if (videoPlayerRef.current.pause && !isPlaying) {
+          try {
+            videoPlayerRef.current.play();
+          } catch (err) {
+            console.log("error in playing video", err);
+          }
+        }
       }
 
       setTimeout(() => {
         if (popupVideoPlayerRef.current) {
           popupVideoPlayerRef.current.srcObject = videoSrcObject;
-          popupVideoPlayerRef.current.play();
+          try {
+            popupVideoPlayerRef.current.play();
+          } catch (err) {
+            console.log("error in playing video", err);
+          }
         }
       }, 1000);
     } else {
@@ -309,7 +317,6 @@ export function JoiningScreen({
             className={`rounded-full min-w-auto w-11 h-11 flex items-center justify-center ${
               onState ? "bg-white" : "bg-red-650 text-white"
             }`}
-            disabled={meetingMode === Constants.modes.VIEWER}
           >
             {onState ? (
               <OnIcon fillcolor={onState ? "#050A0E" : "#fff"} />
@@ -366,9 +373,7 @@ export function JoiningScreen({
                           <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center">
                             {!webcamOn ? (
                               <p className="text-xl xl:text-lg 2xl:text-xl text-white">
-                                {meetingMode === Constants.modes.VIEWER
-                                  ? "You are not permitted to use your microphone and camera."
-                                  : "The camera is off"}
+                                The camera is off
                               </p>
                             ) : null}
                           </div>
@@ -414,24 +419,23 @@ export function JoiningScreen({
                       </div>
                     </div>
 
-                    {!isMobile &&
-                      meetingMode === Constants.modes.CONFERENCE && (
-                        <div
-                          className="m-4 absolute md:left-12 lg:left-24 xl:left-44 md:right-12 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
-                          onClick={(e) => {
-                            handleClickOpen();
-                          }}
-                        >
-                          <div className="flex flex-row items-center justify-center m-1">
-                            <button className="text-white">
-                              <CheckCircleIcon className="h-5 w-5" />
-                            </button>
-                            <p className="text-base text-white ml-1">
-                              Check your audio and video
-                            </p>
-                          </div>
+                    {!isMobile && (
+                      <div
+                        className="m-4 absolute md:left-12 lg:left-24 xl:left-44 md:right-12 lg:right-24 xl:right-44 rounded cursor-pointer bg-gray-700"
+                        onClick={(e) => {
+                          handleClickOpen();
+                        }}
+                      >
+                        <div className="flex flex-row items-center justify-center m-1">
+                          <button className="text-white">
+                            <CheckCircleIcon className="h-5 w-5" />
+                          </button>
+                          <p className="text-base text-white ml-1">
+                            Check your audio and video
+                          </p>
                         </div>
-                      )}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

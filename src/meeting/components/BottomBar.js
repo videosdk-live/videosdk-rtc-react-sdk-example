@@ -98,7 +98,7 @@ function PipBTN({ isMobile, isTab }) {
           const columns = getColCount(videos.length);
           for (let i = 0; i < rows; i++) {
             for (let j = 0; j < columns; j++) {
-              if (j + i * columns <= videos.length || videos.length == 1) {
+              if (j + i * columns <= videos.length || videos.length === 1) {
                 ctx.drawImage(
                   videos[j + i * columns],
                   j < 1 ? 0 : source.width / (columns / j),
@@ -661,7 +661,7 @@ export function BottomBar({
           );
         }}
         isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
-        tooltip={"View Participants"}
+        tooltip={"View \nParticipants"}
         badge={`${new Map(participants)?.size}`}
       />
     );

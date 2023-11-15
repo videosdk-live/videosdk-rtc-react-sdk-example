@@ -1,9 +1,7 @@
-const windmill = require("@windmill/react-ui/config");
 const colors = require("tailwindcss/colors");
 
-module.exports = windmill({
-  mode: "jit",
-  purge: ["./pages/**/*.{js,ts,jsx,tsx}", "./src/**/*.{js,ts,jsx,tsx}"],
+module.exports = {
+  purge: ["./src/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
   darkMode: false, // or 'media' or 'class'
   mode: "jit",
   theme: {
@@ -12,6 +10,12 @@ module.exports = windmill({
       fuchsia: colors.fuchsia,
       indigo: colors.indigo,
       slate: colors.slate,
+      white: colors.white,
+      black: colors.black,
+      blue: colors.blue,
+      green: colors.green,
+      red: colors.red,
+      pink: colors.pink,
     },
     extend: {
       fontFamily: {
@@ -105,5 +109,5 @@ module.exports = windmill({
   variants: {
     extend: {},
   },
-  plugins: [require("@tailwindcss/typography")],
-});
+  plugins: [],
+};

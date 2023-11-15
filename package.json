@@ -4,25 +4,26 @@
   "private": true,
   "homepage": "https://lab.videosdk.live/react-rtc-demo/",
   "dependencies": {
-    "@headlessui/react": "^1.4.1",
-    "@heroicons/react": "^1.0.2",
-    "@popperjs/core": "^2.11.7",
-    "@videosdk.live/react-sdk": "^0.1.74",
+    "@headlessui/react": "^1.7.17",
+    "@heroicons/react": "^1.0.6",
+    "@popperjs/core": "^2.11.8",
+    "@videosdk.live/react-sdk": "^0.1.78",
     "@windmill/react-ui": "^0.6.0",
     "lottie-react": "^2.4.0",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-loader": "^7.3.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-player": "^2.10.1",
+    "react-player": "^2.13.0",
     "react-responsive": "^9.0.2",
-    "react-scripts": "^5.0.1",
-    "react-toastify": "^9.1.2",
-    "web-vitals": "^3.3.1"
+    "react-scripts": "5.0.1",
+    "react-toastify": "^9.1.3",
+    "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "0.5.0-alpha.2",
-    "autoprefixer": "^10.3.1",
-    "postcss": "^8.3.5",
-    "tailwindcss": "^2.2.4"
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5"
   },
   "scripts": {
     "start": "react-scripts start",

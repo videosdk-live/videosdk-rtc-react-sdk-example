@@ -1,12 +1,13 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-ReactDOM.render(
-  <React.StrictMode>
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <>
     <ToastContainer
       toastClassName={() =>
         "relative flex py-4 px-3 rounded overflow-hidden cursor-pointer bg-white shadow-lg"
@@ -25,6 +26,5 @@ ReactDOM.render(
       theme="light"
     />
     <App />
-  </React.StrictMode>,
-  document.getElementById("root")
+  </>
 );

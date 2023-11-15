@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Constants, MeetingProvider } from "@videosdk.live/react-sdk";
+import { MeetingProvider } from "@videosdk.live/react-sdk";
+import { useEffect } from "react";
+import { useState } from "react";
+import { MeetingAppProvider } from "./MeetingAppContextDef";
+import { MeetingContainer } from "./meeting/MeetingContainer";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { JoiningScreen } from "./components/screens/JoiningScreen";
-import { MeetingContainer } from "./meeting/MeetingContainer";
-import { MeetingAppProvider } from "./MeetingAppContextDef";
 
-const App = () => {
+function App() {
   const [token, setToken] = useState("");
   const [meetingId, setMeetingId] = useState("");
   const [participantName, setParticipantName] = useState("");
@@ -16,7 +17,7 @@ const App = () => {
   const [selectWebcamDeviceId, setSelectWebcamDeviceId] = useState(
     selectedWebcam.id
   );
-  const [meetingMode, setMeetingMode] = useState(Constants.modes.CONFERENCE);
+
   const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
@@ -48,7 +49,7 @@ const App = () => {
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
-              mode: meetingMode,
+
               multiStream: true,
             }}
             token={token}
@@ -95,12 +96,10 @@ const App = () => {
           }}
           startMeeting={isMeetingStarted}
           setIsMeetingLeft={setIsMeetingLeft}
-          meetingMode={meetingMode}
-          setMeetingMode={setMeetingMode}
         />
       )}
     </>
   );
-};
+}
 
 export default App;

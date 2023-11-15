@@ -208,7 +208,7 @@ export default function SettingDialogueBox({
                               <button
                                 className={`inline-flex items-center justify-center px-4 py-2 border ${
                                   setting === value
-                                    ? "bg-blue-500 border-transparent"
+                                    ? "bg-purple-350 border-transparent border-purple-350"
                                     : "border-gray-100"
                                 }  text-sm font-medium rounded-sm text-white bg-gray-750`}
                                 onClick={() => {

@@ -2,7 +2,6 @@ import { useMeeting } from "@videosdk.live/react-sdk";
 import React, { Fragment } from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 import useIsTab from "../../hooks/useIsTab";
-
 import { XIcon } from "@heroicons/react/outline";
 import { ChatPanel } from "./ChatPanel";
 import { ParticipantPanel } from "./ParticipantPanel";
@@ -18,7 +17,6 @@ const SideBarTabView = ({
   panelHeaderPadding,
   panelPadding,
   handleClose,
-  meetingMode,
 }) => {
   const { participants } = useMeeting();
   const { sideBarMode } = useMeetingAppContext();
@@ -84,11 +82,7 @@ const SideBarTabView = ({
   );
 };
 
-export function SidebarConatiner({
-  height,
-  sideBarContainerWidth,
-  meetingMode,
-}) {
+export function SidebarConatiner({ height, sideBarContainerWidth }) {
   const { raisedHandsParticipants, sideBarMode, setSideBarMode } =
     useMeetingAppContext();
   const isMobile = useIsMobile();
@@ -183,7 +177,6 @@ export function SidebarConatiner({
         panelHeaderPadding={panelHeaderPadding}
         panelPadding={panelPadding}
         handleClose={handleClose}
-        meetingMode={meetingMode}
       />
     )
   ) : (
