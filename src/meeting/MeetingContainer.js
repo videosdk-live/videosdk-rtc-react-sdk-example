@@ -13,6 +13,8 @@ import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
 import useMediaStream from "../hooks/useMediaStream";
+import CaptureImageListner from "../components/CaptureImageListener";
+import ShowImage from "../components/ShowImage";
 
 export function MeetingContainer({
   onMeetingLeave,
@@ -265,6 +267,10 @@ export function MeetingContainer({
         {typeof localParticipantAllowedJoin === "boolean" ? (
           localParticipantAllowedJoin ? (
             <>
+              <CaptureImageListner
+                localParticipantId={mMeeting?.localParticipant?.id}
+              />
+              <ShowImage />
               <div className={` flex flex-1 flex-row bg-gray-800 `}>
                 <div className={`flex flex-1 `}>
                   {isPresenting ? (

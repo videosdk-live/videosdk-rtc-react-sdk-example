@@ -1,6 +1,6 @@
 import { Popover, Transition } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
-import { useParticipant } from "@videosdk.live/react-sdk";
+import { CameraIcon, XIcon } from "@heroicons/react/outline";
+import { useParticipant, usePubSub } from "@videosdk.live/react-sdk";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import ReactPlayer from "react-player";
 import { useMediaQuery } from "react-responsive";
@@ -420,7 +420,29 @@ export function ParticipantView({ participantId }) {
     isLocal,
     mode,
     isActiveSpeaker,
+    captureImage,
   } = useParticipant(participantId);
+
+  async function imageCapture() {
+    if (webcamOn && webcamStream) {
+      const base64 = await captureImage(); // captureImage will return base64 string
+      console.log("base64", base64);
+    } else {
+      console.error("Camera must be on to capture an image");
+    }
+  }
+
+  const { publish } = usePubSub("IMAGE_CAPTURE");
+
+  // send Request to participant
+  function sendRequest() {
+    // Pass the participantId of the participant to whom you want to capture an image
+    // Here, it will be Participant B id, because we want to capture the the image of Participant B
+    publish("Sending request to capture image", {
+      persist: false,
+      sendOnly: [participantId],
+    });
+  }
 
   const micRef = useRef(null);
   const [mouseOver, setMouseOver] = useState(false);
@@ -490,6 +512,21 @@ export function ParticipantView({ participantId }) {
           </div>
         </div>
       )}
+      <div
+        className="absolute top-2 left-2 rounded-md flex items-center justify-center p-2 cursor-pointer"
+        style={{
+          backgroundColor: "#00000066",
+        }}
+        onClick={async () => {
+          if (isLocal) {
+            await imageCapture();
+          } else {
+            sendRequest();
+          }
+        }}
+      >
+        <CameraIcon className="w-6 h-6 text-white" />
+      </div>
       <CornerDisplayName
         {...{
           isLocal,
