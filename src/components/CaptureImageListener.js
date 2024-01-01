@@ -26,7 +26,7 @@ const CaptureImageListner = ({ localParticipantId }) => {
 
   async function captureAndStoreImage({ senderId }) {
     // capture image
-    const base64Data = await captureImage({ height: 300 });
+    const base64Data = await captureImage();
 
     const token = process.env.REACT_APP_VIDEOSDK_TOKEN;
     const fileName = "myCapture.jpeg"; // specify a name for image file with extension
