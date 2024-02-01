@@ -125,6 +125,8 @@ export default function SettingDialogueBox({
   changeMic,
   videoTrack,
   audioTrack,
+  isCameraPermissionAllowed,
+  isMicrophonePermissionAllowed
 }) {
   const [selectedMicLabel, setSelectedMicLabel] = useState(null);
   const [selectedWebcamLabel, setSelectedWebcamLabel] = useState(null);
@@ -239,10 +241,10 @@ export default function SettingDialogueBox({
                                       {({ close }) => (
                                         <>
                                           <Popover.Button className="flex  w-full ">
-                                            <button className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2">
-                                              {selectedMicLabel
+                                            <button disabled={!isMicrophonePermissionAllowed} className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2">
+                                              {isMicrophonePermissionAllowed ? selectedMicLabel
                                                 ? selectedMicLabel
-                                                : "Select"}
+                                                : "Select" :"Permission Needed"}
                                               <ChevronDownIcon
                                                 className="h-4 w-4"
                                                 style={{
@@ -357,10 +359,17 @@ export default function SettingDialogueBox({
                                       {({ close }) => (
                                         <>
                                           <Popover.Button className="flex  w-full ">
-                                            <button className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2">
-                                              {selectedWebcamLabel
+                                            <button
+                                              disabled={
+                                                !isCameraPermissionAllowed
+                                              }
+                                              className="flex items-center justify-between text-white w-full border border-gray-300 rounded py-3 px-2"
+                                            >
+                                              {isCameraPermissionAllowed
                                                 ? selectedWebcamLabel
-                                                : "Select"}
+                                                  ? selectedWebcamLabel
+                                                  : "Select"
+                                                : "Permission Needed"}
                                               <ChevronDownIcon
                                                 className="h-4 w-4"
                                                 style={{
