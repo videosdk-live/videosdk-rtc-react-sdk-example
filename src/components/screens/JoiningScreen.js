@@ -159,7 +159,13 @@ export function JoiningScreen({
 
   const getDefaultMediaTracks = async ({ mic, webcam, firstTime }) => {
     if (mic) {
-      const stream = await createMicrophoneAudioTrack();
+      const stream = await createMicrophoneAudioTrack({
+        noiseConfig: {
+          noiseSuppression: true,
+          echoCancellation: true,
+          autoGainControl: true,
+        },
+      });
       const audioTracks = stream.getAudioTracks();
 
       const audioTrack = audioTracks.length ? audioTracks[0] : null;
