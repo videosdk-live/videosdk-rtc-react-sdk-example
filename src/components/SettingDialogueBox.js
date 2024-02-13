@@ -18,7 +18,7 @@ const AudioAnalyser = ({ audioTrack }) => {
     const audioSource = audioContext.createMediaStreamSource(audioStream);
     const analyser = audioContext.createAnalyser();
 
-    analyser.fftSize = 512;
+    analyser.fftSize = 512; 
     analyser.minDecibels = -127;
     analyser.maxDecibels = 0;
     analyser.smoothingTimeConstant = 0.4;

@@ -25,6 +25,7 @@ export function MeetingContainer({
   setSelectMicDeviceId,
   micEnabled,
   webcamEnabled,
+  selectedSpeaker
 }) {
   const { useRaisedHandParticipants } = useMeetingAppContext();
   const { getVideoTrack } = useMediaStream();
@@ -108,10 +109,19 @@ export function MeetingContainer({
     }
   };
 
+  const changeSpeaker = (deviceId) => {
+    const audioTags = document.getElementsByTagName("audio");
+  for (let i = 0; i < audioTags.length; i++) {
+    audioTags.item(i).setSinkId(deviceId);
+  }
+  };
+
   function onParticipantJoined(participant) {
     // Change quality to low, med or high based on resolution
     participant && participant.setQuality("high");
+    changeSpeaker(selectedSpeaker.id)
   }
+  
 
   function onEntryResponded(participantId, name) {
     // console.log(" onEntryResponded", participantId, name);
