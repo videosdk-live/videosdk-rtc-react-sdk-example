@@ -80,7 +80,7 @@ export default function DropDownSpeaker({ isMicrophonePermissionAllowed, speaker
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute w-72 z-10 mb-1 bottom-36">
+              <Popover.Panel className=" relative w-72 z-10 mb-1 bottom-60">
                 <div className="max-h-20 rounded-lg shadow-lg">
                   <div
                     className={"bg-gray-350 rounded-lg"}
@@ -104,6 +104,7 @@ export default function DropDownSpeaker({ isMicrophonePermissionAllowed, speaker
                                     value={item?.deviceId}
 
                                     onClick={() => {
+                                      console.log("speaker id",item?.deviceId);
                                       setSelectedSpeakerLabel(
                                         item?.label
                                       );

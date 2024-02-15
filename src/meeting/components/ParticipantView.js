@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
 
-function ParticipantsViewer({ isPresenting }) {
+function ParticipantsViewer({ isPresenting, selectedSpeaker }) {
   const {
     participants,
     pinnedParticipants,
@@ -51,6 +51,7 @@ function ParticipantsViewer({ isPresenting }) {
     <MemoizedParticipantGrid
       participantIds={participantIds}
       isPresenting={isPresenting}
+      selectedSpeaker={selectedSpeaker}
     />
   );
 }
@@ -58,7 +59,7 @@ function ParticipantsViewer({ isPresenting }) {
 const MemorizedParticipantView = React.memo(
   ParticipantsViewer,
   (prevProps, nextProps) => {
-    return prevProps.isPresenting === nextProps.isPresenting;
+    return prevProps.isPresenting === nextProps.isPresenting && prevProps.selectedSpeaker === nextProps.selectedSpeaker;
   }
 );
 

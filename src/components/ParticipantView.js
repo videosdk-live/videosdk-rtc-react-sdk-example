@@ -410,7 +410,7 @@ export const CornerDisplayName = ({
   );
 };
 
-export function ParticipantView({ participantId }) {
+export function ParticipantView({ participantId, selectedSpeaker }) {
   const {
     displayName,
     webcamStream,
@@ -431,16 +431,23 @@ export function ParticipantView({ participantId }) {
         const mediaStream = new MediaStream();
         mediaStream.addTrack(micStream.track);
         micRef.current.srcObject = mediaStream;
+        try{
+          micRef.current.setSinkId(selectedSpeaker.id);
+        }catch(err){
+          console.log("Setting speaker device failed", err);
+        }
+        // micRef.current.setSinkId("f4dada00a7f37f0d0016ac830a0aeb35f9f37b6625ba6252919aceaafd099b90");
         micRef.current
           .play()
           .catch((error) =>
-            console.error("videoElem.current.play() failed", error)
+            console.error("micRef.current.play() failed", error)
           );
       } else {
         micRef.current.srcObject = null;
       }
     }
   }, [micStream, micOn]);
+  
   const webcamMediaStream = useMemo(() => {
     if (webcamOn && webcamStream) {
       const mediaStream = new MediaStream();

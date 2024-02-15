@@ -1,4 +1,4 @@
-import { MeetingProvider } from "@videosdk.live/react-sdk";
+import { MeetingProvider, createMicrophoneAudioTrack } from "@videosdk.live/react-sdk";
 import { useEffect } from "react";
 import { useState } from "react";
 import { MeetingAppProvider } from "./MeetingAppContextDef";
@@ -13,22 +13,19 @@ function App() {
 
   const [micOn, setMicOn] = useState(false);
   const [webcamOn, setWebcamOn] = useState(false);
-  const [speakerOn, setSpeakerOn] = useState(true);
-
   const [selectedMic, setSelectedMic] = useState({ id: null });
   const [selectedWebcam, setSelectedWebcam] = useState({ id: null });
   const [selectedSpeaker, setSelectedSpeaker] = useState({ id: null });
 
-  const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
-  const [selectWebcamDeviceId, setSelectWebcamDeviceId] = useState(
-    selectedWebcam.id
-  );
-  const [selectSpeakerDeviceId, setSelectSpeakerDeviceId] = useState(
-    selectedSpeaker.id
-  );
-  
+  // const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
+  // const [selectWebcamDeviceId, setSelectWebcamDeviceId] = useState(
+  //   selectedWebcam.id
+  // );
+
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
+  let [customAudioTrack, setCustomTrack] = useState();
+
 
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
@@ -42,11 +39,13 @@ function App() {
     }
   }, [isMobile]);
 
+
+
   return (
     <>
       {isMeetingStarted ? (
         <MeetingAppProvider
-          selectedMic={selectedMic}
+          selectedMic={selectedMic} 
           selectedWebcam={selectedWebcam}
           initialMicOn={micOn}
           initialWebcamOn={webcamOn}
@@ -57,8 +56,8 @@ function App() {
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
-
               multiStream: true,
+              customMicrophoneAudioTrack: customAudioTrack
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
@@ -72,20 +71,26 @@ function App() {
                 setWebcamOn(false);
                 setMicOn(false);
                 setMeetingStarted(false);
-                
               }}
               setIsMeetingLeft={setIsMeetingLeft}
+              micOn={micOn}
+              webcamOn={webcamOn}
               selectedMic={selectedMic}
               selectedWebcam={selectedWebcam}
-              selectWebcamDeviceId={selectWebcamDeviceId}
-              setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-              selectMicDeviceId={selectMicDeviceId}
-              setSelectMicDeviceId={setSelectMicDeviceId}
-              micEnabled={micOn}
-              webcamEnabled={webcamOn}
               selectedSpeaker={selectedSpeaker}
+              setSelectedMic={setSelectedMic}
+              setSelectedWebcam={setSelectedWebcam}
+              setSelectedSpeaker={setSelectedSpeaker}
+
+            // selectWebcamDeviceId={selectWebcamDeviceId}
+            // setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+            // selectMicDeviceId={selectMicDeviceId}
+            // setSelectMicDeviceId={setSelectMicDeviceId}
+            //micEnabled={micOn}
+            //webcamEnabled={webcamOn}
+
             />
-          </MeetingProvider>
+          </MeetingProvider> 
         </MeetingAppProvider>
       ) : isMeetingLeft ? (
         <LeaveScreen setIsMeetingLeft={setIsMeetingLeft} />
@@ -95,20 +100,16 @@ function App() {
           setParticipantName={setParticipantName}
           setMeetingId={setMeetingId}
           setToken={setToken}
-
+          micOn={micOn}
           setMicOn={setMicOn}
+          webcamOn={webcamOn}
           setWebcamOn={setWebcamOn}
-          setSpeakerOn={setSpeakerOn}
-
-          micEnabled={micOn}
-          webcamEnabled={webcamOn}
-          speakerEnabled={speakerOn}
-
+          selectedMic={selectedMic}
           setSelectedMic={setSelectedMic}
+          selectedWebcam={selectedWebcam}
           setSelectedWebcam={setSelectedWebcam}
-          setSelectedSpeaker={setSelectedSpeaker}
           selectedSpeaker={selectedSpeaker}
-          
+          setSelectedSpeaker={setSelectedSpeaker}
           onClickStartMeeting={() => {
             setMeetingStarted(true);
           }}

@@ -17,16 +17,20 @@ import useMediaStream from "../hooks/useMediaStream";
 export function MeetingContainer({
   onMeetingLeave,
   setIsMeetingLeft,
+
   selectedMic,
   selectedWebcam,
-  selectWebcamDeviceId,
-  setSelectWebcamDeviceId,
-  selectMicDeviceId,
-  setSelectMicDeviceId,
-  micEnabled,
-  webcamEnabled,
-  selectedSpeaker
+  selectedSpeaker,
+  setSelectedMic,
+  setSelectedWebcam,
+  //selectWebcamDeviceId,
+  //setSelectWebcamDeviceId,
+  //selectMicDeviceId,
+  //setSelectMicDeviceId,
+  micOn,
+  webcamOn,
 }) {
+  console.log('Mic selected ::', selectedMic)
   const { useRaisedHandParticipants } = useMeetingAppContext();
   const { getVideoTrack } = useMediaStream();
 
@@ -57,12 +61,12 @@ export function MeetingContainer({
   const sideBarContainerWidth = isXLDesktop
     ? 400
     : isLGDesktop
-    ? 360
-    : isTab
-    ? 320
-    : isMobile
-    ? 280
-    : 240;
+      ? 360
+      : isTab
+        ? 320
+        : isMobile
+          ? 280
+          : 240;
 
   useEffect(() => {
     containerRef.current?.offsetHeight &&
@@ -90,10 +94,9 @@ export function MeetingContainer({
       status === Constants.recordingEvents.RECORDING_STOPPED
     ) {
       toast(
-        `${
-          status === Constants.recordingEvents.RECORDING_STARTED
-            ? "Meeting recording is started"
-            : "Meeting recording is stopped."
+        `${status === Constants.recordingEvents.RECORDING_STARTED
+          ? "Meeting recording is started"
+          : "Meeting recording is stopped."
         }`,
         {
           position: "bottom-left",
@@ -109,19 +112,13 @@ export function MeetingContainer({
     }
   };
 
-  const changeSpeaker = (deviceId) => {
-    const audioTags = document.getElementsByTagName("audio");
-  for (let i = 0; i < audioTags.length; i++) {
-    audioTags.item(i).setSinkId(deviceId);
-  }
-  };
-
   function onParticipantJoined(participant) {
     // Change quality to low, med or high based on resolution
     participant && participant.setQuality("high");
-    changeSpeaker(selectedSpeaker.id)
+    console.log(selectedSpeaker.label)
+    console.log(selectedSpeaker.id)
   }
-  
+
 
   function onEntryResponded(participantId, name) {
     // console.log(" onEntryResponded", participantId, name);
@@ -138,11 +135,11 @@ export function MeetingContainer({
   }
 
   async function onMeetingJoined() {
-    // console.log("onMeetingJoined");
+    console.log("onMeetingJoined");
     const { changeWebcam, changeMic, muteMic, disableWebcam } =
       mMeetingRef.current;
 
-    if (webcamEnabled && selectedWebcam.id) {
+    if (webcamOn && selectedWebcam.id) {
       await new Promise((resolve) => {
         let track;
         disableWebcam();
@@ -157,7 +154,7 @@ export function MeetingContainer({
       });
     }
 
-    if (micEnabled && selectedMic.id) {
+    if (micOn && selectedMic.id) {
       await new Promise((resolve) => {
         muteMic();
         setTimeout(() => {
@@ -281,8 +278,9 @@ export function MeetingContainer({
                     <PresenterView height={containerHeight - bottomBarHeight} />
                   ) : null}
                   {isPresenting && isMobile ? null : (
-                    <MemorizedParticipantView isPresenting={isPresenting} />
+                    <MemorizedParticipantView isPresenting={isPresenting} selectedSpeaker={selectedSpeaker} />
                   )}
+
                 </div>
 
                 <SidebarConatiner
@@ -294,10 +292,13 @@ export function MeetingContainer({
               <BottomBar
                 bottomBarHeight={bottomBarHeight}
                 setIsMeetingLeft={setIsMeetingLeft}
-                selectWebcamDeviceId={selectWebcamDeviceId}
-                setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-                selectMicDeviceId={selectMicDeviceId}
-                setSelectMicDeviceId={setSelectMicDeviceId}
+                //selectWebcamDeviceId={selectWebcamDeviceId}
+                //setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                //selectMicDeviceId={selectMicDeviceId}
+                selectedMic={selectedMic}
+                selectedWebcam={selectedWebcam}
+                setSelectedMic={setSelectedMic}
+                setSelectedWebcam={setSelectedWebcam}
               />
             </>
           ) : (

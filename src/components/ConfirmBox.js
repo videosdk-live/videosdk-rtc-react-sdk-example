@@ -24,7 +24,7 @@ const ConfirmBox = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-black bg-opacity-25" /> 
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -38,7 +38,7 @@ const ConfirmBox = ({
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-11/12 max-w-md transform overflow-hidden rounded bg-gray-750 p-4 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-11/12 max-w-2xl transform overflow-hidden rounded bg-gray-750 p-4 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title className="text-base font-medium  text-white ">
                     {title}
                   </Dialog.Title>

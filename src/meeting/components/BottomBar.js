@@ -1,4 +1,4 @@
-import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import { Constants, useMeeting, usePubSub,useMediaDevice } from "@videosdk.live/react-sdk";
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   ClipboardIcon,
@@ -28,6 +28,7 @@ import { Dialog, Popover, Transition } from "@headlessui/react";
 import { createPopper } from "@popperjs/core";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import useMediaStream from "../../hooks/useMediaStream";
+
 
 function PipBTN({ isMobile, isTab }) {
   const { pipMode, setPipMode } = useMeetingAppContext();
@@ -151,11 +152,19 @@ function PipBTN({ isMobile, isTab }) {
 export function BottomBar({
   bottomBarHeight,
   setIsMeetingLeft,
-  selectWebcamDeviceId,
-  setSelectWebcamDeviceId,
-  selectMicDeviceId,
-  setSelectMicDeviceId,
+  //selectWebcamDeviceId,
+  //setSelectWebcamDeviceId,
+  //selectMicDeviceId,
+  selectedMic,
+  setSelectedMic,
+  selectedWebcam,
+  setSelectedWebcam
+  //setSelectMicDeviceId,
 }) {
+
+  const {
+    getCameras
+  } = useMediaDevice();
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
   const RaiseHandBTN = ({ isMobile, isTab }) => {
     const { publish } = usePubSub("RAISE_HAND");
@@ -272,7 +281,7 @@ export function BottomBar({
         <OutlinedButton
           Icon={localMicOn ? MicOnIcon : MicOffIcon}
           onClick={() => {
-            mMeeting.toggleMic();
+            // mMeeting.toggleMic();
           }}
           bgColor={localMicOn ? "bg-gray-750" : "bg-white"}
           borderColor={localMicOn && "#ffffff33"}
@@ -327,18 +336,18 @@ export function BottomBar({
                                   {mics.map(({ deviceId, label }, index) => (
                                     <div
                                       className={`px-3 py-1 my-1 pl-6 text-white text-left ${
-                                        deviceId === selectMicDeviceId &&
+                                        deviceId === selectedMic.id &&
                                         "bg-gray-150"
                                       }`}
                                     >
                                       <button
                                         className={`flex flex-1 w-full ${
-                                          deviceId === selectMicDeviceId &&
+                                          deviceId === selectedMic.id &&
                                           "bg-gray-150"
                                         }`}
                                         key={`mics_${deviceId}`}
                                         onClick={() => {
-                                          setSelectMicDeviceId(deviceId);
+                                          setSelectedMic(deviceId);
                                           changeMic(deviceId);
                                           close();
                                         }}
@@ -379,7 +388,10 @@ export function BottomBar({
 
   const WebCamBTN = () => {
     const mMeeting = useMeeting();
-    const { selectWebcamDeviceId } = useMeetingAppContext();
+    //const { selectWebcamDeviceId } = useMeetingAppContext();
+    //const { selectedWebcam } = useMeetingAppContext();
+
+    
 
     const [webcams, setWebcams] = useState([]);
     const { getVideoTrack } = useMediaStream();
@@ -389,13 +401,14 @@ export function BottomBar({
     const changeWebcam = mMeeting?.changeWebcam;
 
     const getWebcams = async (mGetWebcams) => {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const webcams = devices.filter(
-        (d) =>
-          d.kind === "videoinput" &&
-          d.deviceId !== "default" &&
-          d.deviceId !== "communications"
-      );
+      // const devices = await navigator.mediaDevices.enumerateDevices();
+      // const webcams = devices.filter(
+      //   (d) =>
+      //     d.kind === "videoinput" &&
+      //     d.deviceId !== "default" &&
+      //     d.deviceId !== "communications"
+      // );
+      let webcams = await getCameras();
 
       webcams && webcams?.length && setWebcams(webcams);
     };
@@ -422,7 +435,7 @@ export function BottomBar({
             let track;
             if (!localWebcamOn) {
               track = await getVideoTrack({
-                webcamId: selectWebcamDeviceId,
+                webcamId: selectedWebcam.id,
                 encoderConfig: "h540p_w960p",
               });
             }
@@ -481,18 +494,18 @@ export function BottomBar({
                                   {webcams.map(({ deviceId, label }, index) => (
                                     <div
                                       className={`px-3 py-1 my-1 pl-6 text-white text-left ${
-                                        deviceId === selectWebcamDeviceId &&
+                                        deviceId === selectedWebcam.id &&
                                         "bg-gray-150"
                                       }`}
                                     >
                                       <button
                                         className={`flex flex-1 w-full ${
-                                          deviceId === selectWebcamDeviceId &&
+                                          deviceId === selectedWebcam.id &&
                                           "bg-gray-150"
                                         }`}
                                         key={`output_webcams_${deviceId}`}
                                         onClick={async () => {
-                                          setSelectWebcamDeviceId(deviceId);
+                                          setSelectedWebcam(deviceId);
                                           await disableWebcam();
                                           let customTrack = await getVideoTrack(
                                             {
