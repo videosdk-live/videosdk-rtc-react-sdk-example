@@ -31,7 +31,9 @@ export const createMeeting = async ({ token }) => {
     .then((response) => response.json())
     .catch((error) => console.error("error", error));
 
-  return roomId;
+  if(roomId){
+    return roomId;
+  }
 };
 
 export const validateMeeting = async ({ roomId, token }) => {

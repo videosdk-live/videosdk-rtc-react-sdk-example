@@ -7,7 +7,21 @@ import TestMic from "../icons/DropDown/TestMic"
 import TestMicOff from '../icons/DropDown/TestMicOff';
 import PauseButton from '../icons/DropDown/PauseButton';
 
-export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMic, setSelectedMic, selectedMicLabel, setSelectedMicLabel, audioStream, selectedSpeaker, audioTrack, micOn, didDeviceChange, setDidDeviceChange }) {
+export default function DropDown({
+  isMicrophonePermissionAllowed,
+  mics,
+  changeMic,
+  setSelectedMic,
+  selectedMic,
+  selectedMicLabel,
+  setSelectedMicLabel,
+  audioStream,
+  selectedSpeaker,
+  audioTrack,
+  micOn,
+  didDeviceChange,
+  setDidDeviceChange
+}) {
 
   const [audioProgress, setAudioProgress] = useState(0);
   const [recordingProgress, setRecordingProgress] = useState(0)
@@ -15,6 +29,7 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
   const [recordingDuration, setRecordingDuration] = useState(0)
   const [volume, setVolume] = useState(null);
   const [audio, setAudio] = useState(null);
+  const [isHovered, setIsHovered] = useState(false);
 
   const audioTrackRef = useRef();
   const intervalRef = useRef();
@@ -41,7 +56,6 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
       setRecordingStatus("inactive")
     }
   }, [didDeviceChange])
-
 
   const analyseAudio = (audioTrack) => {
     const audioStream = new MediaStream([audioTrack]);
@@ -83,7 +97,7 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
           setAudioProgress(progress);
         });
         audioTags.item(i).addEventListener('ended', () => {
-          setAudioProgress(0); // Reset progress when audio ends
+          setAudioProgress(0); 
         });
       })
     }
@@ -92,6 +106,7 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
   const startRecording = async () => {
     console.log("started recording")
     setRecordingStatus("recording");
+    console.log(selectedMic.id)
 
     const media = new MediaRecorder(audioStream, { type: mimeType });
     mediaRecorder.current = media;
@@ -117,14 +132,14 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
     const startTime = Date.now();
     intervalRef.current = setInterval(() => {
       const elapsedTime = Date.now() - startTime;
-      const progress = (elapsedTime / 5000) * 100;
+      const progress = (elapsedTime / 7000) * 100;
       setRecordingProgress(progress);
     });
 
     setTimeout(() => {
       clearInterval(intervalRef.current)
       stopRecording();
-    }, 5000)
+    }, 7000)
   };
 
   const stopRecording = () => {
@@ -138,25 +153,34 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
   };
 
   return (
-    <div className='mt-4 absolute rounded cursor-pointer w-44 h-9 hover:ring-1 hover:ring-gray-250 focus:ring-1 focus:ring-gray-250 bg-gray-800 hover:bg-black focus:bg-black'>
-      <Popover className="relative ">
+    <>
+      <Popover className="relative">
         {({ open }) => (
           <>
-            <Popover.Button disabled={!isMicrophonePermissionAllowed}
-              className={` focus:outline-none group inline-flex items-center rounded-md px-1 py-1 w-44 text-base text-[#B4B4B4] font-normal hover:text-[#FFF] focus:[#FFF] 
-              ${!isMicrophonePermissionAllowed ? 'opacity-50' : ''}`}
+            <Popover.Button
+              onMouseEnter={() => { setIsHovered(true) }}
+              onMouseLeave={() => { setIsHovered(false) }}
+              disabled={!isMicrophonePermissionAllowed}
+              className={`focus:outline-none hover:ring-1 hover:ring-gray-250 hover:bg-black 
+              ${open
+                  ? "text-white ring-1 ring-gray-250 bg-black"
+                  : "text-customGray-250 hover:text-white"
+              }
+              group inline-flex items-center rounded-md px-1 py-1 w-44 text-base font-normal
+              ${!isMicrophonePermissionAllowed ? "opacity-50" : ""}`}
               onClick={() => {
                 if (mediaRecorder.current != null && mediaRecorder.current.state == "recording") { stopRecording() }
                 setRecordingProgress(0)
                 setRecordingStatus("inactive")
               }}
             >
-              <DropMIC />
+              <DropMIC fillColor={isHovered || open ? "#FFF" : "#B4B4B4"} />
               <span className="overflow-hidden whitespace-nowrap overflow-ellipsis w-28 ml-6">
                 {isMicrophonePermissionAllowed ? selectedMicLabel : "Permission Needed"}
               </span>
               <ChevronDownIcon
-                className={`${open ? 'text-orange-300' : 'text-orange-300/70'} ml-8 h-5 w-5 transition duration-150 ease-in-out group-hover:text-orange-300/80 mt-1`}
+                className={`${open ? 'text-white' : 'text-customGray-250 hover:text-white'}
+                ml-8 h-5 w-5 transition duration-150 ease-in-out group-hover:text-orange-300/80 mt-1`}
                 aria-hidden="true"
               />
             </Popover.Button>
@@ -170,8 +194,8 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute w-72 z-10 mb-1 bottom-56">
-                <div className="max-h-20 rounded-lg shadow-lg">
+              <Popover.Panel className="absolute bottom-full z-10 mt-3 w-72 px-4 sm:px-0 pb-2">
+                <div className="rounded-lg shadow-lg">
                   <div className="bg-gray-350 rounded-lg">
                     <div>
                       <div className="flex flex-col">
@@ -205,11 +229,10 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
                                       setRecordingStatus("inactive")
                                     }}
                                   >
-
                                     {item?.label ? (
                                       <span>{item?.label}</span>
                                     ) : (
-                                      <span >{`Mic ${index + 1}`}</span>
+                                      <span>{`Mic ${index + 1}`}</span>
                                     )}
                                   </button>
                                 </div>
@@ -220,7 +243,7 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
 
                         <hr className='border border-gray-50 mt-2 mb-1' />
 
-                        {micOn ? <div className={` my-1 pl-4 pr-2 text-white text-left flex flex-1 w-full text-left mb-2 pl-1 `} >
+                        {micOn ? <div className="my-1 pr-2 text-white flex flex-1 w-full text-left mb-2 pl-4" >
 
                           <span className="mr-4 mt-1">
                             <TestMic />
@@ -267,7 +290,7 @@ export default function DropDown({ isMicrophonePermissionAllowed, mics, changeMi
         )}
       </Popover>
       <audio src={audio} ></audio>
-    </div>
+    </>
   )
 }
 

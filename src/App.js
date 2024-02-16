@@ -1,10 +1,10 @@
-import { MeetingProvider, createMicrophoneAudioTrack } from "@videosdk.live/react-sdk";
+import { MeetingProvider } from "@videosdk.live/react-sdk";
 import { useEffect } from "react";
 import { useState } from "react";
 import { MeetingAppProvider } from "./MeetingAppContextDef";
 import { MeetingContainer } from "./meeting/MeetingContainer";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
-import { JoiningScreen } from "./components/screens/JoiningScreen";
+import { JoiningScreen } from "./components/screens/JoiningScreen"
 
 function App() {
   const [token, setToken] = useState("");
@@ -17,15 +17,11 @@ function App() {
   const [selectedWebcam, setSelectedWebcam] = useState({ id: null });
   const [selectedSpeaker, setSelectedSpeaker] = useState({ id: null });
 
-  // const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
-  // const [selectWebcamDeviceId, setSelectWebcamDeviceId] = useState(
-  //   selectedWebcam.id
-  // );
+  const [isCameraPermissionAllowed, setIsCameraPermissionAllowed] = useState(null);
+  const [isMicrophonePermissionAllowed, setIsMicrophonePermissionAllowed] = useState(null);
 
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
-  let [customAudioTrack, setCustomTrack] = useState();
-
 
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
@@ -39,13 +35,11 @@ function App() {
     }
   }, [isMobile]);
 
-
-
   return (
     <>
       {isMeetingStarted ? (
         <MeetingAppProvider
-          selectedMic={selectedMic} 
+          selectedMic={selectedMic}
           selectedWebcam={selectedWebcam}
           initialMicOn={micOn}
           initialWebcamOn={webcamOn}
@@ -56,8 +50,7 @@ function App() {
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
-              multiStream: true,
-              customMicrophoneAudioTrack: customAudioTrack
+              multiStream: true
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
@@ -70,6 +63,9 @@ function App() {
                 setParticipantName("");
                 setWebcamOn(false);
                 setMicOn(false);
+                setSelectedMic({ id: null })
+                setSelectedWebcam({ id: null })
+                setSelectedSpeaker({ id: null })
                 setMeetingStarted(false);
               }}
               setIsMeetingLeft={setIsMeetingLeft}
@@ -81,17 +77,15 @@ function App() {
               setSelectedMic={setSelectedMic}
               setSelectedWebcam={setSelectedWebcam}
               setSelectedSpeaker={setSelectedSpeaker}
-
-            // selectWebcamDeviceId={selectWebcamDeviceId}
-            // setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-            // selectMicDeviceId={selectMicDeviceId}
-            // setSelectMicDeviceId={setSelectMicDeviceId}
-            //micEnabled={micOn}
-            //webcamEnabled={webcamOn}
+              isCameraPermissionAllowed={isCameraPermissionAllowed}
+              isMicrophonePermissionAllowed={isMicrophonePermissionAllowed}
 
             />
-          </MeetingProvider> 
+          </MeetingProvider>
         </MeetingAppProvider>
+
+
+
       ) : isMeetingLeft ? (
         <LeaveScreen setIsMeetingLeft={setIsMeetingLeft} />
       ) : (
@@ -110,6 +104,10 @@ function App() {
           setSelectedWebcam={setSelectedWebcam}
           selectedSpeaker={selectedSpeaker}
           setSelectedSpeaker={setSelectedSpeaker}
+          isCameraPermissionAllowed={isCameraPermissionAllowed}
+          isMicrophonePermissionAllowed={isMicrophonePermissionAllowed}
+          setIsCameraPermissionAllowed={setIsCameraPermissionAllowed}
+          setIsMicrophonePermissionAllowed={setIsMicrophonePermissionAllowed}
           onClickStartMeeting={() => {
             setMeetingStarted(true);
           }}

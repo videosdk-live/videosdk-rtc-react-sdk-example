@@ -23,14 +23,12 @@ export function MeetingContainer({
   selectedSpeaker,
   setSelectedMic,
   setSelectedWebcam,
-  //selectWebcamDeviceId,
-  //setSelectWebcamDeviceId,
-  //selectMicDeviceId,
-  //setSelectMicDeviceId,
   micOn,
   webcamOn,
+  isCameraPermissionAllowed,
+  isMicrophonePermissionAllowed
 }) {
-  console.log('Mic selected ::', selectedMic)
+
   const { useRaisedHandParticipants } = useMeetingAppContext();
   const { getVideoTrack } = useMediaStream();
 
@@ -171,6 +169,7 @@ export function MeetingContainer({
 
   const _handleOnError = (data) => {
     const { code, message } = data;
+    console.log("meetingErr", code, message)
 
     const joiningErrCodes = [
       4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010,
@@ -292,13 +291,12 @@ export function MeetingContainer({
               <BottomBar
                 bottomBarHeight={bottomBarHeight}
                 setIsMeetingLeft={setIsMeetingLeft}
-                //selectWebcamDeviceId={selectWebcamDeviceId}
-                //setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-                //selectMicDeviceId={selectMicDeviceId}
                 selectedMic={selectedMic}
                 selectedWebcam={selectedWebcam}
                 setSelectedMic={setSelectedMic}
                 setSelectedWebcam={setSelectedWebcam}
+                isCameraPermissionAllowed={isCameraPermissionAllowed}
+                isMicrophonePermissionAllowed={isMicrophonePermissionAllowed}
               />
             </>
           ) : (

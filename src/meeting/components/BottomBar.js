@@ -1,4 +1,4 @@
-import { Constants, useMeeting, usePubSub,useMediaDevice } from "@videosdk.live/react-sdk";
+import { Constants, useMeeting, usePubSub,useMediaDevice,createMicrophoneAudioTrack } from "@videosdk.live/react-sdk";
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   ClipboardIcon,
@@ -158,12 +158,14 @@ export function BottomBar({
   selectedMic,
   setSelectedMic,
   selectedWebcam,
-  setSelectedWebcam
+  setSelectedWebcam,
   //setSelectMicDeviceId,
+  isCameraPermissionAllowed,
+  isMicrophonePermissionAllowed
 }) {
 
   const {
-    getCameras
+    getCameras,getMicrophones
   } = useMediaDevice();
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
   const RaiseHandBTN = ({ isMobile, isTab }) => {
@@ -230,6 +232,7 @@ export function BottomBar({
 
     return (
       <OutlinedButton
+        
         Icon={RecordingIcon}
         onClick={_handleClick}
         isFocused={isRecording}
@@ -257,7 +260,8 @@ export function BottomBar({
     const changeMic = mMeeting?.changeMic;
 
     const getMics = async (mGetMics) => {
-      const mics = await mGetMics();
+      //const mics = await mGetMics();
+      const mics = await getMicrophones();
 
       mics && mics?.length && setMics(mics);
     };
@@ -275,14 +279,15 @@ export function BottomBar({
     const closeTooltip = () => {
       setTooltipShow(false);
     };
-
     return (
       <>
         <OutlinedButton
           Icon={localMicOn ? MicOnIcon : MicOffIcon}
-          onClick={() => {
-            // mMeeting.toggleMic();
-          }}
+          onClick={ () =>{
+            mMeeting.toggleMic()
+          }
+            
+          }
           bgColor={localMicOn ? "bg-gray-750" : "bg-white"}
           borderColor={localMicOn && "#ffffff33"}
           isFocused={localMicOn}
@@ -294,13 +299,13 @@ export function BottomBar({
                 <Popover className="relative">
                   {({ close }) => (
                     <>
-                      <Popover.Button className="flex items-center justify-center mt-1 mr-1">
+                      <Popover.Button disabled={!isMicrophonePermissionAllowed} className="flex items-center justify-center mt-1 mr-1">
                         <div
                           ref={btnRef}
                           onMouseEnter={openTooltip}
                           onMouseLeave={closeTooltip}
                         >
-                          <button
+                          <button 
                             onClick={(e) => {
                               getMics(mMeeting.getMics);
                             }}
@@ -452,7 +457,7 @@ export function BottomBar({
                 <Popover className="relative">
                   {({ close }) => (
                     <>
-                      <Popover.Button className="flex items-center justify-center mt-1 mr-1">
+                      <Popover.Button disabled={!isCameraPermissionAllowed} className="flex items-center justify-center mt-1 mr-1">
                         <div
                           ref={btnRef}
                           onMouseEnter={openTooltip}
@@ -510,7 +515,7 @@ export function BottomBar({
                                           let customTrack = await getVideoTrack(
                                             {
                                               webcamId: deviceId,
-                                              encoderConfig: "h540p_w960p",
+                                               encoderConfig: "h540p_w960p",
                                             }
                                           );
 

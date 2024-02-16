@@ -1,6 +1,6 @@
 import React from "react";
 
-function DropSpeaker() {
+function DropSpeaker({fillColor}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -11,7 +11,7 @@ function DropSpeaker() {
       className="ml-1 mt-0.5 fixed"
     >
       <path
-        stroke="#B4B4B4"
+        stroke={fillColor}
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="1.5"

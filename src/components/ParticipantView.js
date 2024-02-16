@@ -436,7 +436,6 @@ export function ParticipantView({ participantId, selectedSpeaker }) {
         }catch(err){
           console.log("Setting speaker device failed", err);
         }
-        // micRef.current.setSinkId("f4dada00a7f37f0d0016ac830a0aeb35f9f37b6625ba6252919aceaafd099b90");
         micRef.current
           .play()
           .catch((error) =>
