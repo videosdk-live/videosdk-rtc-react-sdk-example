@@ -1,13 +1,12 @@
 import { CheckIcon, ClipboardIcon } from "@heroicons/react/outline";
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 
 export function MeetingDetailsScreen({
   onClickJoin,
   _handleOnCreateMeeting,
   participantName,
   setParticipantName,
-  videoTrack,
-  setVideoTrack,
   onClickStartMeeting,
 }) {
   const [meetingId, setMeetingId] = useState("");
@@ -72,15 +71,10 @@ export function MeetingDetailsScreen({
           </p> */}
           <button
             disabled={participantName.length < 3}
-            className={`w-full ${
-              participantName.length < 3 ? "bg-gray-650" : "bg-purple-350"
-            }  text-white px-2 py-3 rounded-xl mt-5`}
+            className={`w-full ${participantName.length < 3 ? "bg-gray-650" : "bg-purple-350"
+              }  text-white px-2 py-3 rounded-xl mt-5`}
             onClick={(e) => {
               if (iscreateMeetingClicked) {
-                if (videoTrack) {
-                  videoTrack.stop();
-                  setVideoTrack(null);
-                }
                 onClickStartMeeting();
               } else {
                 if (meetingId.match("\\w{4}\\-\\w{4}\\-\\w{4}")) {
@@ -100,9 +94,26 @@ export function MeetingDetailsScreen({
             <button
               className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
               onClick={async (e) => {
-                const meetingId = await _handleOnCreateMeeting();
-                setMeetingId(meetingId);
-                setIscreateMeetingClicked(true);
+                const { meetingId, err } = await _handleOnCreateMeeting();
+              
+                if (meetingId) {
+                  setMeetingId(meetingId);
+                  setIscreateMeetingClicked(true);
+                } else {
+                  toast(
+                    `${err}`,
+                    {
+                      position: "bottom-left",
+                      autoClose: 4000,
+                      hideProgressBar: true,
+                      closeButton: false,
+                      pauseOnHover: true,
+                      draggable: true,
+                      progress: undefined,
+                      theme: "light",
+                    }
+                  );
+                }
               }}
             >
               Create a meeting

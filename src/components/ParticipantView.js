@@ -12,6 +12,7 @@ import NetworkIcon from "../icons/NetworkIcon";
 import SpeakerIcon from "../icons/SpeakerIcon";
 import { getQualityScore, nameTructed } from "../utils/common";
 import * as ReactDOM from "react-dom";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 
 export const CornerDisplayName = ({
   participantId,
@@ -422,6 +423,7 @@ export function ParticipantView({ participantId }) {
     isActiveSpeaker,
   } = useParticipant(participantId);
 
+  const {selectedSpeaker} = useMeetingAppContext();
   const micRef = useRef(null);
   const [mouseOver, setMouseOver] = useState(false);
 
@@ -431,16 +433,22 @@ export function ParticipantView({ participantId }) {
         const mediaStream = new MediaStream();
         mediaStream.addTrack(micStream.track);
         micRef.current.srcObject = mediaStream;
+        try{
+          micRef.current.setSinkId(selectedSpeaker.id);
+        }catch(err){
+          console.log("Setting speaker device failed", err);
+        }
         micRef.current
           .play()
           .catch((error) =>
-            console.error("videoElem.current.play() failed", error)
+            console.error("micRef.current.play() failed", error)
           );
       } else {
         micRef.current.srcObject = null;
       }
     }
-  }, [micStream, micOn]);
+  }, [micStream, micOn,selectedSpeaker]);
+  
   const webcamMediaStream = useMemo(() => {
     if (webcamOn && webcamStream) {
       const mediaStream = new MediaStream();

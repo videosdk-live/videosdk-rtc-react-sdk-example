@@ -7,7 +7,7 @@
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^1.0.6",
     "@popperjs/core": "^2.11.8",
-    "@videosdk.live/react-sdk": "^0.1.82",
+    "@videosdk.live/react-sdk": "^0.1.84",
     "lottie-react": "^2.4.0",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^7.3.3",

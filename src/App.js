@@ -4,21 +4,16 @@ import { useState } from "react";
 import { MeetingAppProvider } from "./MeetingAppContextDef";
 import { MeetingContainer } from "./meeting/MeetingContainer";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
-import { JoiningScreen } from "./components/screens/JoiningScreen";
+import { JoiningScreen } from "./components/screens/JoiningScreen"
 
 function App() {
   const [token, setToken] = useState("");
   const [meetingId, setMeetingId] = useState("");
   const [participantName, setParticipantName] = useState("");
-  const [micOn, setMicOn] = useState(true);
-  const [webcamOn, setWebcamOn] = useState(true);
-  const [selectedMic, setSelectedMic] = useState({ id: null });
-  const [selectedWebcam, setSelectedWebcam] = useState({ id: null });
-  const [selectWebcamDeviceId, setSelectWebcamDeviceId] = useState(
-    selectedWebcam.id
-  );
-
-  const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
+  const [micOn, setMicOn] = useState(false);
+  const [webcamOn, setWebcamOn] = useState(false);
+  const [customAudioStream, setCustomAudioStream] = useState(null);
+  const [customVideoStream, setCustomVideoStream] = useState(null)
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
 
@@ -36,21 +31,18 @@ function App() {
 
   return (
     <>
-      {isMeetingStarted ? (
-        <MeetingAppProvider
-          selectedMic={selectedMic}
-          selectedWebcam={selectedWebcam}
-          initialMicOn={micOn}
-          initialWebcamOn={webcamOn}
-        >
+      <MeetingAppProvider>
+        {isMeetingStarted ? (
+
           <MeetingProvider
             config={{
               meetingId,
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
-
               multiStream: true,
+              customCameraVideoTrack: customVideoStream,
+              customMicrophoneAudioTrack: customAudioStream
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
@@ -66,38 +58,34 @@ function App() {
                 setMeetingStarted(false);
               }}
               setIsMeetingLeft={setIsMeetingLeft}
-              selectedMic={selectedMic}
-              selectedWebcam={selectedWebcam}
-              selectWebcamDeviceId={selectWebcamDeviceId}
-              setSelectWebcamDeviceId={setSelectWebcamDeviceId}
-              selectMicDeviceId={selectMicDeviceId}
-              setSelectMicDeviceId={setSelectMicDeviceId}
-              micEnabled={micOn}
-              webcamEnabled={webcamOn}
             />
           </MeetingProvider>
-        </MeetingAppProvider>
-      ) : isMeetingLeft ? (
-        <LeaveScreen setIsMeetingLeft={setIsMeetingLeft} />
-      ) : (
-        <JoiningScreen
-          participantName={participantName}
-          setParticipantName={setParticipantName}
-          setMeetingId={setMeetingId}
-          setToken={setToken}
-          setMicOn={setMicOn}
-          micEnabled={micOn}
-          webcamEnabled={webcamOn}
-          setSelectedMic={setSelectedMic}
-          setSelectedWebcam={setSelectedWebcam}
-          setWebcamOn={setWebcamOn}
-          onClickStartMeeting={() => {
-            setMeetingStarted(true);
-          }}
-          startMeeting={isMeetingStarted}
-          setIsMeetingLeft={setIsMeetingLeft}
-        />
-      )}
+
+        ) : isMeetingLeft ? (
+          <LeaveScreen setIsMeetingLeft={setIsMeetingLeft} />
+        ) : (
+
+          <JoiningScreen
+            participantName={participantName}
+            setParticipantName={setParticipantName}
+            setMeetingId={setMeetingId}
+            setToken={setToken}
+            micOn={micOn}
+            setMicOn={setMicOn}
+            webcamOn={webcamOn}
+            setWebcamOn={setWebcamOn}
+            customAudioStream={customAudioStream}
+            setCustomAudioStream={setCustomAudioStream}
+            customVideoStream={customVideoStream}
+            setCustomVideoStream={setCustomVideoStream}
+            onClickStartMeeting={() => {
+              setMeetingStarted(true);
+            }}
+            startMeeting={isMeetingStarted}
+            setIsMeetingLeft={setIsMeetingLeft}
+          />
+        )}
+      </MeetingAppProvider>
     </>
   );
 }
