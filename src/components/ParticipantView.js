@@ -445,7 +445,7 @@ export function ParticipantView({ participantId, selectedSpeaker }) {
         micRef.current.srcObject = null;
       }
     }
-  }, [micStream, micOn]);
+  }, [micStream, micOn,selectedSpeaker]);
   
   const webcamMediaStream = useMemo(() => {
     if (webcamOn && webcamStream) {

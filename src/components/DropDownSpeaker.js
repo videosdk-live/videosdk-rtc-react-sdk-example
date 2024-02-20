@@ -5,16 +5,15 @@ import React, { useState } from "react";
 import DropSpeaker from '../icons/DropDown/DropSpeaker';
 import TestSpeaker from '../icons/DropDown/TestSpeaker';
 import test_sound from '../sounds/test_sound.mp3'
+import { useMeetingAppContext } from '../MeetingAppContextDef';
 
-export default function DropDownSpeaker({
-  isMicrophonePermissionAllowed,
-  speakers,
-  setSelectedSpeaker,
-  selectedSpeakerLabel,
-  setSelectedSpeakerLabel,
-  selectedSpeaker
-}) {
+export default function DropDownSpeaker({ speakers }) {
 
+  const {
+    setSelectedSpeaker,
+    selectedSpeaker,
+    isMicrophonePermissionAllowed
+  } = useMeetingAppContext()
   const [audioProgress, setAudioProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false)
   const [isHovered, setIsHovered] = useState(false);
@@ -67,7 +66,7 @@ export default function DropDownSpeaker({
             >
               <DropSpeaker fillColor={isHovered || open ? "#FFF" : "#B4B4B4"} />
               <span className=" overflow-hidden whitespace-nowrap overflow-ellipsis w-28 ml-6">
-                {isMicrophonePermissionAllowed ? selectedSpeakerLabel : "Permission Needed"}
+                {isMicrophonePermissionAllowed ? selectedSpeaker?.label : "Permission Needed"}
               </span>
               <ChevronDownIcon
                 className={`${open ? 'text-orange-300' : 'text-orange-300/70'}
@@ -97,7 +96,7 @@ export default function DropDownSpeaker({
                                   key={`speaker_${index}`}
                                   className={` my-1 pl-4 pr-2 text-white text-left flex `} >
                                   <span className="w-6 mr-2 flex items-center justify-center">
-                                    {selectedSpeakerLabel === item?.label && (
+                                    {selectedSpeaker?.label === item?.label && (
                                       <CheckIcon className='h-5 w-5' />
                                     )}
                                   </span>
@@ -105,11 +104,11 @@ export default function DropDownSpeaker({
                                     className={`flex flex-1 w-full text-left `}
                                     value={item?.deviceId}
                                     onClick={() => {
-                                      setSelectedSpeakerLabel(item?.label);
                                       setSelectedSpeaker(
                                         (s) => ({
                                           ...s,
                                           id: item?.deviceId,
+                                          label: item?.label
                                         })
                                       );
                                     }}
@@ -128,7 +127,7 @@ export default function DropDownSpeaker({
                         {speakers.length && <> <hr className='border border-gray-50 mt-2 mb-1' />
                           <div className={`my-1 pl-4 pr-2 text-white text-left`} >
                             <button
-                              className={`flex flex-1 w-full text-left mb-1 pl-1 `}
+                              className={`flex flex-1 w-full text-left mb-1 pl-1 focus:outline-none`}
                               onClick={testSpeakers}
                             >
                               <span className="mr-3">

@@ -5,6 +5,11 @@ export const MeetingAppContext = createContext();
 export const useMeetingAppContext = () => useContext(MeetingAppContext);
 
 export const MeetingAppProvider = ({ children }) => {
+  const [selectedMic, setSelectedMic] = useState({ id: null, label: null });
+  const [selectedWebcam, setSelectedWebcam] = useState({ id: null, label: null });
+  const [selectedSpeaker, setSelectedSpeaker] = useState({ id: null, label: null });
+  const [isCameraPermissionAllowed, setIsCameraPermissionAllowed] = useState(null);
+  const [isMicrophonePermissionAllowed, setIsMicrophonePermissionAllowed] = useState(null);
   const [raisedHandsParticipants, setRaisedHandsParticipants] = useState([]);
   const [sideBarMode, setSideBarMode] = useState(null);
   const [pipMode, setPipMode] = useState(false);
@@ -65,16 +70,25 @@ export const MeetingAppProvider = ({ children }) => {
         // states
 
         raisedHandsParticipants,
-
+        selectedMic,
+        selectedWebcam,
+        selectedSpeaker,
         sideBarMode,
         pipMode,
+        isCameraPermissionAllowed,
+        isMicrophonePermissionAllowed,
+
         // setters
 
         setRaisedHandsParticipants,
-
+        setSelectedMic,
+        setSelectedWebcam,
+        setSelectedSpeaker,
         setSideBarMode,
         setPipMode,
         useRaisedHandParticipants,
+        setIsCameraPermissionAllowed,
+        setIsMicrophonePermissionAllowed,
       }}
     >
       {children}

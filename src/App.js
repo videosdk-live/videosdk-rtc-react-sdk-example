@@ -10,16 +10,10 @@ function App() {
   const [token, setToken] = useState("");
   const [meetingId, setMeetingId] = useState("");
   const [participantName, setParticipantName] = useState("");
-
   const [micOn, setMicOn] = useState(false);
   const [webcamOn, setWebcamOn] = useState(false);
-  const [selectedMic, setSelectedMic] = useState({ id: null });
-  const [selectedWebcam, setSelectedWebcam] = useState({ id: null });
-  const [selectedSpeaker, setSelectedSpeaker] = useState({ id: null });
-
-  const [isCameraPermissionAllowed, setIsCameraPermissionAllowed] = useState(null);
-  const [isMicrophonePermissionAllowed, setIsMicrophonePermissionAllowed] = useState(null);
-
+  const [customAudioStream, setCustomAudioStream] = useState(null);
+  const [customVideoStream, setCustomVideoStream] = useState(null)
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
 
@@ -37,20 +31,18 @@ function App() {
 
   return (
     <>
-      {isMeetingStarted ? (
-        <MeetingAppProvider
-          selectedMic={selectedMic}
-          selectedWebcam={selectedWebcam}
-          initialMicOn={micOn}
-          initialWebcamOn={webcamOn}
-        >
+      <MeetingAppProvider>
+        {isMeetingStarted ? (
+
           <MeetingProvider
             config={{
               meetingId,
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",
-              multiStream: true
+              multiStream: true,
+              customCameraVideoTrack: customVideoStream,
+              customMicrophoneAudioTrack: customAudioStream
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
@@ -63,58 +55,37 @@ function App() {
                 setParticipantName("");
                 setWebcamOn(false);
                 setMicOn(false);
-                setSelectedMic({ id: null })
-                setSelectedWebcam({ id: null })
-                setSelectedSpeaker({ id: null })
                 setMeetingStarted(false);
               }}
               setIsMeetingLeft={setIsMeetingLeft}
-              micOn={micOn}
-              webcamOn={webcamOn}
-              selectedMic={selectedMic}
-              selectedWebcam={selectedWebcam}
-              selectedSpeaker={selectedSpeaker}
-              setSelectedMic={setSelectedMic}
-              setSelectedWebcam={setSelectedWebcam}
-              setSelectedSpeaker={setSelectedSpeaker}
-              isCameraPermissionAllowed={isCameraPermissionAllowed}
-              isMicrophonePermissionAllowed={isMicrophonePermissionAllowed}
-
             />
           </MeetingProvider>
-        </MeetingAppProvider>
 
+        ) : isMeetingLeft ? (
+          <LeaveScreen setIsMeetingLeft={setIsMeetingLeft} />
+        ) : (
 
-
-      ) : isMeetingLeft ? (
-        <LeaveScreen setIsMeetingLeft={setIsMeetingLeft} />
-      ) : (
-        <JoiningScreen
-          participantName={participantName}
-          setParticipantName={setParticipantName}
-          setMeetingId={setMeetingId}
-          setToken={setToken}
-          micOn={micOn}
-          setMicOn={setMicOn}
-          webcamOn={webcamOn}
-          setWebcamOn={setWebcamOn}
-          selectedMic={selectedMic}
-          setSelectedMic={setSelectedMic}
-          selectedWebcam={selectedWebcam}
-          setSelectedWebcam={setSelectedWebcam}
-          selectedSpeaker={selectedSpeaker}
-          setSelectedSpeaker={setSelectedSpeaker}
-          isCameraPermissionAllowed={isCameraPermissionAllowed}
-          isMicrophonePermissionAllowed={isMicrophonePermissionAllowed}
-          setIsCameraPermissionAllowed={setIsCameraPermissionAllowed}
-          setIsMicrophonePermissionAllowed={setIsMicrophonePermissionAllowed}
-          onClickStartMeeting={() => {
-            setMeetingStarted(true);
-          }}
-          startMeeting={isMeetingStarted}
-          setIsMeetingLeft={setIsMeetingLeft}
-        />
-      )}
+          <JoiningScreen
+            participantName={participantName}
+            setParticipantName={setParticipantName}
+            setMeetingId={setMeetingId}
+            setToken={setToken}
+            micOn={micOn}
+            setMicOn={setMicOn}
+            webcamOn={webcamOn}
+            setWebcamOn={setWebcamOn}
+            customAudioStream={customAudioStream}
+            setCustomAudioStream={setCustomAudioStream}
+            customVideoStream={customVideoStream}
+            setCustomVideoStream={setCustomVideoStream}
+            onClickStartMeeting={() => {
+              setMeetingStarted(true);
+            }}
+            startMeeting={isMeetingStarted}
+            setIsMeetingLeft={setIsMeetingLeft}
+          />
+        )}
+      </MeetingAppProvider>
     </>
   );
 }

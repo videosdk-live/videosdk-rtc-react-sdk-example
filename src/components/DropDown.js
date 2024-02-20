@@ -6,23 +6,24 @@ import DropMIC from '../icons/DropDown/DropMIC';
 import TestMic from "../icons/DropDown/TestMic"
 import TestMicOff from '../icons/DropDown/TestMicOff';
 import PauseButton from '../icons/DropDown/PauseButton';
+import { useMeetingAppContext } from '../MeetingAppContextDef';
 
 export default function DropDown({
-  isMicrophonePermissionAllowed,
   mics,
   changeMic,
-  setSelectedMic,
-  selectedMic,
-  selectedMicLabel,
-  setSelectedMicLabel,
-  audioStream,
-  selectedSpeaker,
+  customAudioStream,
   audioTrack,
   micOn,
   didDeviceChange,
   setDidDeviceChange
 }) {
 
+  const {
+    setSelectedMic,
+    selectedMic,
+    selectedSpeaker,
+    isMicrophonePermissionAllowed
+  } = useMeetingAppContext();
   const [audioProgress, setAudioProgress] = useState(0);
   const [recordingProgress, setRecordingProgress] = useState(0)
   const [recordingStatus, setRecordingStatus] = useState("inactive");
@@ -51,7 +52,7 @@ export default function DropDown({
   useEffect(() => {
     if (didDeviceChange) {
       setDidDeviceChange(false)
-      if (mediaRecorder.current != null && mediaRecorder.current.state == "recording") { stopRecording() }
+      if (mediaRecorder.current != null && mediaRecorder.current.state === "recording") { stopRecording() }
       setRecordingProgress(0)
       setRecordingStatus("inactive")
     }
@@ -85,7 +86,6 @@ export default function DropDown({
   };
 
   const handlePlaying = () => {
-    console.log("playing")
     setRecordingStatus("playing");
     const audioTags = document.getElementsByTagName("audio");
 
@@ -97,55 +97,56 @@ export default function DropDown({
           setAudioProgress(progress);
         });
         audioTags.item(i).addEventListener('ended', () => {
-          setAudioProgress(0); 
+          setAudioProgress(0);
         });
       })
     }
   }
 
   const startRecording = async () => {
-    console.log("started recording")
     setRecordingStatus("recording");
-    console.log(selectedMic.id)
 
-    const media = new MediaRecorder(audioStream, { type: mimeType });
-    mediaRecorder.current = media;
-    mediaRecorder.current.start();
-    let localAudioChunks = [];
+    try {
+      const media = new MediaRecorder(customAudioStream, { type: mimeType });
+      mediaRecorder.current = media;
+      mediaRecorder.current.start();
+      let localAudioChunks = [];
 
-    mediaRecorder.current.ondataavailable = (event) => {
-      if (typeof event.data === "undefined") return;
-      if (event.data.size === 0) return;
-      localAudioChunks.push(event.data);
-    };
+      mediaRecorder.current.ondataavailable = (event) => {
+        if (typeof event.data === "undefined") return;
+        if (event.data.size === 0) return;
+        localAudioChunks.push(event.data);
+      };
 
-    mediaRecorder.current.onstop = () => {
-      const audioBlob = new Blob(localAudioChunks, { type: mimeType });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      setAudio(audioUrl);
-      localAudioChunks = []
-      const elapsedTime = Date.now() - startTime;
-      const durationInSeconds = (elapsedTime / 1000);
-      setRecordingDuration(durationInSeconds)
-    };
+      mediaRecorder.current.onstop = () => {
+        const audioBlob = new Blob(localAudioChunks, { type: mimeType });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudio(audioUrl);
+        localAudioChunks = []
+        const elapsedTime = Date.now() - startTime;
+        const durationInSeconds = (elapsedTime / 1000);
+        setRecordingDuration(durationInSeconds)
+      };
 
-    const startTime = Date.now();
-    intervalRef.current = setInterval(() => {
-      const elapsedTime = Date.now() - startTime;
-      const progress = (elapsedTime / 7000) * 100;
-      setRecordingProgress(progress);
-    });
+      const startTime = Date.now();
+      intervalRef.current = setInterval(() => {
+        const elapsedTime = Date.now() - startTime;
+        const progress = (elapsedTime / 7000) * 100;
+        setRecordingProgress(progress);
+      });
 
-    setTimeout(() => {
-      clearInterval(intervalRef.current)
-      stopRecording();
-    }, 7000)
+      setTimeout(() => {
+        clearInterval(intervalRef.current)
+        stopRecording();
+      }, 7000)
+    } catch (err) {
+      console.log("Error in MediaRecorder:", err)
+    }
   };
 
   const stopRecording = () => {
     if (mediaRecorder.current.state != "inactive") {
-      setRecordingProgress(0)
-      console.log("stopped recording")
+      setRecordingProgress(0);
       setRecordingStatus("stopped recording");
       clearInterval(intervalRef.current)
       mediaRecorder.current.stop();
@@ -165,7 +166,7 @@ export default function DropDown({
               ${open
                   ? "text-white ring-1 ring-gray-250 bg-black"
                   : "text-customGray-250 hover:text-white"
-              }
+                }
               group inline-flex items-center rounded-md px-1 py-1 w-44 text-base font-normal
               ${!isMicrophonePermissionAllowed ? "opacity-50" : ""}`}
               onClick={() => {
@@ -176,7 +177,7 @@ export default function DropDown({
             >
               <DropMIC fillColor={isHovered || open ? "#FFF" : "#B4B4B4"} />
               <span className="overflow-hidden whitespace-nowrap overflow-ellipsis w-28 ml-6">
-                {isMicrophonePermissionAllowed ? selectedMicLabel : "Permission Needed"}
+                {isMicrophonePermissionAllowed ? selectedMic?.label : "Permission Needed"}
               </span>
               <ChevronDownIcon
                 className={`${open ? 'text-white' : 'text-customGray-250 hover:text-white'}
@@ -208,7 +209,7 @@ export default function DropDown({
                                   className={` my-1 pl-4 pr-2 text-white text-left flex`}
                                 >
                                   <span className="w-6 mr-2 flex items-center justify-center">
-                                    {selectedMicLabel === item?.label && (
+                                    {selectedMic?.label === item?.label && (
                                       <CheckIcon className='h-5 w-5' />
                                     )}
                                   </span>
@@ -216,10 +217,10 @@ export default function DropDown({
                                     className={`flex flex-1 w-full text-left`}
                                     value={item?.deviceId}
                                     onClick={() => {
-                                      setSelectedMicLabel(item?.label);
                                       setSelectedMic(
                                         (s) => ({
                                           ...s,
+                                          label: item?.label,
                                           id: item?.deviceId,
                                         })
                                       );

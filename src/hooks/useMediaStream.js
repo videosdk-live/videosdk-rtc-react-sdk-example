@@ -1,25 +1,34 @@
-import { createCameraVideoTrack } from "@videosdk.live/react-sdk";
-import { useMeetingAppContext } from "../MeetingAppContextDef";
+import { createCameraVideoTrack , createMicrophoneAudioTrack } from "@videosdk.live/react-sdk";
 
 const useMediaStream = () => {
-  const { selectedWebcam, webCamResolution } = useMeetingAppContext();
 
   const getVideoTrack = async ({ webcamId, encoderConfig }) => {
     try {
       const track = await createCameraVideoTrack({
-        cameraId: webcamId ? webcamId : selectedWebcam.id,
-        encoderConfig: encoderConfig ? encoderConfig : webCamResolution,
+        cameraId: webcamId ,
+        encoderConfig: encoderConfig ?  encoderConfig :"h540p_w960p",
         optimizationMode: "motion",
         multiStream: false,
       });
 
       return track;
-    } catch (error) {
+    } catch(error) {
       return null;
     }
   };
 
-  return { getVideoTrack };
+  const getAudioTrack = async ({micId}) => {
+    try{
+      const track = await createMicrophoneAudioTrack({
+        microphoneId: micId
+      });
+      return track;
+    } catch(error) {
+      return null;
+    }
+  };
+
+  return { getVideoTrack,getAudioTrack };
 };
 
 export default useMediaStream;

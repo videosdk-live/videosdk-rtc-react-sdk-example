@@ -12,32 +12,24 @@ import useIsTab from "../hooks/useIsTab";
 import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
-import useMediaStream from "../hooks/useMediaStream";
 
 export function MeetingContainer({
   onMeetingLeave,
   setIsMeetingLeft,
-
-  selectedMic,
-  selectedWebcam,
-  selectedSpeaker,
-  setSelectedMic,
-  setSelectedWebcam,
-  micOn,
-  webcamOn,
-  isCameraPermissionAllowed,
-  isMicrophonePermissionAllowed
 }) {
+  const {
+    setSelectedMic,
+    setSelectedWebcam,
+    selectedSpeaker,
+    setSelectedSpeaker,
+  } = useMeetingAppContext()
 
   const { useRaisedHandParticipants } = useMeetingAppContext();
-  const { getVideoTrack } = useMediaStream();
-
   const bottomBarHeight = 60;
 
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
-    useState(null);
+  const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] = useState(null);
   const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
   const [meetingError, setMeetingError] = useState(false);
 
@@ -113,13 +105,10 @@ export function MeetingContainer({
   function onParticipantJoined(participant) {
     // Change quality to low, med or high based on resolution
     participant && participant.setQuality("high");
-    console.log(selectedSpeaker.label)
-    console.log(selectedSpeaker.id)
   }
 
 
   function onEntryResponded(participantId, name) {
-    // console.log(" onEntryResponded", participantId, name);
     if (mMeetingRef.current?.localParticipant?.id === participantId) {
       if (name === "allowed") {
         setLocalParticipantAllowedJoin(true);
@@ -132,38 +121,14 @@ export function MeetingContainer({
     }
   }
 
-  async function onMeetingJoined() {
+  function onMeetingJoined() {
     console.log("onMeetingJoined");
-    const { changeWebcam, changeMic, muteMic, disableWebcam } =
-      mMeetingRef.current;
-
-    if (webcamOn && selectedWebcam.id) {
-      await new Promise((resolve) => {
-        let track;
-        disableWebcam();
-        setTimeout(async () => {
-          track = await getVideoTrack({
-            webcamId: selectedWebcam.id,
-            encoderConfig: "h540p_w960p",
-          });
-          changeWebcam(track);
-          resolve();
-        }, 500);
-      });
-    }
-
-    if (micOn && selectedMic.id) {
-      await new Promise((resolve) => {
-        muteMic();
-        setTimeout(() => {
-          changeMic(selectedMic.id);
-          resolve();
-        }, 500);
-      });
-    }
   }
+
   function onMeetingLeft() {
-    // console.log("onMeetingLeft");
+    setSelectedMic({ id: null, label: null })
+    setSelectedWebcam({ id: null, label: null })
+    setSelectedSpeaker({ id: null, label: null })
     onMeetingLeave();
   }
 
@@ -277,7 +242,10 @@ export function MeetingContainer({
                     <PresenterView height={containerHeight - bottomBarHeight} />
                   ) : null}
                   {isPresenting && isMobile ? null : (
-                    <MemorizedParticipantView isPresenting={isPresenting} selectedSpeaker={selectedSpeaker} />
+                    <MemorizedParticipantView
+                      isPresenting={isPresenting}
+                      selectedSpeaker={selectedSpeaker}
+                    />
                   )}
 
                 </div>
@@ -291,12 +259,6 @@ export function MeetingContainer({
               <BottomBar
                 bottomBarHeight={bottomBarHeight}
                 setIsMeetingLeft={setIsMeetingLeft}
-                selectedMic={selectedMic}
-                selectedWebcam={selectedWebcam}
-                setSelectedMic={setSelectedMic}
-                setSelectedWebcam={setSelectedWebcam}
-                isCameraPermissionAllowed={isCameraPermissionAllowed}
-                isMicrophonePermissionAllowed={isMicrophonePermissionAllowed}
               />
             </>
           ) : (

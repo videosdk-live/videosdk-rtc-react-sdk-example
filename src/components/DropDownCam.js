@@ -3,16 +3,18 @@ import { ChevronDownIcon, CheckIcon } from "@heroicons/react/outline";
 import { Fragment, useState } from 'react'
 import React from "react";
 import DropCAM from '../icons/DropDown/DropCAM';
+import { useMeetingAppContext } from '../MeetingAppContextDef';
 
 export default function DropDownCam({
-  isCameraPermissionAllowed,
   webcams,
-  changeWebcam,
-  setSelectedWebcam,
-  selectedWebcamLabel,
-  setSelectedWebcamLabel
+  changeWebcam
 }) {
 
+  const {
+    setSelectedWebcam,
+    selectedWebcam,
+    isCameraPermissionAllowed
+  } = useMeetingAppContext()
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -34,7 +36,7 @@ export default function DropDownCam({
             >
               <DropCAM fillColor={isHovered || open ? "#FFF" : "#B4B4B4"} />
               <span className=" overflow-hidden whitespace-nowrap overflow-ellipsis w-28 ml-7">
-                {isCameraPermissionAllowed ? selectedWebcamLabel : "Permission Needed"}
+                {isCameraPermissionAllowed ? selectedWebcam?.label : "Permission Needed"}
               </span>
 
               <ChevronDownIcon
@@ -67,7 +69,7 @@ export default function DropDownCam({
                                   className={` my-1 pl-4 pr-2 text-white text-left flex`}
                                 >
                                   <span className="w-6 mr-2 flex items-center justify-center">
-                                    {selectedWebcamLabel === item?.label && (
+                                    {selectedWebcam?.label === item?.label && (
                                       <CheckIcon className='h-5 w-5' />
                                     )}
                                   </span>
@@ -75,11 +77,11 @@ export default function DropDownCam({
                                     className={`flex flex-1 w-full text-left`}
                                     value={item?.deviceId}
                                     onClick={() => {
-                                      setSelectedWebcamLabel(item?.label);
                                       setSelectedWebcam(
                                         (s) => ({
                                           ...s,
                                           id: item?.deviceId,
+                                          label: item?.label
                                         })
                                       );
                                       changeWebcam(item?.deviceId);
