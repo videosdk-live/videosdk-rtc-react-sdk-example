@@ -20,7 +20,6 @@ export function MeetingContainer({
   const {
     setSelectedMic,
     setSelectedWebcam,
-    selectedSpeaker,
     setSelectedSpeaker,
   } = useMeetingAppContext()
 
@@ -242,10 +241,7 @@ export function MeetingContainer({
                     <PresenterView height={containerHeight - bottomBarHeight} />
                   ) : null}
                   {isPresenting && isMobile ? null : (
-                    <MemorizedParticipantView
-                      isPresenting={isPresenting}
-                      selectedSpeaker={selectedSpeaker}
-                    />
+                    <MemorizedParticipantView isPresenting={isPresenting}/>
                   )}
 
                 </div>

@@ -12,6 +12,7 @@ import NetworkIcon from "../icons/NetworkIcon";
 import SpeakerIcon from "../icons/SpeakerIcon";
 import { getQualityScore, nameTructed } from "../utils/common";
 import * as ReactDOM from "react-dom";
+import { useMeetingAppContext } from "../MeetingAppContextDef";
 
 export const CornerDisplayName = ({
   participantId,
@@ -410,7 +411,7 @@ export const CornerDisplayName = ({
   );
 };
 
-export function ParticipantView({ participantId, selectedSpeaker }) {
+export function ParticipantView({ participantId }) {
   const {
     displayName,
     webcamStream,
@@ -422,6 +423,7 @@ export function ParticipantView({ participantId, selectedSpeaker }) {
     isActiveSpeaker,
   } = useParticipant(participantId);
 
+  const {selectedSpeaker} = useMeetingAppContext();
   const micRef = useRef(null);
   const [mouseOver, setMouseOver] = useState(false);
 

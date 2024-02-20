@@ -5,11 +5,11 @@ import { ParticipantView } from "./ParticipantView";
 const MemoizedParticipant = React.memo(
   ParticipantView,
   (prevProps, nextProps) => {
-    return prevProps.participantId === nextProps.participantId && prevProps.selectedSpeaker  === nextProps.selectedSpeaker;
+    return prevProps.participantId === nextProps.participantId;
   }
 );
 
-function ParticipantGrid({ participantIds, isPresenting,selectedSpeaker }) {
+function ParticipantGrid({ participantIds, isPresenting }) {
   const { sideBarMode } = useMeetingAppContext();
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
@@ -83,7 +83,7 @@ function ParticipantGrid({ participantIds, isPresenting,selectedSpeaker }) {
                             : "md:max-w-lg 2xl:max-w-2xl"
                         } overflow-clip overflow-hidden  p-1`}
                       >
-                        <MemoizedParticipant participantId={participantId} selectedSpeaker={selectedSpeaker} />
+                        <MemoizedParticipant participantId={participantId} />
                       </div>
                     );
                   })}
@@ -102,7 +102,7 @@ export const MemoizedParticipantGrid = React.memo(
     return (
       JSON.stringify(prevProps.participantIds) ===
         JSON.stringify(nextProps.participantIds) &&
-      prevProps.isPresenting === nextProps.isPresenting && prevProps.selectedSpeaker  === nextProps.selectedSpeaker
+      prevProps.isPresenting === nextProps.isPresenting
     );
   }
 );
