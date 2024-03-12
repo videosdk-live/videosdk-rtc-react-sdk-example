@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, createRef } from "react";
 import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import { BottomBar } from "./components/BottomBar";
-import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
+import { SidebarContainer } from "../components/sidebar/SidebarContainer";
 import MemorizedParticipantView from "./components/ParticipantView";
 import { PresenterView } from "../components/PresenterView";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
@@ -13,22 +13,17 @@ import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
 
-export function MeetingContainer({
-  onMeetingLeave,
-  setIsMeetingLeft,
-}) {
-  const {
-    setSelectedMic,
-    setSelectedWebcam,
-    setSelectedSpeaker,
-  } = useMeetingAppContext()
+export function MeetingContainer({ onMeetingLeave, setIsMeetingLeft }) {
+  const { setSelectedMic, setSelectedWebcam, setSelectedSpeaker } =
+    useMeetingAppContext();
 
   const { useRaisedHandParticipants } = useMeetingAppContext();
   const bottomBarHeight = 60;
 
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
-  const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] = useState(null);
+  const [localParticipantAllowedJoin, setLocalParticipantAllowedJoin] =
+    useState(null);
   const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
   const [meetingError, setMeetingError] = useState(false);
 
@@ -50,12 +45,12 @@ export function MeetingContainer({
   const sideBarContainerWidth = isXLDesktop
     ? 400
     : isLGDesktop
-      ? 360
-      : isTab
-        ? 320
-        : isMobile
-          ? 280
-          : 240;
+    ? 360
+    : isTab
+    ? 320
+    : isMobile
+    ? 280
+    : 240;
 
   useEffect(() => {
     containerRef.current?.offsetHeight &&
@@ -83,9 +78,10 @@ export function MeetingContainer({
       status === Constants.recordingEvents.RECORDING_STOPPED
     ) {
       toast(
-        `${status === Constants.recordingEvents.RECORDING_STARTED
-          ? "Meeting recording is started"
-          : "Meeting recording is stopped."
+        `${
+          status === Constants.recordingEvents.RECORDING_STARTED
+            ? "Meeting recording is started"
+            : "Meeting recording is stopped."
         }`,
         {
           position: "bottom-left",
@@ -106,7 +102,6 @@ export function MeetingContainer({
     participant && participant.setQuality("high");
   }
 
-
   function onEntryResponded(participantId, name) {
     if (mMeetingRef.current?.localParticipant?.id === participantId) {
       if (name === "allowed") {
@@ -125,15 +120,15 @@ export function MeetingContainer({
   }
 
   function onMeetingLeft() {
-    setSelectedMic({ id: null, label: null })
-    setSelectedWebcam({ id: null, label: null })
-    setSelectedSpeaker({ id: null, label: null })
+    setSelectedMic({ id: null, label: null });
+    setSelectedWebcam({ id: null, label: null });
+    setSelectedSpeaker({ id: null, label: null });
     onMeetingLeave();
   }
 
   const _handleOnError = (data) => {
     const { code, message } = data;
-    console.log("meetingErr", code, message)
+    console.log("meetingErr", code, message);
 
     const joiningErrCodes = [
       4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010,
@@ -241,12 +236,11 @@ export function MeetingContainer({
                     <PresenterView height={containerHeight - bottomBarHeight} />
                   ) : null}
                   {isPresenting && isMobile ? null : (
-                    <MemorizedParticipantView isPresenting={isPresenting}/>
+                    <MemorizedParticipantView isPresenting={isPresenting} />
                   )}
-
                 </div>
 
-                <SidebarConatiner
+                <SidebarContainer
                   height={containerHeight - bottomBarHeight}
                   sideBarContainerWidth={sideBarContainerWidth}
                 />

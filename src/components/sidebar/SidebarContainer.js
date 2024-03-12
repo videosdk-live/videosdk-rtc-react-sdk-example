@@ -82,7 +82,7 @@ const SideBarTabView = ({
   );
 };
 
-export function SidebarConatiner({ height, sideBarContainerWidth }) {
+export function SidebarContainer({ height, sideBarContainerWidth }) {
   const { raisedHandsParticipants, sideBarMode, setSideBarMode } =
     useMeetingAppContext();
   const isMobile = useIsMobile();
