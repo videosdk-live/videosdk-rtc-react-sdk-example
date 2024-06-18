@@ -38,6 +38,7 @@ export function ILSContainer({
 }) {
   const {
     setDownstreamUrl,
+    setCanPlay,
     setAfterMeetingJoinedHLSState,
     useRaisedHandParticipants,
     sideBarMode,
@@ -150,13 +151,14 @@ export function ILSContainer({
       );
     }
 
+    setCanPlay(data.isPlayable)
     if (
       data.status === Constants.hlsEvents.HLS_STARTED ||
       data.status === Constants.hlsEvents.HLS_STOPPED
     ) {
       setDownstreamUrl(
         data.status === Constants.hlsEvents.HLS_STARTED
-          ? data.downstreamUrl
+          ? data.playbackHlsUrl
           : null
       );
     }

@@ -7,7 +7,7 @@
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.2",
     "@popperjs/core": "^2.9.2",
-    "@videosdk.live/react-sdk": "^0.1.73",
+    "@videosdk.live/react-sdk": "^0.1.92",
     "@windmill/react-ui": "^0.6.0",
     "hls.js": "^1.2.5",
     "lottie-react": "^2.3.1",

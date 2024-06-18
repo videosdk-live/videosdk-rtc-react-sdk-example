@@ -15,8 +15,8 @@ export async function sleep(ms) {
 }
 
 const PlayerViewer = () => {
-  const { downstreamUrl, afterMeetingJoinedHLSState } = useMeetingAppContext();
-  const [canPlay, setCanPlay] = useState(false);
+  const { canPlay, downstreamUrl, afterMeetingJoinedHLSState } = useMeetingAppContext();
+  // const [canPlay, setCanPlay] = useState(false);
   const playerRef = useRef();
 
   const isMobile = useIsMobile();
@@ -61,15 +61,15 @@ const PlayerViewer = () => {
     });
   }
 
-  const checkHLSPlayable = async (downstreamUrl) => {
-    const canPlay = await waitForHLSPlayable(downstreamUrl, 20);
+  // const checkHLSPlayable = async (downstreamUrl) => {
+  //   const canPlay = await waitForHLSPlayable(downstreamUrl, 20);
 
-    if (canPlay) {
-      setCanPlay(true);
-    } else {
-      setCanPlay(false);
-    }
-  };
+  //   if (canPlay) {
+  //     setCanPlay(true);
+  //   } else {
+  //     setCanPlay(false);
+  //   }
+  // };
 
   useEffect(async () => {
     if (downstreamUrl) {
@@ -82,9 +82,9 @@ const PlayerViewer = () => {
         },
       };
 
-      checkHLSPlayable(downstreamUrl);
+      // checkHLSPlayable(downstreamUrl);
     } else {
-      setCanPlay(false);
+      // setCanPlay(false);
     }
   }, [downstreamUrl]);
 
@@ -131,10 +131,9 @@ const PlayerViewer = () => {
             autoPlay={true}
             controls
             style={{ width: "100%", height: "100%" }}
-            playsinline
             playsInline
             muted={true}
-            playing
+            playing="true"
             onError={(err) => {
               console.log(err, "hls video error");
             }}

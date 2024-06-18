@@ -35,7 +35,7 @@ function ILSParticipantView({ isPresenting }) {
 
     const filteredParticipants = ids
       .filter((participantId) => {
-        return participants.get(participantId).mode === "CONFERENCE";
+        return participants?.get(participantId)?.mode === "CONFERENCE";
       })
       .slice(0, 16);
 

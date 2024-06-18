@@ -21,6 +21,7 @@ export const MeetingAppProvider = ({ children }) => {
   const [createdPolls, setCreatedPolls] = useState([]);
   const [endedPolls, setEndedPolls] = useState([]);
   const [downstreamUrl, setDownstreamUrl] = useState(null);
+  const [canPlay, setCanPlay] = useState(false);
   const [afterMeetingJoinedHLSState, setAfterMeetingJoinedHLSState] =
     useState(null);
 
@@ -96,6 +97,7 @@ export const MeetingAppProvider = ({ children }) => {
         downstreamUrl,
         afterMeetingJoinedHLSState,
         sideBarMode,
+        canPlay,
         // setters
         setMeetingType,
         setRaisedHandsParticipants,
@@ -105,6 +107,7 @@ export const MeetingAppProvider = ({ children }) => {
         setDownstreamUrl,
         setAfterMeetingJoinedHLSState,
         setSideBarMode,
+        setCanPlay,
 
         polls,
         useRaisedHandParticipants,
