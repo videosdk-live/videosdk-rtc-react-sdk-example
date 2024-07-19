@@ -468,6 +468,12 @@ export function ParticipantView({ participantId }) {
     >
       <audio ref={micRef} autoPlay muted={isLocal} />
       {webcamOn ? (
+        <div style={{
+          background: "transparent", 
+          height: "55vh",
+          // padding: "5px",
+          opacity: 0.6
+        }}>
         <ReactPlayer
           //
           playsinline // very very imp prop
@@ -487,6 +493,7 @@ export function ParticipantView({ participantId }) {
             console.log(err, "participant video error");
           }}
         />
+        </div>
       ) : (
         <div className="h-full w-full flex items-center justify-center">
           <div
