@@ -219,7 +219,7 @@ export function JoiningScreen({
       })
       setCustomVideoStream(stream);
       const videoTracks = stream?.getVideoTracks();
-      const videoTrack = videoTracks.length ? videoTracks[0] : null;
+      const videoTrack = videoTracks?.length ? videoTracks[0] : null;
       setVideoTrack(videoTrack);
 
     }
@@ -367,6 +367,12 @@ export function JoiningScreen({
                 <div className="flex items-center justify-center p-1.5 sm:p-4 lg:p-6">
                   <div className="relative w-full md:pl-4 sm:pl-10 pl-5  md:pr-4 sm:pr-10 pr-5">
                     <div className="w-full relative" style={{ height: "55vh" }}>
+                      <div style={{
+                        background: "transparent", 
+                        height: "55vh",
+                        // padding: "5px",
+                        opacity: 0.6
+                      }}>
                       <video
                         autoPlay
                         playsInline
@@ -379,7 +385,8 @@ export function JoiningScreen({
                         className={
                           "rounded-[10px] h-full w-full object-cover flex items-center justify-center flip"
                         }
-                      />
+                        />
+                        </div>
 
                       {!isMobile ? (
                         <>
