@@ -428,20 +428,16 @@ export function ParticipantView({ participantId }) {
   const [mouseOver, setMouseOver] = useState(false);
 
   useEffect(() => {
-    // console.log("Speaker Change Use Effect Called!");
     if (micRef.current) {
         try{
           micRef.current.setSinkId(selectedSpeaker.id);
         }catch(err){
           console.log("Setting speaker device failed", err);
         }
-
       } 
-    // }
   }, [ selectedSpeaker]);
 
   useEffect(() => {
-    // console.log("MIC REF UseEffect Called")
     if (micRef.current) {
       if (micOn && micStream) {
         const mediaStream = new MediaStream();

@@ -169,8 +169,6 @@ const MicBTN = () => {
   const [speakers, setSpeakers] = useState([]);
   const localMicOn = mMeeting?.localMicOn;
   const changeMic = mMeeting?.changeMic;
-  // const {changeMic } = useMeeting();
-
 
   useMediaDevice({
     onDeviceChanged
@@ -179,7 +177,6 @@ const MicBTN = () => {
   function onDeviceChanged(devices){
     getMics();
     const newSpeakerList = devices.devices.filter(device => device.kind === 'audiooutput');
-    // const newMicroPhoneList = devices.devices.filter(devices => devices.kind === 'audioinput');
 
     if (newSpeakerList.length > 0) {
       setSelectedSpeaker({id : newSpeakerList[0].deviceId, label : newSpeakerList[0].label});
@@ -357,10 +354,6 @@ const MicBTN = () => {
 const WebCamBTN = () => {
   const { selectedWebcam, setSelectedWebcam, isCameraPermissionAllowed } =
     useMeetingAppContext();
-
-  // function onDeviceChanged() {
-  //   getWebcams();
-  // }
 
   const { getCameras } = useMediaDevice();
   const mMeeting = useMeeting();
