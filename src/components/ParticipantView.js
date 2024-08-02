@@ -13,7 +13,6 @@ import SpeakerIcon from "../icons/SpeakerIcon";
 import { getQualityScore, nameTructed } from "../utils/common";
 import * as ReactDOM from "react-dom";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
-
 export const CornerDisplayName = ({
   participantId,
   isPresenting,
@@ -64,6 +63,7 @@ export const CornerDisplayName = ({
     getVideoStats,
     getAudioStats,
     getShareStats,
+    getShareAudioStats
   } = useParticipant(participantId);
 
   const statsIntervalIdRef = useRef();
@@ -77,6 +77,7 @@ export const CornerDisplayName = ({
     let videoStats = [];
     if (isPresenting) {
       stats = await getShareStats();
+
     } else if (webcamStream) {
       stats = await getVideoStats();
     } else if (micStream) {
@@ -85,10 +86,9 @@ export const CornerDisplayName = ({
 
     if (webcamStream || micStream || isPresenting) {
       videoStats = isPresenting ? await getShareStats() : await getVideoStats();
-      audioStats = isPresenting ? [] : await getAudioStats();
+      audioStats = isPresenting ? await getShareAudioStats() : await getAudioStats();
     }
 
-    // setScore(stats?.score);
     let score = stats
       ? stats.length > 0
         ? getQualityScore(stats[0])
@@ -423,14 +423,18 @@ export function ParticipantView({ participantId }) {
     isActiveSpeaker,
   } = useParticipant(participantId);
 
-  const {selectedSpeaker} = useMeetingAppContext();
+  const { selectedSpeaker } = useMeetingAppContext();
   const micRef = useRef(null);
   const [mouseOver, setMouseOver] = useState(false);
 
   useEffect(() => {
+    const isFirefox =
+          navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
     if (micRef.current) {
         try{
-          micRef.current.setSinkId(selectedSpeaker.id);
+          if (!isFirefox){
+            micRef.current.setSinkId(selectedSpeaker.id);
+          }
         }catch(err){
           console.log("Setting speaker device failed", err);
         }
@@ -453,7 +457,7 @@ export function ParticipantView({ participantId }) {
         }
       }
   }, [micStream, micOn, micRef])
-  
+
   const webcamMediaStream = useMemo(() => {
     if (webcamOn && webcamStream) {
       const mediaStream = new MediaStream();
