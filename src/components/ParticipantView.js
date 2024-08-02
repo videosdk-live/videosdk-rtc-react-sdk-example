@@ -428,29 +428,35 @@ export function ParticipantView({ participantId }) {
   const [mouseOver, setMouseOver] = useState(false);
 
   useEffect(() => {
+    const isFirefox =
+          navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+    if (micRef.current) {
+        try{
+          if (!isFirefox){
+            micRef.current.setSinkId(selectedSpeaker.id);
+          }
+        }catch(err){
+          console.log("Setting speaker device failed", err);
+        }
+      } 
+  }, [ selectedSpeaker]);
+
+  useEffect(() => {
     if (micRef.current) {
       if (micOn && micStream) {
         const mediaStream = new MediaStream();
         mediaStream.addTrack(micStream.track);
         micRef.current.srcObject = mediaStream;
-        const isFirefox =
-          navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-        try {
-          if (!isFirefox)
-             micRef.current.setSinkId(selectedSpeaker.id);
-        } catch (err) {
-          console.log("Setting speaker device failed", err);
-        }
         micRef.current
           .play()
           .catch((error) =>
             console.error("micRef.current.play() failed", error)
           );
-      } else {
-        micRef.current.srcObject = null;
+        }else {
+          micRef.current.srcObject = null;
+        }
       }
-    }
-  }, [micStream, micOn, selectedSpeaker]);
+  }, [micStream, micOn, micRef])
 
   const webcamMediaStream = useMemo(() => {
     if (webcamOn && webcamStream) {
