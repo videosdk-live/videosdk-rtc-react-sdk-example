@@ -13,7 +13,6 @@ import SpeakerIcon from "../icons/SpeakerIcon";
 import { getQualityScore, nameTructed } from "../utils/common";
 import * as ReactDOM from "react-dom";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
-
 export const CornerDisplayName = ({
   participantId,
   isPresenting,
@@ -64,6 +63,7 @@ export const CornerDisplayName = ({
     getVideoStats,
     getAudioStats,
     getShareStats,
+    getShareAudioStats
   } = useParticipant(participantId);
 
   const statsIntervalIdRef = useRef();
@@ -77,6 +77,7 @@ export const CornerDisplayName = ({
     let videoStats = [];
     if (isPresenting) {
       stats = await getShareStats();
+
     } else if (webcamStream) {
       stats = await getVideoStats();
     } else if (micStream) {
@@ -85,10 +86,9 @@ export const CornerDisplayName = ({
 
     if (webcamStream || micStream || isPresenting) {
       videoStats = isPresenting ? await getShareStats() : await getVideoStats();
-      audioStats = isPresenting ? [] : await getAudioStats();
+      audioStats = isPresenting ? await getShareAudioStats() : await getAudioStats();
     }
 
-    // setScore(stats?.score);
     let score = stats
       ? stats.length > 0
         ? getQualityScore(stats[0])
@@ -423,7 +423,7 @@ export function ParticipantView({ participantId }) {
     isActiveSpeaker,
   } = useParticipant(participantId);
 
-  const {selectedSpeaker} = useMeetingAppContext();
+  const { selectedSpeaker } = useMeetingAppContext();
   const micRef = useRef(null);
   const [mouseOver, setMouseOver] = useState(false);
 
@@ -433,9 +433,12 @@ export function ParticipantView({ participantId }) {
         const mediaStream = new MediaStream();
         mediaStream.addTrack(micStream.track);
         micRef.current.srcObject = mediaStream;
-        try{
-          micRef.current.setSinkId(selectedSpeaker.id);
-        }catch(err){
+        const isFirefox =
+          navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+        try {
+          if (!isFirefox)
+             micRef.current.setSinkId(selectedSpeaker.id);
+        } catch (err) {
           console.log("Setting speaker device failed", err);
         }
         micRef.current
@@ -447,8 +450,8 @@ export function ParticipantView({ participantId }) {
         micRef.current.srcObject = null;
       }
     }
-  }, [micStream, micOn,selectedSpeaker]);
-  
+  }, [micStream, micOn, selectedSpeaker]);
+
   const webcamMediaStream = useMemo(() => {
     if (webcamOn && webcamStream) {
       const mediaStream = new MediaStream();
@@ -468,12 +471,6 @@ export function ParticipantView({ participantId }) {
     >
       <audio ref={micRef} autoPlay muted={isLocal} />
       {webcamOn ? (
-        <div style={{
-          background: "transparent", 
-          height: "55vh",
-          // padding: "5px",
-          opacity: 0.6
-        }}>
         <ReactPlayer
           //
           playsinline // very very imp prop
@@ -493,7 +490,6 @@ export function ParticipantView({ participantId }) {
             console.log(err, "participant video error");
           }}
         />
-        </div>
       ) : (
         <div className="h-full w-full flex items-center justify-center">
           <div
