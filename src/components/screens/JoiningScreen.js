@@ -96,6 +96,12 @@ export function JoiningScreen({
 
   useEffect(() => {
     if (webcamOn) {
+
+      // Close the existing video track if there's a new one
+      if (videoTrackRef.current && videoTrackRef.current !== videoTrack) {
+        videoTrackRef.current.stop(); // Stop the existing video track
+      }
+
       videoTrackRef.current = videoTrack;
 
       var isPlaying =
@@ -103,7 +109,7 @@ export function JoiningScreen({
         !videoPlayerRef.current.paused &&
         !videoPlayerRef.current.ended &&
         videoPlayerRef.current.readyState >
-          videoPlayerRef.current.HAVE_CURRENT_DATA;
+        videoPlayerRef.current.HAVE_CURRENT_DATA;
 
       if (videoTrack) {
         const videoSrcObject = new MediaStream([videoTrack]);
@@ -134,7 +140,7 @@ export function JoiningScreen({
 
   useEffect(() => {
     checkMediaPermission();
-    return () => {};
+    return () => { };
   }, []);
 
   const _toggleWebcam = () => {
@@ -186,8 +192,8 @@ export function JoiningScreen({
     }
   };
   const changeMic = async (deviceId) => {
-    
-    
+
+
     if (micOn) {
       const currentAudioTrack = audioTrackRef.current;
       currentAudioTrack && currentAudioTrack.stop();
@@ -203,7 +209,7 @@ export function JoiningScreen({
   };
 
   const getDefaultMediaTracks = async ({ mic, webcam }) => {
-    
+
     if (mic) {
       const stream = await getAudioTrack({
         micId: selectedMic.id,
@@ -339,7 +345,7 @@ export function JoiningScreen({
     }
   };
 
-  
+
 
   const getAudioDevices = async () => {
     try {
@@ -361,13 +367,13 @@ export function JoiningScreen({
         });
       }
     } catch (err) {
-      console.log("Error in getting audio devices", err); 
+      console.log("Error in getting audio devices", err);
     }
   };
 
 
-  useEffect(()=> {
-   getAudioDevices()
+  useEffect(() => {
+    getAudioDevices()
   }, [])
 
   const ButtonWithTooltip = ({ onClick, onState, OnIcon, OffIcon }) => {

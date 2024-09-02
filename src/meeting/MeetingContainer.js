@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, createRef } from "react";
-import { Constants, useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import React, { useState, useEffect, useRef, createRef, memo } from "react";
+import { Constants, useMeeting, useParticipant, usePubSub } from "@videosdk.live/react-sdk";
 import { BottomBar } from "./components/BottomBar";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import MemorizedParticipantView from "./components/ParticipantView";
@@ -21,7 +21,29 @@ export function MeetingContainer({
     setSelectedMic,
     setSelectedWebcam,
     setSelectedSpeaker,
-  } = useMeetingAppContext()
+  } = useMeetingAppContext();
+
+  const [participantsData, setParticipantsData] = useState([]);
+
+  const ParticipantMicStream = memo(({ participantId }) => {
+    // Individual hook for each participant
+    const { micStream } = useParticipant(participantId);
+  
+    useEffect(() => {
+  
+      if (micStream) {
+        const mediaStream = new MediaStream();
+        mediaStream.addTrack(micStream.track);
+  
+        const audioElement = new Audio();
+        audioElement.srcObject = mediaStream;
+        audioElement.play();
+
+      }
+    }, [micStream, participantId]); 
+  
+    return null;
+  }, [participantsData]);
 
   const { useRaisedHandParticipants } = useMeetingAppContext();
   const bottomBarHeight = 60;
@@ -167,8 +189,23 @@ export function MeetingContainer({
   const isPresenting = mMeeting.presenterId ? true : false;
 
   useEffect(() => {
+    const debounceTimeout = setTimeout(() => {
+      const participantIds = Array.from(mMeeting.participants.keys());
+      console.log("Debounced participantIds", participantIds);
+
+      setParticipantsData(participantIds);
+      console.log("Setting participants");
+    }, 500); 
+
+
+    return () => clearTimeout(debounceTimeout);
+  }, [mMeeting.participants]);
+
+
+  useEffect(() => {
     mMeetingRef.current = mMeeting;
   }, [mMeeting]);
+
 
   usePubSub("RAISE_HAND", {
     onMessageReceived: (data) => {
@@ -240,10 +277,13 @@ export function MeetingContainer({
                   {isPresenting ? (
                     <PresenterView height={containerHeight - bottomBarHeight} />
                   ) : null}
-                  {isPresenting && isMobile ? null : (
-                    <MemorizedParticipantView isPresenting={isPresenting}/>
+                  {isPresenting && isMobile ? (
+                    participantsData.map((participantId) => (
+                      <ParticipantMicStream key={participantId} participantId={participantId} />
+                    ))
+                  ) : (
+                    <MemorizedParticipantView isPresenting={isPresenting} />
                   )}
-
                 </div>
 
                 <SidebarConatiner
