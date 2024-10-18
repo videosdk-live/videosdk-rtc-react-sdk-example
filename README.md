@@ -15,8 +15,7 @@ At Video SDK, we’re building tools to help companies create world-class collab
 - [🔥 **Meeting Features**](#-meeting-features)
 - [🧠 **Key Concepts**](#-key-concepts)
 - [🔑 **Token Generation**](#-token-generation)
-- [📋 **Project Overview**](#-project-overview)
-- [🧩 **Feature List with Associated Components**](#-feature-list-with-associated-components)
+- [🧩 **Project OverView**](#-project-overview)
 - [📖 **Examples**](#-examples)
 - [📝 **VideoSDK's Documentation**](#-documentation)
 - [💬 **Join Our Community**](#-join-our-community)
@@ -131,14 +130,7 @@ Token is used to create and validate a meeting using API and also initialise a m
 - You must set up an authentication server to authorise users for production. To set up an authentication server, refer to our official example repositories. [videosdk-rtc-api-server-examples](https://github.com/videosdk-live/videosdk-rtc-api-server-examples)
 
 
-## 🔍 Project Overview
-
-### 🔑 Branches
-
-- **`main`**: Features meetings and interactive live streaming with an enhanced UI.
-- **`design/v1`**: Offers a simple UI encompassing all features and methods.
-
-## 🧩 Feature List with Associated Components
+## 🧩 Project Overview
 
 ### 1. Pre-Call Setup on Join Screen
 
@@ -158,7 +150,7 @@ Token is used to create and validate a meeting using API and also initialise a m
 
 - **[`components/screens/JoiningScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/JoiningScreen.js)** : Provides users the option to create or join a meeting, manage webcam and mic status, select devices (microphone, camera, speakers), check permissions, preview video, and monitor network statistics to ensure proper setup before entering the meeting.
 
-- **`api.js`** : Includes all API calls for creating and validating meetings.
+- **[`api.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/api.js)** : Includes all API calls for creating and validating meetings.
 
 - **[`components/MeetingDetailsScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/MeetingDetailsScreen.js)** : Displays options for creating or joining a meeting.
 
@@ -251,4 +243,4 @@ Explore more and start building with our [**Documentation**](https://docs.videos
 ## 🤝 Join Our Community
 
 - **[Discord](https://discord.gg/Gpmj6eCq5u)**: Engage with the Video SDK community, ask questions, and share insights.
-- **[Twitter](https://twitter.com/video_sdk)**: Stay updated with the latest news, updates, and tips from Video SDK.
+- **[X](https://x.com/video_sdk)**: Stay updated with the latest news, updates, and tips from Video SDK.
