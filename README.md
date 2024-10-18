@@ -6,6 +6,9 @@
 
 At Video SDK, we’re building tools to help companies create world-class collaborative products with capabilities of live audio/videos, compose cloud recordings/rtmp/hls and interaction APIs
 
+### 🥳 Get **10,000 minutes free** every month! **[Try it now!](https://app.videosdk.live/signup)**
+
+
 ## 📚 **Table of Contents**
 
 - [🖥️ **Demo App**](#%EF%B8%8F-demo-app)
