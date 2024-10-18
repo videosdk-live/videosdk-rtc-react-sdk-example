@@ -17,7 +17,7 @@ At Video SDK, we’re building tools to help companies create world-class collab
 - [🔑 **Token Generation**](#-token-generation)
 - [📋 **Project Overview**](#-project-overview)
 - [🗂️ **Project Structure**](#%EF%B8%8F-project-structure)
-- [🧩 **Feature List with Associated Components**](#-common-components)
+- [🧩 **Feature List with Associated Components**](##-feature-list-with-associated-components)
 - [📖 **Examples**](#-examples)
 - [📝 **VideoSDK's Documentation**](#-documentation)
 - [💬 **Join Our Community**](#-join-our-community)
