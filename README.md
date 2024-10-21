@@ -51,7 +51,7 @@ git clone https://github.com/videosdk-live/videosdk-rtc-react-sdk-example.git
 
 ### Step 2: Set Up Environment Variables
 
-Copy the example environment file:
+Open your favorite code editor and copy the example environment file:
 
 ```bash
 cp .env.example .env
@@ -67,7 +67,7 @@ REACT_APP_VIDEOSDK_TOKEN="YOUR_TEMPORARY_TOKEN"
 
 ### Step 4: Install Dependencies
 
-Navigate to the project directory and install the necessary packages:
+Install the necessary packages:
 
 ```bash
 npm install
@@ -91,6 +91,7 @@ Unlock a suite of powerful features to enhance your meetings:
 | 📋 **Precall Setup**           | [Setup Precall](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/setup-call/precall)                   | Configure audio, video devices and other settings before joining the meeting.                                              |
 | ⏳ **Waiting Lobby**           | [Waiting Lobby](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/setup-call/waiting-lobby)             | Virtual space for participants to wait before joining the meeting.                                               |
 | 🤝 **Join Meeting**            | [Join Meeting](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/setup-call/join-meeting)                | Allows participants to join a meeting.                                                                 |
+| 🚪 **Leave Meeting**            | [Leave Meeting](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/setup-call/leave-end-meeting)                | Allows participants to leave a meeting.                                                                 |
 | 🎤 **Toggle Mic**         | [Mic Control](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/handling-media/mute-unmute-mic)          | Toggle the microphone on or off during a meeting.                                                                  |
 | 📷 **Toggle Camera**           | [Camera Control](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/handling-media/on-off-camera)         | Turn the video camera on or off during a meeting.                                                                  |
 | 🖥️ **Screen Share**            | [Screen Share](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/handling-media/screen-share)          | Share your screen with other participants during the call.                                                      |
@@ -175,7 +176,7 @@ The token is used to create and validate a meeting using API and also initialize
 
 - **[`components/ParticipantGrid.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/ParticipantGrid.js)** : Displays a grid of participants shown on the main screen.
 
-- **[`meeting/components/ParticipantView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/meeting/components/ParticipantView.js)** : Displays the grid of participants on the main screen.
+- **[`meeting/components/ParticipantView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/meeting/components/ParticipantView.js)** : Manage how many participants will be displayed in the participant grid.
 
 <p align="center">
 <img width="600" height="338" src="public/participant_view.png"/>
@@ -220,7 +221,7 @@ The token is used to create and validate a meeting using API and also initialize
 
 ### 9. Leave Screen
 
-- **[`components/screens/LeaveScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/LeaveScreen.js)** : Displays the leave screen when exiting the meeting.
+- **[`components/screens/LeaveScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/LeaveScreen.js)** : Displays the leave screen when participant exit the meeting.
 
 <p align="center">
 <img width="600" src="public/leave-screen.png"/>
