@@ -111,18 +111,18 @@ Unlock a suite of powerful features to enhance your meetings:
 
 Understand the core components of our SDK:
 
-- `Meeting` - A Meeting represents Real time audio and video communication.
+- `Meeting` - A Meeting represents Real-time audio and video communication.
 
-  **`Note : Don't confuse with Room and Meeting keyword, both are same thing 😃`**
+  **` Note: Don't confuse with Room and Meeting keyword, both are same thing 😃`**
 
-- `Sessions` - A particular duration you spend in a given meeting is a referred as session, you can have multiple session of a particular meetingId.
+- `Sessions` - A particular duration you spend in a given meeting is referred as a session, you can have multiple sessions of a specific meetingId.
 - `Participant` - Participant represents someone who is attending the meeting's session, `local partcipant` represents self (You), for this self, other participants are `remote participants`.
 - `Stream` - Stream means video or audio media content that is either published by `local participant` or `remote participants`.
 
 
 ## 🔐 Token Generation
 
-Token is used to create and validate a meeting using API and also initialise a meeting.
+The token is used to create and validate a meeting using API and also initialize a meeting.
 
 🛠️ `Development Environment`:
 
@@ -130,7 +130,7 @@ Token is used to create and validate a meeting using API and also initialise a m
 
 🌐 `Production Environment`:
 
-- You must set up an authentication server to authorise users for production. To set up an authentication server, refer to our official example repositories. [videosdk-rtc-api-server-examples](https://github.com/videosdk-live/videosdk-rtc-api-server-examples)
+- You must set up an authentication server to authorize users for production. To set up an authentication server, please take a look at our official example repositories. [videosdk-rtc-api-server-examples](https://github.com/videosdk-live/videosdk-rtc-api-server-examples)
 
 
 ## 🧩 Project Overview
@@ -188,7 +188,7 @@ Token is used to create and validate a meeting using API and also initialise a m
   - Shows the meeting ID with a copy icon button on the left.
   - Displays the recording indicator, raise hand button, mic button (with a list of available mics), webcam button (with available webcam list), screen share button, and leave meeting button in the middle.
   - The rightmost corner contains the chat button and participant count button.
-  - On mobile, tablet, or smaller screens, the bottom bar reorders to show the leave button, recording button, mic/webcam buttons, and a `more actions` button. The `more actions` button opens a drawer containing the remaining options.
+  - On a mobile, tablet, or smaller screens, the bottom bar reorders to show the leave button, recording button, mic/webcam buttons, and a `more actions` button. The `more actions` button opens a drawer containing the remaining options.
 
 <p align="center">
 <img width="1363" src="public/bottombar.png"/>
