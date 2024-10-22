@@ -4,7 +4,7 @@
 [![Discord](https://img.shields.io/discord/876774498798551130?label=Join%20on%20Discord)](https://discord.gg/kgAvyxtTxv)
 [![Register](https://img.shields.io/badge/Contact-Know%20More-blue)](https://app.videosdk.live/signup)
 
-At Video SDK, we’re building tools to help companies create world-class collaborative products with capabilities of live audio/videos, compose cloud recordings/rtmp/hls and interaction APIs
+At Video SDK, we’re building tools to help companies create world-class collaborative products with capabilities for live audio/video, cloud recordings, RTMP/HLS streaming, and interaction APIs.
 
 ### 🥳 Get **10,000 minutes free** every month! **[Try it now!](https://app.videosdk.live/signup)**
 
@@ -31,7 +31,7 @@ Curious to see it in action? Check out our [live demo here](https://videosdk.liv
 ## ⚡ Quick Setup
 
 1. Sign up on [VideoSDK](https://app.videosdk.live/) to grab your API Key and Secret.
-2. Get familiarized with [Token](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/authentication-and-token)
+2. Familiarize yourself with [Token](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/authentication-and-token)
 
 ## 🛠 Prerequisites
 
@@ -114,11 +114,11 @@ Understand the core components of our SDK:
 
 - `Meeting` - A Meeting represents Real-time audio and video communication.
 
-  **` Note: Don't confuse with Room and Meeting keyword, both are same thing 😃`**
+  **` Note: Don't confuse the terms Room and Meeting; both mean the same thing 😃`**
 
 - `Sessions` - A particular duration you spend in a given meeting is referred as a session, you can have multiple sessions of a specific meetingId.
-- `Participant` - Participant represents someone who is attending the meeting's session, `local partcipant` represents self (You), for this self, other participants are `remote participants`.
-- `Stream` - Stream means video or audio media content that is either published by `local participant` or `remote participants`.
+- `Participant` - A participant refers to anyone attending the meeting session. The `local participant` represents yourself (You), while all other attendees are considered `remote participants`.
+- `Stream` - A stream refers to video or audio media content that is published by either the `local participant` or `remote participants`.
 
 
 ## 🔐 Token Generation
@@ -127,7 +127,7 @@ The token is used to create and validate a meeting using API and also initialize
 
 🛠️ `Development Environment`:
 
-- You may use a temporary token for development. To create a temporary token, go to VideoSDK [dashboard](https://app.videosdk.live/api-keys) .
+- You may use a temporary token for development. To create a temporary token, go to VideoSDK's [dashboard](https://app.videosdk.live/api-keys) .
 
 🌐 `Production Environment`:
 
@@ -140,7 +140,7 @@ The token is used to create and validate a meeting using API and also initialize
 
 - **[components/DropDown.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/DropDown.js)** : A dropdown component for selecting audio input devices (microphones), monitoring audio via the Web Audio API, and managing microphone settings.
 
-- **[components/DropDownCam.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/DropDownCam.js)** : A dropdown for selecting camera devices and managing camera permissions.
+- **[components/DropDownCam.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/DropDownCam.js)** : A dropdown component for selecting camera devices and managing camera permissions.
 
 - **[components/DropDownSpeaker.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/DropDownSpeaker.js)** : Allows users to select speakers, test them with sample sounds, and track playback progress for confirmation.
 
