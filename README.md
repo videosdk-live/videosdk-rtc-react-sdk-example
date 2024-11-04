@@ -150,7 +150,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[components/NetworkStats.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/NetworkStats.js)** : Displays real-time network statistics, such as upload and download speeds.
 
 <p align="center">
-<img width="600" height="338" src="public/precall-screen.gif"/>
+<img width="600" height="338" src="public/precall-view.png"/>
 </p>
 
 ### 2. Create or Join Meeting
@@ -160,10 +160,6 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`api.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/api.js)** : Includes all API calls for creating and validating meetings.
 
 - **[`components/MeetingDetailsScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/MeetingDetailsScreen.js)** : Displays options for creating or joining a meeting.
-
-<p align="center">
-<img width="600" height="338" src="public/create-meeting.gif"/>
-</p>
 
 ### 3. Waiting Screen
 
@@ -182,7 +178,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`meeting/components/ParticipantView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/meeting/components/ParticipantView.js)** : Manage how many participants will be displayed in the participant grid.
 
 <p align="center">
-<img width="600" height="338" src="public/participant_view.png"/>
+<img width="600" height="338" src="public/participant-view.png"/>
 </p>
 
 ### 5. Meeting Bottom Bar
@@ -193,10 +189,6 @@ The token is used to create and validate a meeting using API and also initialize
   - Displays the recording indicator, raise hand button, mic button (with a list of available mics), webcam button (with available webcam list), screen share button, and leave meeting button in the middle.
   - The rightmost corner contains the chat button and participant count button.
   - On a mobile, tablet, or smaller screens, the bottom bar reorders to show the leave button, recording button, mic/webcam buttons, and a `more actions` button. The `more actions` button opens a drawer containing the remaining options.
-
-<p align="center">
-<img width="1363" src="public/bottombar.png"/>
-</p>
 
 ### 6. Presenter View
 
