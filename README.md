@@ -158,7 +158,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`components/MeetingDetailsScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/MeetingDetailsScreen.js)** : Displays options for creating or joining a meeting.
 
 <p align="center">
-<img width="900" height="600" src="public/precall-view.png"/>
+<img width="600" height="338" src="public/precall-view.png"/>
 </p>
 
 ### 3. Waiting Screen
