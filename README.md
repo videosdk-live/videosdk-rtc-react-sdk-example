@@ -10,7 +10,7 @@ At Video SDK, we’re building tools to help companies create world-class collab
 
 ### ⚡️From Clone to Launch - Get Started with the Example in 5 mins!
 
-[![React](https://cdn.videosdk.live/docs/images/youtube/React.png)](https://youtu.be/ps-idQhbjZU?si=xvRWGf8MVgyNuET9 "React")
+[![React](https://cdn.videosdk.live/docs/images/youtube/React.png)](https://www.youtube.com/watch?v=Yho3zNYLVg8)
 
 ## 📚 **Table of Contents**
 
@@ -149,10 +149,6 @@ The token is used to create and validate a meeting using API and also initialize
 
 - **[components/NetworkStats.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/NetworkStats.js)** : Displays real-time network statistics, such as upload and download speeds.
 
-<p align="center">
-<img width="600" height="338" src="public/precall-view.png"/>
-</p>
-
 ### 2. Create or Join Meeting
 
 - **[`components/screens/JoiningScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/JoiningScreen.js)** : Provides users the option to create or join a meeting, manage webcam and mic status, select devices (microphone, camera, speakers), check permissions, preview video, and monitor network statistics to ensure proper setup before entering the meeting.
@@ -161,13 +157,13 @@ The token is used to create and validate a meeting using API and also initialize
 
 - **[`components/MeetingDetailsScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/MeetingDetailsScreen.js)** : Displays options for creating or joining a meeting.
 
+<p align="center">
+<img width="900" height="600" src="public/precall-view.png"/>
+</p>
+
 ### 3. Waiting Screen
 
 - **[`components/screens/WaitingToJoin.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/WaitingToJoinScreen.js)** : Displays a Lottie animation with messages while waiting to join the meeting. This screen is shown until the `isMeetingJoined` flag is true, which is received from the `meeting` initialized using `useMeeting()` from `@videosdk.live/react-sdk`.
-
-<p align="center">
-<img width="600" height="338" src="public/waiting-screen.gif"/>
-</p>
 
 ### 4. Participant View
 
@@ -177,10 +173,6 @@ The token is used to create and validate a meeting using API and also initialize
 
 - **[`meeting/components/ParticipantView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/meeting/components/ParticipantView.js)** : Manage how many participants will be displayed in the participant grid.
 
-<p align="center">
-<img width="600" height="338" src="public/participant-view.png"/>
-</p>
-
 ### 5. Meeting Bottom Bar
 
 - **[`meeting/components/BottomBar.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/meeting/components/BottomBar.js)**  
@@ -189,6 +181,10 @@ The token is used to create and validate a meeting using API and also initialize
   - Displays the recording indicator, raise hand button, mic button (with a list of available mics), webcam button (with available webcam list), screen share button, and leave meeting button in the middle.
   - The rightmost corner contains the chat button and participant count button.
   - On a mobile, tablet, or smaller screens, the bottom bar reorders to show the leave button, recording button, mic/webcam buttons, and a `more actions` button. The `more actions` button opens a drawer containing the remaining options.
+ 
+<p align="center">
+<img width="600" height="338" src="public/participant-view.png"/>
+</p>
 
 ### 6. Presenter View
 
