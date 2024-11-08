@@ -10,7 +10,7 @@ At Video SDK, we’re building tools to help companies create world-class collab
 
 ### ⚡️From Clone to Launch - Get Started with the Example in 5 mins!
 
-[![React](https://cdn.videosdk.live/docs/images/youtube/React.png)](https://youtu.be/ps-idQhbjZU?si=xvRWGf8MVgyNuET9 "React")
+[![React](https://cdn.videosdk.live/docs/images/youtube/React.png)](https://www.youtube.com/watch?v=Yho3zNYLVg8 "React")
 
 ## 📚 **Table of Contents**
 
