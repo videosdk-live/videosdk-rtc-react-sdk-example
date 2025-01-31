@@ -213,6 +213,8 @@ export const MeetingAppProvider = ({ children }) => {
         setIsMicrophonePermissionAllowed,
         setIsTranscribing,
         setTranscript,
+        startTranscription,
+        stopTranscription,
       }}
     >
       {children}
