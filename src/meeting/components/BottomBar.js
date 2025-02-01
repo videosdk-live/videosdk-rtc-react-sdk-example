@@ -33,6 +33,7 @@ import { Dialog, Popover, Transition } from "@headlessui/react";
 import { createPopper } from "@popperjs/core";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import useMediaStream from "../../hooks/useMediaStream";
+import { CaptionIcon } from "../../icons/Bottombar/CaptionIcon";
 
 function PipBTN({ isMobile, isTab }) {
   const { pipMode, setPipMode } = useMeetingAppContext();
@@ -171,20 +172,22 @@ const MicBTN = () => {
   const changeMic = mMeeting?.changeMic;
 
   useMediaDevice({
-    onDeviceChanged
-  })
+    onDeviceChanged,
+  });
 
-  function onDeviceChanged(devices){
+  function onDeviceChanged(devices) {
     getMics();
-    const newSpeakerList = devices.devices.filter(device => device.kind === 'audiooutput');
+    const newSpeakerList = devices.devices.filter(
+      (device) => device.kind === "audiooutput"
+    );
 
     if (newSpeakerList.length > 0) {
-      setSelectedSpeaker({id : newSpeakerList[0].deviceId, label : newSpeakerList[0].label});
+      setSelectedSpeaker({
+        id: newSpeakerList[0].deviceId,
+        label: newSpeakerList[0].label,
+      });
     }
-    
   }
-
-
 
   const getMics = async () => {
     const mics = await getMicrophones();
@@ -741,6 +744,27 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
     );
   };
 
+  const LiveCaptionBTN = () => {
+    const { startTranscription, stopTranscription, isTranscribing } =
+      useMeetingAppContext();
+    console.log("isTranscribing", isTranscribing);
+
+    return (
+      <OutlinedButton
+        Icon={CaptionIcon}
+        onClick={() => {
+          if (isTranscribing) {
+            stopTranscription();
+          } else {
+            startTranscription();
+          }
+        }}
+        isFocused={isTranscribing}
+        tooltip={isTranscribing ? "Stop Transcription" : "Start Transcription"}
+      />
+    );
+  };
+
   const tollTipEl = useRef();
   const isMobile = useIsMobile();
   const isTab = useIsTab();
@@ -766,6 +790,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
       RECORDING: "RECORDING",
       PIP: "PIP",
       MEETING_ID_COPY: "MEETING_ID_COPY",
+      LIVE_CAPTION: "LIVE_CAPTION",
     }),
     []
   );
@@ -865,6 +890,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
           </Transition.Child>
         </Dialog>
       </Transition>
+      <LiveCaptionBTN />
     </div>
   ) : (
     <div className="md:flex lg:px-2 xl:px-6 pb-2 px-2 hidden">
@@ -878,6 +904,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
         <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
         <PipBTN isMobile={isMobile} isTab={isTab} />
         <LeaveBTN />
+        <LiveCaptionBTN />
       </div>
       <div className="flex items-center justify-center">
         <ChatBTN isMobile={isMobile} isTab={isTab} />
