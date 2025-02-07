@@ -8,13 +8,13 @@ import {
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import { PresenterView } from "../components/PresenterView";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
-import { ILSBottomBar } from "./components/ILSBottomBar";
+import { HLSBottomBar } from "./components/HLSBottomBar";
 import { TopBar } from "./components/TopBar";
 import useIsTab from "../hooks/useIsTab";
 import PollsListner from "./components/pollContainer/PollListner";
 import HLSContainer from "./components/hlsViewContainer/HLSContainer";
 import FlyingEmojisOverlay from "./components/FlyingEmojisOverlay";
-import MemorizedILSParticipantView from "./components/ILSParticipantView";
+import MemorizedHLSParticipantView from "./components/HLSParticipantView";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import LocalParticipantListner from "./components/LocalParticipantListner";
 import ConfirmBox from "../components/ConfirmBox";
@@ -23,7 +23,7 @@ import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
 
-export function ILSContainer({
+export function HLSContainerView({
   onMeetingLeave,
   setIsMeetingLeft,
   selectedMic,
@@ -101,7 +101,7 @@ export function ILSContainer({
 
   const _handleOnRecordingStateChanged = ({ status }) => {
     if (
-      meetingModeRef.current === Constants.modes.CONFERENCE &&
+      meetingModeRef.current === Constants.modes.SEND_AND_RECV &&
       (status === Constants.recordingEvents.RECORDING_STARTED ||
         status === Constants.recordingEvents.RECORDING_STOPPED)
     ) {
@@ -128,7 +128,7 @@ export function ILSContainer({
   const _handleOnHlsStateChanged = (data) => {
     //
     if (
-      meetingModeRef.current === Constants.modes.CONFERENCE && // trigger on conference mode only
+      meetingModeRef.current === Constants.modes.SEND_AND_RECV && // trigger on conference mode only
       (data.status === Constants.hlsEvents.HLS_STARTED ||
         data.status === Constants.hlsEvents.HLS_STOPPED)
     ) {
@@ -175,11 +175,9 @@ export function ILSContainer({
   function onParticipantJoined(participant) {
     // Change quality to low, med or high based on resolution
     participant && participant.setQuality("high");
-    // console.log(" onParticipantJoined", participant);
   }
 
   function onEntryResponded(participantId, name) {
-    // console.log(" onEntryResponded", participantId, name);
     if (mMeetingRef.current?.localParticipant?.id === participantId) {
       if (name === "allowed") {
         setLocalParticipantAllowedJoin(true);
@@ -224,7 +222,6 @@ export function ILSContainer({
     }
   }
   function onMeetingLeft() {
-    // console.log("onMeetingLeft");
     onMeetingLeave();
   }
 
@@ -344,7 +341,7 @@ export function ILSContainer({
                 meetingMode={meetingMode}
               />
             )}
-            {meetingMode === Constants.modes.CONFERENCE &&
+            {meetingMode === Constants.modes.SEND_AND_RECV &&
               (isMobile || isTab ? (
                 <></>
               ) : (
@@ -360,7 +357,7 @@ export function ILSContainer({
               ))}
 
             <div className={` flex flex-1 flex-row bg-gray-800 `}>
-              {meetingMode === Constants.modes.CONFERENCE ? (
+              {meetingMode === Constants.modes.SEND_AND_RECV ? (
                 <div className={`flex flex-1 `}>
                   {isPresenting ? (
                     <PresenterView
@@ -368,7 +365,7 @@ export function ILSContainer({
                     />
                   ) : null}
                   {isPresenting && isMobile ? null : (
-                    <MemorizedILSParticipantView isPresenting={isPresenting} />
+                    <MemorizedHLSParticipantView isPresenting={isPresenting} />
                   )}
                 </div>
               ) : (
@@ -386,7 +383,7 @@ export function ILSContainer({
               )}
               <SidebarConatiner
                 height={
-                  meetingMode === Constants.modes.VIEWER
+                  meetingMode === Constants.modes.RECV_ONLY
                     ? containerHeight - bottomBarHeight
                     : isMobile || isTab
                     ? containerHeight - bottomBarHeight
@@ -397,7 +394,7 @@ export function ILSContainer({
               />
             </div>
 
-            <ILSBottomBar
+            <HLSBottomBar
               bottomBarHeight={bottomBarHeight}
               setIsMeetingLeft={setIsMeetingLeft}
               selectWebcamDeviceId={selectWebcamDeviceId}

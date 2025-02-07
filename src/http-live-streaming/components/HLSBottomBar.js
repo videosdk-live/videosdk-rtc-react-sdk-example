@@ -40,7 +40,7 @@ import { Dialog, Popover, Transition } from "@headlessui/react";
 import OutlineIconTextButton from "../../components/buttons/OutlineIconTextButton";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 
-export function ILSBottomBar({
+export function HLSBottomBar({
   bottomBarHeight,
   setIsMeetingLeft,
   selectWebcamDeviceId,
@@ -48,7 +48,6 @@ export function ILSBottomBar({
   selectMicDeviceId,
   setSelectMicDeviceId,
   meetingMode,
-  setIsStreamLeft
 }) {
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
   const RaiseHandBTN = ({ isMobile, isTab }) => {
@@ -488,7 +487,6 @@ export function ILSBottomBar({
         onClick={() => {
           leave();
           setIsMeetingLeft(true);
-          setIsStreamLeft(true);
         }}
         tooltip="Leave Meeting"
       />
@@ -804,12 +802,15 @@ export function ILSBottomBar({
     let interactiveMeetigUrlArray = [
       {
         role: "Host",
-        url: `${window.location.origin}/interactive-live-streaming/host/${meetingId}`,
+        url: `${window.location.origin}/interactive-meeting/host/${meetingId}`,
       },
-      
+      {
+        role: "Co-host",
+        url: `${window.location.origin}/interactive-meeting/co-host/${meetingId}`,
+      },
       {
         role: "Audience",
-        url: `${window.location.origin}/interactive-live-streaming/audience/${meetingId}`,
+        url: `${window.location.origin}/interactive-meeting/audience/${meetingId}`,
       },
     ];
 
@@ -936,7 +937,7 @@ export function ILSBottomBar({
     { icon: BottomBarButtonTypes.ECOMMERCE },
   ];
 
-  if (meetingMode === Constants.modes.SEND_AND_RECV) {
+  if (meetingMode === Constants.modes.CONFERENCE) {
     otherFeatures.pop({ icon: BottomBarButtonTypes.REACTION });
     otherFeatures.push({ icon: BottomBarButtonTypes.SCREEN_SHARE });
     otherFeatures.push({ icon: BottomBarButtonTypes.HLS });
@@ -1104,9 +1105,9 @@ export function ILSBottomBar({
         <LeaveBTN />
       </div>
       <div className="flex items-center justify-center">
-        {/* {meetingMode === Constants.modes.VIEWER && (
+        {meetingMode === Constants.modes.RECV_ONLY && (
           <ECommerceBTN isMobile={isMobile} isTab={isTab} />
-        )} */}
+        )}
         <PollBTN isMobile={isMobile} isTab={isTab} />
         <ChatBTN isMobile={isMobile} isTab={isTab} />
         <ParticipantsBTN isMobile={isMobile} isTab={isTab} />

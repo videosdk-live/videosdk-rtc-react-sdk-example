@@ -1,5 +1,5 @@
 const API_BASE_URL = "https://api.videosdk.live";
-const VIDEOSDK_TOKEN = process.env.REACT_APP_VIDEOSDK_TOKEN;
+export const VIDEOSDK_TOKEN = process.env.REACT_APP_VIDEOSDK_TOKEN;
 const API_AUTH_URL = process.env.REACT_APP_AUTH_URL;
 
 export const getToken = async () => {
@@ -18,6 +18,21 @@ export const getToken = async () => {
   } else {
     console.error("Error: ", Error("Please add a token or Auth Server URL"));
   }
+};
+
+// API call to create stream
+export const createStream = async ({ token }) => {
+  const res = await fetch(`${API_BASE_URL}/v2/rooms`, {
+    method: "POST",
+    headers: {
+      authorization: `${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({}),
+  });
+  //Destructuring the streamId from the response
+  const { roomId: streamId } = await res.json();
+  return streamId;
 };
 
 export const createMeeting = async ({ token }) => {

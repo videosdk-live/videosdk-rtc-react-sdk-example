@@ -68,7 +68,8 @@ export const sideBarModes = {
 
 export const meetingTypes = {
   MEETING: "MEETING",
-  ILS: "ILS",
+  HLS: "HLS",
+  ILS: "ILS"
 };
 
 export const meetingLayoutTopics = {

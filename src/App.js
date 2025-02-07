@@ -4,9 +4,11 @@ import { LeaveScreen } from "./components/screens/LeaveScreen";
 import { JoiningScreen } from "./components/screens/JoiningScreen";
 import { meetingTypes } from "./utils/common";
 import { MeetingContainer } from "./meeting/MeetingContainer";
-import { ILSContainer } from "./interactive-live-streaming/ILSContainer";
+import { HLSContainerView } from "./http-live-streaming/HLSContainerView";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { MeetingAppProvider } from "./MeetingAppContextDef";
+import { createStream, VIDEOSDK_TOKEN } from "./api";
+import { ILSContainerView } from "./interactive-live-streaming/ILSContainerView";
 
 const App = () => {
   const [token, setToken] = useState("");
@@ -20,10 +22,12 @@ const App = () => {
     selectedWebcam.id
   );
 
-  const [meetingMode, setMeetingMode] = useState(Constants.modes.CONFERENCE);
+  const [meetingMode, setMeetingMode] = useState(Constants.modes.SEND_AND_RECV);
   const [selectMicDeviceId, setSelectMicDeviceId] = useState(selectedMic.id);
   const [isMeetingStarted, setMeetingStarted] = useState(false);
+  const [isStreamStarted, setStreamStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
+  const [isStreamLeft, setIsStreamLeft] = useState(false);
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
   ).matches;
@@ -35,6 +39,25 @@ const App = () => {
       };
     }
   }, [isMobile]);
+
+  // ILS
+  const [streamId, setStreamId] = useState("");
+  const [mode, setMode] = useState(Constants.modes.SEND_AND_RECV);
+
+  // const initializeStream = async (id)=> {
+  //   const newStreamId = id || (await createStream({token: VIDEOSDK_TOKEN}))
+  //   setStreamId(newStreamId)
+  //   return newStreamId;
+  // }
+
+  // useEffect(()=> {
+  //   initializeStream()
+  // },[])
+
+
+  const onStreamLeave = () => setStreamId(null);
+
+  // Add this effect to help debug state changes
 
   return (
     <MeetingAppProvider>
@@ -49,6 +72,7 @@ const App = () => {
                 setParticipantName={setParticipantName}
                 setMeetingId={setMeetingId}
                 setToken={setToken}
+                setMode={setMode}
                 setMicOn={setMicOn}
                 micEnabled={micOn}
                 webcamEnabled={webcamOn}
@@ -58,10 +82,16 @@ const App = () => {
                 onClickStartMeeting={() => {
                   setMeetingStarted(true);
                 }}
+                onClickStartStream={() => {
+                  setStreamStarted(true);
+                }}
                 startMeeting={isMeetingStarted}
+                startStream={isStreamStarted}
                 setIsMeetingLeft={setIsMeetingLeft}
+                setIsStreamLeft={setIsStreamLeft}
                 meetingMode={meetingMode}
                 setMeetingMode={setMeetingMode}
+                setStreamId={setStreamId}
               />
             }
           />
@@ -83,10 +113,16 @@ const App = () => {
                 onClickStartMeeting={() => {
                   setMeetingStarted(true);
                 }}
+                onClickStartStream={() => {
+                  setStreamStarted(true);
+                }}
                 startMeeting={isMeetingStarted}
+                startStream={isStreamStarted}
                 setIsMeetingLeft={setIsMeetingLeft}
+                setIsStreamLeft={setIsStreamLeft}
                 meetingMode={meetingMode}
                 setMeetingMode={setMeetingMode}
+                setStreamId={setStreamId}
               />
             }
           ></Route>
@@ -98,6 +134,8 @@ const App = () => {
                 participantName={participantName}
                 setParticipantName={setParticipantName}
                 setMeetingId={setMeetingId}
+                setMode={setMode}
+                setStreamId={setStreamId}
                 setToken={setToken}
                 setMicOn={setMicOn}
                 micEnabled={micOn}
@@ -108,8 +146,13 @@ const App = () => {
                 onClickStartMeeting={() => {
                   setMeetingStarted(true);
                 }}
+                onClickStartStream={() => {
+                  setStreamStarted(true);
+                }}
                 startMeeting={isMeetingStarted}
+                startStream={isStreamStarted}
                 setIsMeetingLeft={setIsMeetingLeft}
+                setIsStreamLeft={setIsStreamLeft}
                 meetingMode={meetingMode}
                 setMeetingMode={setMeetingMode}
               />
@@ -171,6 +214,9 @@ const App = () => {
                     onClickStartMeeting={() => {
                       setMeetingStarted(true);
                     }}
+                    onClickStartStream={() => {
+                      setStreamStarted(true);
+                    }}
                     startMeeting={isMeetingStarted}
                     setIsMeetingLeft={setIsMeetingLeft}
                     meetingMode={meetingMode}
@@ -191,7 +237,6 @@ const App = () => {
                       micEnabled: micOn,
                       webcamEnabled: webcamOn,
                       name: participantName ? participantName : "TestUser",
-                      // mode: Constants.modes.CONFERENCE,
                       mode: meetingMode,
                       multiStream: false,
                     }}
@@ -199,7 +244,7 @@ const App = () => {
                     reinitialiseMeetingOnConfigChange={true}
                     joinWithoutUserInteraction={true}
                   >
-                    <ILSContainer
+                    <HLSContainerView
                       onMeetingLeave={() => {
                         // setToken("");
                         // setMeetingId("");
@@ -238,10 +283,89 @@ const App = () => {
                     onClickStartMeeting={() => {
                       setMeetingStarted(true);
                     }}
+                    onClickStartStream={() => {
+                      setStreamStarted(true);
+                    }}
                     startMeeting={isMeetingStarted}
                     setIsMeetingLeft={setIsMeetingLeft}
                     meetingMode={meetingMode}
                     setMeetingMode={setMeetingMode}
+                  />
+                )}
+              </>
+            }
+          />
+          <Route
+            path={`interactive-live-streaming/:mode/:id`}
+            element={
+              <>
+                
+                {isStreamStarted ? (
+                  <MeetingProvider
+                    config={{
+                      meetingId: streamId,
+                      micEnabled: micOn,
+                      webcamEnabled: webcamOn,
+                      name: participantName ? participantName : "TestUser",
+                      mode: mode,
+                      multiStream: false, 
+                    }}
+                    token={token}
+                    joinWithoutUserInteraction={true}
+                  >
+                    <ILSContainerView
+                      onMeetingLeave={() => {
+                        setWebcamOn(false);
+                        setMicOn(false);
+                        setStreamStarted(false);
+                        setIsMeetingLeft(true);
+                        setIsStreamLeft(true);
+                      }}
+                      setIsMeetingLeft={setIsMeetingLeft}
+                      setIsStreamLeft={setIsStreamLeft}
+                      selectedMic={selectedMic}
+                      selectedWebcam={selectedWebcam}
+                      selectWebcamDeviceId={selectWebcamDeviceId}
+                      setSelectWebcamDeviceId={setSelectWebcamDeviceId}
+                      selectMicDeviceId={selectMicDeviceId}
+                      setSelectMicDeviceId={setSelectMicDeviceId}
+                      micEnabled={micOn}
+                      webcamEnabled={webcamOn}
+                      meetingMode={meetingMode}
+                      setMeetingMode={setMeetingMode}
+                      mode={mode}
+                    /> 
+                  </MeetingProvider>
+                ) : isStreamLeft ? (
+                  <LeaveScreen
+                    setIsMeetingLeft={setIsMeetingLeft}
+                    setIsStreamLeft={setIsStreamLeft}
+                  />
+                ) : (
+                  <JoiningScreen
+                    participantName={participantName}
+                    setParticipantName={setParticipantName}
+                    setMode={setMode}
+                    setMeetingId={setMeetingId}
+                    setToken={setToken}
+                    setMicOn={setMicOn}
+                    micEnabled={micOn}
+                    webcamEnabled={webcamOn}
+                    setSelectedMic={setSelectedMic}
+                    setSelectedWebcam={setSelectedWebcam}
+                    setWebcamOn={setWebcamOn}
+                    onClickStartMeeting={() => {
+                      setMeetingStarted(true);
+                    }}
+                    onClickStartStream={() => {
+                      setStreamStarted(true);
+                    }}
+                    startMeeting={isMeetingStarted}
+                    setIsMeetingLeft={setIsMeetingLeft}
+                    setIsStreamLeft={setIsStreamLeft}
+                    meetingMode={meetingMode}
+                    setMeetingMode={setMeetingMode}
+                    setStreamId={setStreamId}
                   />
                 )}
               </>

@@ -14,6 +14,9 @@ export function ParticipantView({ participantId }) {
     mode,
   } = useParticipant(participantId);
 
+  
+  
+
   const micRef = useRef(null);
   const [mouseOver, setMouseOver] = useState(false);
 
@@ -40,7 +43,8 @@ export function ParticipantView({ participantId }) {
       return mediaStream;
     }
   }, [webcamStream, webcamOn]);
-  return mode === "CONFERENCE" ? (
+
+  return mode === "SEND_AND_RECV" || mode === 'CONFERENCE' ? (
     <div
       onMouseEnter={() => {
         setMouseOver(true);

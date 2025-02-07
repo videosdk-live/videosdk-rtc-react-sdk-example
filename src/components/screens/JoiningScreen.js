@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MeetingDetailsScreen } from "../MeetingDetailsScreen";
-import { createMeeting, getToken, validateMeeting } from "../../api";
+import { createMeeting, createStream, getToken, validateMeeting } from "../../api";
 import { CheckCircleIcon } from "@heroicons/react/outline";
 import SettingDialogueBox from "../SettingDialogueBox";
 import ConfirmBox from "../ConfirmBox";
@@ -27,8 +27,12 @@ export function JoiningScreen({
   webcamEnabled,
   setWebcamOn,
   setMicOn,
+  onClickStartStream,
   setMeetingMode,
   meetingMode,
+  // ILS Params
+  setMode,
+  setStreamId
 }) {
   const { meetingType } = useMeetingAppContext();
   const [setting, setSetting] = useState("video");
@@ -56,6 +60,10 @@ export function JoiningScreen({
   const [settingDialogueOpen, setSettingDialogueOpen] = useState(false);
 
   const [audioTrack, setAudioTrack] = useState(null);
+
+
+  // For ILS
+  
 
   const handleClickOpen = () => {
     setSettingDialogueOpen(true);
@@ -250,13 +258,15 @@ export function JoiningScreen({
   }, [audioTrack]);
 
   useEffect(() => {
-    if (mode === "viewer") {
-      setMeetingMode(Constants.modes.VIEWER);
+    if (mode === "audience") {
+      setMeetingMode(Constants.modes.RECV_ONLY);
+      // setMode(Constants.modes.RECV_ONLY)
     }
   }, [mode]);
 
+
   useEffect(() => {
-    if (meetingMode === Constants.modes.VIEWER) {
+    if (meetingMode === Constants.modes.SEND_AND_RECV) {
       _handleTurnOffMic();
       _handleTurnOffWebcam();
     }
@@ -290,7 +300,7 @@ export function JoiningScreen({
   }, [videoTrack, setting, settingDialogueOpen]);
 
   useEffect(() => {
-    if (mode === "viewer") {
+    if (mode === "audience") {
       // do nothing
     } else {
       getDevices({ micEnabled, webcamEnabled });
@@ -323,7 +333,7 @@ export function JoiningScreen({
             className={`rounded-full min-w-auto w-11 h-11 flex items-center justify-center ${
               onState ? "bg-white" : "bg-red-650 text-white"
             }`}
-            disabled={meetingMode === Constants.modes.VIEWER}
+            disabled={meetingMode === Constants.modes.RECV_ONLY}
           >
             {onState ? (
               <OnIcon fillcolor={onState ? "#050A0E" : "#fff"} />
@@ -380,7 +390,7 @@ export function JoiningScreen({
                           <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center">
                             {!webcamOn ? (
                               <p className="text-xl xl:text-lg 2xl:text-xl text-white">
-                                {meetingMode === Constants.modes.VIEWER
+                                {meetingMode === Constants.modes.RECV_ONLY
                                   ? "You are not permitted to use your microphone and camera."
                                   : "The camera is off"}
                               </p>
@@ -459,13 +469,40 @@ export function JoiningScreen({
                     setVideoTrack={setVideoTrack}
                     meetingType={meetingType}
                     setMeetingMode={setMeetingMode}
+                    meetingMode={meetingMode}
                     onClickStartMeeting={onClickStartMeeting}
+                    onClickStartStream={onClickStartStream}
+                    onClickJoinStream={async (id, mode)=> {
+                      const token  = await getToken();
+                      const valid = await validateMeeting({
+                        roomId: id,
+                        token
+                      })
+
+
+                      
+                      
+                      if (valid) {
+                        setToken(token);
+                        setStreamId(id);
+                        if (videoTrack) {
+                          videoTrack.stop();
+                          setVideoTrack(null);
+                        }
+                        // onClickStartMeeting();
+                        setMeetingMode(mode)
+                        onClickStartStream()
+                        setParticipantName("");
+                      } else alert("Invalid Stream Id");
+
+                      
+                    }}
                     onClickJoin={async (id) => {
                       const token = await getToken();
                       const valid = await validateMeeting({
                         roomId: id,
                         token,
-                      });
+                      });                      
 
                       if (valid) {
                         setToken(token);
@@ -486,6 +523,16 @@ export function JoiningScreen({
                       setParticipantName("");
                       return _meetingId;
                     }}
+
+                    _handleOnCreateStream={async ()=> {
+                      const token = await getToken();
+                      const _streamId = await createStream({ token });
+                      setToken(token)
+                      setStreamId(_streamId)
+                      setParticipantName("")
+                      return _streamId;
+                    }}
+                    setMode={setMode}
                   />
                 </div>
               </div>

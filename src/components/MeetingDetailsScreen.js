@@ -15,7 +15,13 @@ export function MeetingDetailsScreen({
   videoTrack,
   setVideoTrack,
   onClickStartMeeting,
+  onClickStartStream,
   setMeetingMode,
+  initializeStream,
+  meetingMode,
+  setMode,
+  onClickJoinStream,
+  _handleOnCreateStream,
 }) {
   const { meetingType, setMeetingType } = useMeetingAppContext();
   const { id, mode, type } = useParams();
@@ -25,7 +31,11 @@ export function MeetingDetailsScreen({
   const [meetingId, setMeetingId] = useState(id || "");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);
+  const [iscreateStreamClicked, setIscreateStreamClicked] = useState(false);
+  const [isJoinStreamClicked, setIsJoinStreamClicked] = useState(false);
   const [isJoinMeetingClicked, setIsJoinMeetingClicked] = useState(false);
+
+  const [streamId, setStreamId] = useState(id || "");
 
   const selectType = [
     {
@@ -38,6 +48,11 @@ export function MeetingDetailsScreen({
       label: "Interactive Live Streaming",
       value: meetingTypes.ILS,
     },
+    {
+      Icon: LiveStreamingIcon,
+      label: "HTTP Live Streaming",
+      value: meetingTypes.HLS,
+    },
   ];
 
   useEffect(() => {
@@ -49,10 +64,23 @@ export function MeetingDetailsScreen({
   }, [meetingId]);
 
   useEffect(() => {
-    if (mode) {
-      setMeetingType(meetingTypes.ILS);
+    if (streamId) {
+      setIsJoinStreamClicked(true);
+    } else {
+      setIscreateStreamClicked(false);
     }
-  }, [mode]);
+  }, [streamId]);
+
+  useEffect(() => {
+    if (mode && window.location.pathname.startsWith('/interactive-meeting')) {
+      setMeetingType(meetingTypes.HLS);
+    }
+    else if(mode && window.location.pathname.startsWith('/interactive-live-streaming')) {
+      setMeetingType(meetingTypes.ILS)
+    }
+  }, [mode, window.location]);
+
+
 
   useEffect(async () => {
     if (type === "conference") {
@@ -60,11 +88,16 @@ export function MeetingDetailsScreen({
       setMeetingType(meetingTypes.MEETING);
       const meetingId = await _handleOnCreateMeeting();
       setMeetingId(meetingId);
-    } else if (type === "interactive") {
-      setMeetingType(meetingTypes.ILS);
+    } else if (type === "interactive-meeting") {
+      setMeetingType(meetingTypes.HLS);
       setIscreateMeetingClicked(true);
       const meetingId = await _handleOnCreateMeeting();
       setMeetingId(meetingId);
+    } else if (type === "interactive-live-streaming") {
+      setMeetingType(meetingTypes.ILS);
+      setIscreateStreamClicked(true);
+      const streamid = await _handleOnCreateStream();
+      setStreamId(streamid);
     }
   }, [type]);
 
@@ -124,6 +157,7 @@ export function MeetingDetailsScreen({
                       replace: true,
                     });
                     setMeetingMode(Constants.modes.CONFERENCE);
+
                     onClickJoin(validatedMeetingId);
                   } else setMeetingIdError(true);
                 }
@@ -136,7 +170,7 @@ export function MeetingDetailsScreen({
           </>
         )}
 
-      {meetingType === meetingTypes.ILS &&
+      {meetingType === meetingTypes.HLS &&
         (iscreateMeetingClicked || isJoinMeetingClicked) && (
           <>
             <input
@@ -171,75 +205,153 @@ export function MeetingDetailsScreen({
                       navigate(`/interactive-meeting/host/${meetingId}`, {
                         replace: true,
                       });
+                      setMeetingMode(Constants.modes.SEND_AND_RECV);
+                      // setMode(Constants.modes.SEND_AND_RECV);
                     } else if (mode === "co-host") {
                       navigate(`/interactive-meeting/co-host/${meetingId}`, {
                         replace: true,
                       });
+                      setMeetingMode(Constants.modes.SEND_AND_RECV);
+                      // setMode(Constants.modes.SEND_AND_RECV);
                     } else {
-                      navigate(`/interactive-meeting/viewer/${meetingId}`, {
+                      navigate(`/interactive-meeting/audience/${meetingId}`, {
                         replace: true,
                       });
-                      setMeetingMode(Constants.modes.VIEWER);
+                      setMeetingMode(Constants.modes.RECV_ONLY);
+                      // setMode(Constants.modes.RECV_ONLY);
                     }
                     onClickJoin(meetingId);
                   } else setMeetingIdError(true);
                 }
               }}
             >
-              {meetingType === meetingTypes.ILS && iscreateMeetingClicked
+             
+              {meetingType === meetingTypes.HLS &&
+              iscreateMeetingClicked
+                ? "Join Studio"
+                : "Join Streaming Room"}
+            </button>
+          </>
+        )}
+      {meetingType === meetingTypes.ILS &&
+        (iscreateStreamClicked || isJoinStreamClicked) && (
+          <>
+            <input
+              value={participantName}
+              onChange={(e) => setParticipantName(e.target.value)}
+              placeholder="Enter your name"
+              className="px-4 py-3 mt-5 bg-gray-650 rounded-xl text-white w-full text-center"
+            />
+
+            {/* <p className="text-xs text-white mt-1 text-center">
+           Your name will help everyone identify you in the meeting.
+         </p> */}
+            <button
+              disabled={participantName.length < 3}
+              className={`w-full ${
+                participantName.length < 3 ? "bg-gray-650" : "bg-purple-350"
+              }  text-white px-2 py-3 rounded-xl mt-5`}
+              onClick={(e) => {
+                if (iscreateStreamClicked) {
+                  if (videoTrack) {
+                    videoTrack.stop();
+                    setVideoTrack(null);
+                  }
+                  onClickStartStream();
+                  // onClickStartMeeting();
+
+                  navigate(`/interactive-live-streaming/host/${streamId}`, {
+                    replace: true,
+                  });
+                } else {
+                  if (streamId.match("\\w{4}\\-\\w{4}\\-\\w{4}")) {
+                    if (mode === "host") {
+                      setMeetingMode(Constants.modes.SEND_AND_RECV);
+                      setMode(Constants.modes.SEND_AND_RECV);
+                      onClickJoinStream(streamId, Constants.modes.SEND_AND_RECV);
+                      navigate(`/interactive-live-streaming/host/${streamId}`, {
+                        replace: true,
+                      });
+                    } else {
+                      setMeetingMode(Constants.modes.RECV_ONLY);
+                      setMode(Constants.modes.RECV_ONLY);
+                      onClickJoinStream(streamId, Constants.modes.RECV_ONLY);
+
+                      navigate(
+                        `/interactive-live-streaming/audience/${streamId}`,
+                        {
+                          replace: true,
+                        }
+                      );
+                    }
+                  } else setMeetingIdError(true);
+                }
+              }}
+            >
+              {meetingType === meetingTypes.ILS && iscreateStreamClicked || (mode === "host" )
                 ? "Join Studio"
                 : "Join Streaming Room"}
             </button>
           </>
         )}
 
-      {!iscreateMeetingClicked && !isJoinMeetingClicked && (
-        <div className="w-full md:mt-0 mt-4 flex flex-col">
-          <p className="text-white text-2xl text-center font-extrabold">
-            Select meeting type
-          </p>
-          <div className="flex flex-col justify-between w-full mt-8">
-            {selectType.map(({ Icon, label, value }, index) => (
-              <button
-                onClick={(e) => {
-                  setMeetingType(value);
-                }}
-                className={`bg-gray-650 py-5  flex flex-col items-center justify-center mb-5 rounded-xl ${
-                  meetingType === value
-                    ? "border border-white"
-                    : "border border-gray-650"
-                }`}
-              >
-                <Icon />
-                <div className="mt-4">
-                  <p
-                    className={`text-base font-medium ${
-                      meetingType === value
-                        ? "text-white"
-                        : "text-customGray-750"
-                    }`}
-                  >
-                    {label}
-                  </p>
-                </div>
-              </button>
-            ))}
-          </div>
+      {!iscreateMeetingClicked &&
+        !isJoinMeetingClicked &&
+        !isJoinStreamClicked &&
+        !iscreateStreamClicked && (
+          <div className="w-full md:mt-0 mt-4 flex flex-col">
+            <p className="text-white text-2xl text-center font-extrabold">
+              Select meeting type
+            </p>
+            <div className="flex flex-col justify-between w-full mt-8">
+              {selectType.map(({ Icon, label, value }, index) => (
+                <button
+                  onClick={(e) => {
+                    setMeetingType(value);
+                  }}
+                  className={`bg-gray-650 py-5  flex flex-col items-center justify-center mb-5 rounded-xl ${
+                    meetingType === value
+                      ? "border border-white"
+                      : "border border-gray-650"
+                  }`}
+                >
+                  <Icon />
+                  <div className="mt-4">
+                    <p
+                      className={`text-base font-medium ${
+                        meetingType === value
+                          ? "text-white"
+                          : "text-customGray-750"
+                      }`}
+                    >
+                      {label}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
 
-          <div className="mt-4 flex w-full">
-            <button
-              className="rounded-xl w-full py-4 bg-purple-350 text-center text-white text-xl font-bold"
-              onClick={async (e) => {
-                const meetingId = await _handleOnCreateMeeting();
-                setMeetingId(meetingId);
-                setIscreateMeetingClicked(true);
-              }}
-            >
-              Next
-            </button>
+            <div className="mt-4 flex w-full">
+              <button
+                className="rounded-xl w-full py-4 bg-purple-350 text-center text-white text-xl font-bold"
+                onClick={async (e) => {
+                  if (meetingType === "ILS") {
+                    const streamId = await _handleOnCreateStream();
+                    setStreamId(streamId);
+                    setIscreateStreamClicked(true);
+                  } else if(meetingType === 'HLS' || meetingType === 'MEETING'){
+                    const meetingId = await _handleOnCreateMeeting();
+                    setMeetingId(meetingId);
+                    setIscreateMeetingClicked(true);
+                  }
+                  // decide on ds
+                }}
+              >
+                Next
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

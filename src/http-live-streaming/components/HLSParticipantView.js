@@ -1,9 +1,8 @@
 import React, { useMemo } from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
-import { useParams } from "react-router-dom";
 
-function ParticipantsViewer({ isPresenting }) {
+function HLSParticipantView({ isPresenting }) {
   const {
     participants,
     pinnedParticipants,
@@ -12,9 +11,6 @@ function ParticipantsViewer({ isPresenting }) {
     localScreenShareOn,
     presenterId,
   } = useMeeting();
-
-  const params = useParams()
-  
 
   const participantIds = useMemo(() => {
     const pinnedParticipantId = [...pinnedParticipants.keys()].filter(
@@ -35,14 +31,20 @@ function ParticipantsViewer({ isPresenting }) {
       localParticipant.id,
       ...pinnedParticipantId,
       ...regularParticipantIds,
-    ].slice(0, isPresenting ? 6 : 16);
+    ];
+
+    const filteredParticipants = ids
+      .filter((participantId) => {
+        return participants?.get(participantId)?.mode === "SEND_AND_RECV";
+      })
+      .slice(0, 16);
 
     if (activeSpeakerId) {
       if (!ids.includes(activeSpeakerId)) {
         ids[ids.length - 1] = activeSpeakerId;
       }
     }
-    return ids;
+    return filteredParticipants;
   }, [
     participants,
     activeSpeakerId,
@@ -59,11 +61,11 @@ function ParticipantsViewer({ isPresenting }) {
   );
 }
 
-const MemorizedParticipantView = React.memo(
-  ParticipantsViewer,
+const MemorizedHLSParticipantView = React.memo(
+  HLSParticipantView,
   (prevProps, nextProps) => {
     return prevProps.isPresenting === nextProps.isPresenting;
   }
 );
 
-export default MemorizedParticipantView;
+export default MemorizedHLSParticipantView;

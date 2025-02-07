@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import InvitePeopleIcon from "../icons/InvitePeopleIcon";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
 import { ParticipantView } from "./ParticipantView";
+import { meetingTypes } from "../utils/common";
 
 const MemoizedParticipant = React.memo(
   ParticipantView,
@@ -22,6 +23,7 @@ function ParticipantGrid({ participantIds, isPresenting }) {
   if (participantIds.length === 1) participantIds.push("");
 
   const { id, mode } = useParams();
+  const params = useParams();
 
   const perRow =
     isMobile || isPresenting
@@ -42,7 +44,7 @@ function ParticipantGrid({ participantIds, isPresenting }) {
       ? 4
       : 4;
 
-  let interactiveMeetigUrlArray = [
+  let HLSMeetigUrlArray = [
     {
       role: "Host",
       url: `${window.location.origin}/interactive-meeting/host/${id}`,
@@ -52,8 +54,19 @@ function ParticipantGrid({ participantIds, isPresenting }) {
       url: `${window.location.origin}/interactive-meeting/co-host/${id}`,
     },
     {
-      role: "Viewer",
-      url: `${window.location.origin}/interactive-meeting/viewer/${id}`,
+      role: "Audience",
+      url: `${window.location.origin}/interactive-meeting/audience/${id}`,
+    },
+  ];
+
+  let ILSMeetigUrlArray = [
+    {
+      role: "Host",
+      url: `${window.location.origin}/interactive-live-streaming/host/${id}`,
+    },
+    {
+      role: "Audience",
+      url: `${window.location.origin}/interactive-live-streaming/audience/${id}`,
     },
   ];
 
@@ -117,56 +130,108 @@ function ParticipantGrid({ participantIds, isPresenting }) {
                                   Invite others to demo
                                 </p>
                               </div>
-                              {mode === "host" || mode === "co-host" ? (
+                              {mode === "host" ||
+                              (mode === "co-host") ? (
                                 <div className="mt-9 grid grid-flow-row">
-                                  {interactiveMeetigUrlArray.map(
-                                    ({ role, url }, i) => (
-                                      <div
-                                        key={`role_link_${i}`}
-                                        className="flex w-full my-2.5 items-center justify-center"
-                                      >
-                                        <p className="text-lg text-white flex flex-1">
-                                          {role}
-                                        </p>
-                                        <div
-                                          className={`border border-customGray-250 rounded py-3 px-3 ml-2`}
-                                        >
-                                          <p className="text-[15px] text-white ">
-                                            {`${
-                                              url.length > 35
-                                                ? `${url.slice(0, 35)}...`
-                                                : url
-                                            }`}
-                                          </p>
-                                        </div>
-                                        <div>
-                                          <button
-                                            onClick={() => {
-                                              navigator.clipboard.writeText(
-                                                url
-                                              );
-                                              setIsCopied({
-                                                index: i,
-                                                copied: true,
-                                              });
-                                              setTimeout(() => {
-                                                setIsCopied({
-                                                  index: null,
-                                                  copied: false,
-                                                });
-                                              }, 5000);
-                                            }}
-                                            className="ml-2 bg-white text-black text-[15px] font-medium py-2.5 px-3 rounded w-28"
+                                  {/* find other way */}
+                                  {window.location.pathname.startsWith('/interactive-live-streaming') 
+                                    ? ILSMeetigUrlArray.map(
+                                        ({ role, url }, i) => (
+                                          <div
+                                            key={`role_link_${i}`}
+                                            className="flex w-full my-2.5 items-center justify-center"
                                           >
-                                            {isCopied.index === i &&
-                                            isCopied.copied
-                                              ? "Link Copied"
-                                              : "Copy Link"}
-                                          </button>
-                                        </div>
-                                      </div>
-                                    )
-                                  )}
+                                            <p className="text-lg text-white flex flex-1">
+                                              {role}
+                                            </p>
+                                            <div
+                                              className={`border border-customGray-250 rounded py-3 px-3 ml-2`}
+                                            >
+                                              <p className="text-[15px] text-white ">
+                                                {`${
+                                                  url.length > 35
+                                                    ? `${url.slice(0, 35)}...`
+                                                    : url
+                                                }`}
+                                              </p>
+                                            </div>
+                                            <div>
+                                              <button
+                                                onClick={() => {
+                                                  navigator.clipboard.writeText(
+                                                    url
+                                                  );
+                                                  setIsCopied({
+                                                    index: i,
+                                                    copied: true,
+                                                  });
+                                                  setTimeout(() => {
+                                                    setIsCopied({
+                                                      index: null,
+                                                      copied: false,
+                                                    });
+                                                  }, 5000);
+                                                }}
+                                                className="ml-2 bg-white text-black text-[15px] font-medium py-2.5 px-3 rounded w-28"
+                                              >
+                                                {isCopied.index === i &&
+                                                isCopied.copied
+                                                  ? "Link Copied"
+                                                  : "Copy Link"}
+                                              </button>
+                                            </div>
+                                          </div>
+                                        )
+                                      )
+                                    : 
+                                      HLSMeetigUrlArray.map(
+                                        ({ role, url }, i) => (
+                                          <div
+                                            key={`role_link_${i}`}
+                                            className="flex w-full my-2.5 items-center justify-center"
+                                          >
+                                            <p className="text-lg text-white flex flex-1">
+                                              {role}
+                                            </p>
+                                            <div
+                                              className={`border border-customGray-250 rounded py-3 px-3 ml-2`}
+                                            >
+                                              <p className="text-[15px] text-white ">
+                                                {`${
+                                                  url.length > 35
+                                                    ? `${url.slice(0, 35)}...`
+                                                    : url
+                                                }`}
+                                              </p>
+                                            </div>
+                                            <div>
+                                              <button
+                                                onClick={() => {
+                                                  navigator.clipboard.writeText(
+                                                    url
+                                                  );
+                                                  setIsCopied({
+                                                    index: i,
+                                                    copied: true,
+                                                  });
+                                                  setTimeout(() => {
+                                                    setIsCopied({
+                                                      index: null,
+                                                      copied: false,
+                                                    });
+                                                  }, 5000);
+                                                }}
+                                                className="ml-2 bg-white text-black text-[15px] font-medium py-2.5 px-3 rounded w-28"
+                                              >
+                                                {isCopied.index === i &&
+                                                isCopied.copied
+                                                  ? "Link Copied"
+                                                  : "Copy Link"}
+                                              </button>
+                                            </div>
+                                          </div>
+                                        )
+                                      )}
                                 </div>
                               ) : (
                                 <div className="mt-9">
