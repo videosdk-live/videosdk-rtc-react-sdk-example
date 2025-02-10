@@ -20,10 +20,13 @@ function ParticipantGrid({ participantIds, isPresenting }) {
   const [isCopied, setIsCopied] = useState({ index: null, copied: false });
   const [isConfereceUrlCopied, setIsConfereceUrlCopied] = useState(false);
 
-  if (participantIds.length === 1) participantIds.push("");
+  if (
+    participantIds.length === 1 &&
+    !window.location.pathname.startsWith("/interactive-live-streaming/audience")
+  )
+    participantIds.push("");
 
   const { id, mode } = useParams();
-  const params = useParams();
 
   const perRow =
     isMobile || isPresenting
@@ -115,13 +118,19 @@ function ParticipantGrid({ participantIds, isPresenting }) {
                             : "w-full"
                         } items-center justify-center h-full ${
                           participantIds.length === 1
-                            ? "md:max-w-lg 2xl:max-w-2xl"
+                            ? "md:max-w-full"
                             : participantIds.length === 2
                             ? "md:max-w-xl 2xl:max-w-2xl"
                             : "md:max-w-lg 2xl:max-w-2xl"
                         } overflow-clip overflow-hidden  p-1`}
                       >
-                        {participantId === "" && !isPresenting ? (
+                        {participantId === "" &&
+                        !isPresenting &&
+                        (!window.location.pathname.startsWith(
+                          "/interactive-live-streaming/audience"
+                        ) 
+                         )
+                           ? (
                           <div className="h-full w-full bg-gray-750 relative overflow-hidden rounded-lg px-9">
                             <div className="h-full w-full flex flex-col items-center justify-center ">
                               <InvitePeopleIcon />
@@ -130,11 +139,12 @@ function ParticipantGrid({ participantIds, isPresenting }) {
                                   Invite others to demo
                                 </p>
                               </div>
-                              {mode === "host" ||
-                              (mode === "co-host") ? (
+                              {mode === "host" || mode === "co-host" ? (
                                 <div className="mt-9 grid grid-flow-row">
                                   {/* find other way */}
-                                  {window.location.pathname.startsWith('/interactive-live-streaming') 
+                                  {window.location.pathname.startsWith(
+                                    "/interactive-live-streaming"
+                                  )
                                     ? ILSMeetigUrlArray.map(
                                         ({ role, url }, i) => (
                                           <div
@@ -183,8 +193,7 @@ function ParticipantGrid({ participantIds, isPresenting }) {
                                           </div>
                                         )
                                       )
-                                    : 
-                                      HLSMeetigUrlArray.map(
+                                    : HLSMeetigUrlArray.map(
                                         ({ role, url }, i) => (
                                           <div
                                             key={`role_link_${i}`}
@@ -234,32 +243,36 @@ function ParticipantGrid({ participantIds, isPresenting }) {
                                       )}
                                 </div>
                               ) : (
-                                <div className="mt-9">
-                                  <div className="border border-customGray-250 rounded py-3 px-3">
-                                    <p className="text-[15px] text-white">
-                                      {`${window.location.href}`}
-                                    </p>
+                                !window.location.pathname.startsWith(
+                                  "/interactive-live-streaming/audience"
+                                ) && 
+                                  <div className="mt-9">
+                                    <div className="border border-customGray-250 rounded py-3 px-3">
+                                      <p className="text-[15px] text-white">
+                                        {`${window.location.href}`}
+                                      </p>
+                                    </div>
+                                    <div className="mt-3">
+                                      <button
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(
+                                            `${window.location.href}`
+                                          );
+                                          setIsConfereceUrlCopied(true);
+                                          setTimeout(() => {
+                                            setIsConfereceUrlCopied(false);
+                                          }, 5000);
+                                        }}
+                                        className="bg-white text-black text-base font-medium py-2.5 w-full rounded"
+                                      >
+                                        {isConfereceUrlCopied
+                                          ? "Link Copied"
+                                          : "Copy Link"}
+                                      </button>
+                                    </div>
                                   </div>
-                                  <div className="mt-3">
-                                    <button
-                                      onClick={() => {
-                                        navigator.clipboard.writeText(
-                                          `${window.location.href}`
-                                        );
-                                        setIsConfereceUrlCopied(true);
-                                        setTimeout(() => {
-                                          setIsConfereceUrlCopied(false);
-                                        }, 5000);
-                                      }}
-                                      className="bg-white text-black text-base font-medium py-2.5 w-full rounded"
-                                    >
-                                      {isConfereceUrlCopied
-                                        ? "Link Copied"
-                                        : "Copy Link"}
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
+                                )
+                            }
                             </div>
                           </div>
                         ) : (
