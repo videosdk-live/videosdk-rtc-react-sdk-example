@@ -2,7 +2,7 @@ import { useMeeting } from "@videosdk.live/react-sdk";
 import React, { Fragment } from "react";
 import useIsMobile from "../../hooks/useIsMobile";
 import useIsTab from "../../hooks/useIsTab";
-import { XIcon } from "@heroicons/react/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ChatPanel } from "./ChatPanel";
 import { ParticipantPanel } from "./ParticipantPanel";
 import { Dialog, Transition } from "@headlessui/react";
@@ -66,7 +66,7 @@ const SideBarTabView = ({
                   onClick={handleClose}
                   style={{ margin: 0, padding: 0 }}
                 >
-                  <XIcon className="h-5 w-5" />
+                  <XMarkIcon className="h-5 w-5" />
                 </button>
               </div>
             )}

@@ -1,5 +1,5 @@
 import { Popover, Transition } from "@headlessui/react";
-import { XIcon } from "@heroicons/react/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useParticipant } from "@videosdk.live/react-sdk";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import ReactPlayer from "react-player";
@@ -344,7 +344,7 @@ export const CornerDisplayName = ({
                                   close();
                                 }}
                               >
-                                <XIcon
+                                <XMarkIcon
                                   className="text-white"
                                   style={{ height: 16, width: 16 }}
                                 />
@@ -465,7 +465,7 @@ export function ParticipantView({ participantId }) {
       return mediaStream;
     }
   }, [webcamStream, webcamOn]);
-  return mode === "CONFERENCE" ? (
+  return mode === "SEND_AND_RECV" ? (
     <div
       onMouseEnter={() => {
         setMouseOver(true);

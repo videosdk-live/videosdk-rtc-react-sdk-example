@@ -1,5 +1,5 @@
 import { Popover, Transition } from '@headlessui/react'
-import { ChevronDownIcon, CheckIcon } from "@heroicons/react/outline";
+import { ChevronDownIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { Fragment, useState } from 'react'
 import React from "react";
 import DropCAM from '../icons/DropDown/DropCAM';
