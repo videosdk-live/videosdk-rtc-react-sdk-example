@@ -138,12 +138,19 @@ function PipBTN({ isMobile, isTab }) {
   ) : (
     <OutlinedButton
       Icon={PipIcon}
+      label={pipMode ? "Stop PiP" : "Start Pip"} // Assuming OutlinedButton supports a 'label' prop
       onClick={() => {
         togglePipMode();
       }}
-      isFocused={pipMode}
+      isFocused={pipMode} // Use this for styling if active
       tooltip={pipMode ? "Stop PiP" : "Start Pip"}
       disabled={false}
+      // Styling for list item appearance
+      buttonClassName="w-full flex items-center justify-start p-2 rounded-md text-white space-x-3"
+      bgColor={pipMode ? "bg-gray-500" : "bg-transparent"} // Slightly different background if active
+      hoverBgColor="hover:bg-gray-600"
+      textClassName="text-sm font-normal"
+      focusIconColor="white" // Keep icon white
     />
   );
 }
@@ -157,6 +164,11 @@ export function BottomBar({
   setSelectMicDeviceId,
 }) {
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
+
+  // Define isMobile and isTab once here for use throughout BottomBar
+  const isMobile = useIsMobile();
+  const isTab = useIsTab();
+
   const RaiseHandBTN = ({ isMobile, isTab }) => {
     const { publish } = usePubSub("RAISE_HAND");
     const RaiseHand = () => {
@@ -175,7 +187,14 @@ export function BottomBar({
       <OutlinedButton
         onClick={RaiseHand}
         tooltip={"Raise Hand"}
+        label={"Raise Hand"} // Assuming OutlinedButton supports a 'label' prop
         Icon={RaiseHandIcon}
+        // Styling for list item appearance
+        buttonClassName="w-full flex items-center justify-start p-2 rounded-md text-white space-x-3"
+        bgColor="bg-transparent"
+        hoverBgColor="hover:bg-gray-600"
+        textClassName="text-sm font-normal"
+        focusIconColor="white" // Keep icon white
       />
     );
   };
@@ -219,24 +238,36 @@ export function BottomBar({
       }
     };
 
+    const buttonText =
+      recordingState === Constants.recordingEvents.RECORDING_STARTED
+        ? "Stop Recording"
+        : recordingState === Constants.recordingEvents.RECORDING_STARTING
+        ? "Starting Recording"
+        : recordingState === Constants.recordingEvents.RECORDING_STOPPED
+        ? "Start Recording"
+        : recordingState === Constants.recordingEvents.RECORDING_STOPPING
+        ? "Stopping Recording"
+        : "Start Recording";
+    
+    // Determine if the recording is in an "active" state for styling
+    const isActive = recordingState === Constants.recordingEvents.RECORDING_STARTED || 
+                     recordingState === Constants.recordingEvents.RECORDING_STARTING;
+
     return (
       <OutlinedButton
         Icon={RecordingIcon}
+        label={buttonText} // Assuming OutlinedButton supports a 'label' prop for visible text
         onClick={_handleClick}
-        isFocused={isRecording}
-        tooltip={
-          recordingState === Constants.recordingEvents.RECORDING_STARTED
-            ? "Stop Recording"
-            : recordingState === Constants.recordingEvents.RECORDING_STARTING
-            ? "Starting Recording"
-            : recordingState === Constants.recordingEvents.RECORDING_STOPPED
-            ? "Start Recording"
-            : recordingState === Constants.recordingEvents.RECORDING_STOPPING
-            ? "Stopping Recording"
-            : "Start Recording"
-        }
+        isFocused={isActive} // Use 'isActive' for styling focus/active state
+        tooltip={buttonText} // Tooltip remains for accessibility on hover (if label is not visible enough)
         lottieOption={isRecording ? defaultOptions : null}
         isRequestProcessing={isRequestProcessing}
+        // Styling for list item appearance in "More Options" menu
+        buttonClassName="w-full flex items-center justify-start p-2 rounded-md text-white space-x-3"
+        bgColor={isActive ? "bg-gray-500" : "bg-transparent"} // Different background if active
+        hoverBgColor="hover:bg-gray-600" // Hover effect
+        textClassName="text-sm font-normal" // Styling for the label text
+        focusIconColor="white" // Keep icon white
       />
     );
   };
@@ -274,11 +305,13 @@ export function BottomBar({
           onClick={() => {
             mMeeting.toggleMic();
           }}
-          bgColor={localMicOn ? "bg-gray-750" : "bg-white"}
-          borderColor={localMicOn && "#ffffff33"}
+          bgColor={localMicOn ? "bg-blue-500" : "bg-gray-700"}
+          hoverBgColor={localMicOn ? "hover:bg-blue-600" : "hover:bg-gray-600"} // Added hover
+          borderColor={localMicOn ? "border-blue-500" : "border-gray-700"}
           isFocused={localMicOn}
-          focusIconColor={localMicOn && "white"}
+          focusIconColor={"white"}
           tooltip={"Toggle Mic"}
+          buttonClassName="rounded-lg"
           renderRightComponent={() => {
             return (
               <>
@@ -428,11 +461,13 @@ export function BottomBar({
             }
             mMeeting.toggleWebcam(track);
           }}
-          bgColor={localWebcamOn ? "bg-gray-750" : "bg-white"}
-          borderColor={localWebcamOn && "#ffffff33"}
+          bgColor={localWebcamOn ? "bg-blue-500" : "bg-gray-700"}
+          hoverBgColor={localWebcamOn ? "hover:bg-blue-600" : "hover:bg-gray-600"} // Added hover
+          borderColor={localWebcamOn ? "border-blue-500" : "border-gray-700"}
           isFocused={localWebcamOn}
-          focusIconColor={localWebcamOn && "white"}
+          focusIconColor={"white"}
           tooltip={"Toggle Webcam"}
+          buttonClassName="rounded-lg"
           renderRightComponent={() => {
             return (
               <>
@@ -581,6 +616,10 @@ export function BottomBar({
           toggleScreenShare();
         }}
         isFocused={localScreenShareOn}
+        bgColor={localScreenShareOn ? "bg-blue-500" : "bg-gray-700"}
+        hoverBgColor={localScreenShareOn ? "hover:bg-blue-600" : "hover:bg-gray-600"} // Added hover
+        borderColor={localScreenShareOn ? "border-blue-500" : "border-gray-700"}
+        focusIconColor={"white"}
         tooltip={
           presenterId
             ? localScreenShareOn
@@ -589,6 +628,7 @@ export function BottomBar({
             : "Present Screen"
         }
         disabled={presenterId ? (localScreenShareOn ? false : true) : false}
+        buttonClassName="rounded-lg"
       />
     );
   };
@@ -599,12 +639,15 @@ export function BottomBar({
     return (
       <OutlinedButton
         Icon={EndIcon}
-        bgColor="bg-red-150"
+        bgColor="bg-red-500" // This was corrected in Phase 1, ensuring it's still bg-red-500
+        hoverBgColor="hover:bg-red-600" // Added hover state
         onClick={() => {
           leave();
           setIsMeetingLeft(true);
         }}
         tooltip="Leave Meeting"
+        buttonClassName="rounded-lg text-white" // Ensure text/icon is white
+        focusIconColor="white" // Ensure icon is white
       />
     );
   };
@@ -632,6 +675,10 @@ export function BottomBar({
         }}
         isFocused={sideBarMode === "CHAT"}
         tooltip="View Chat"
+      bgColor={sideBarMode === "CHAT" ? "bg-gray-600" : "bg-gray-700"} // Active state like MoreOptions
+      hoverBgColor={sideBarMode === "CHAT" ? "" : "hover:bg-gray-600"}
+      buttonClassName="rounded-lg"
+      focusIconColor="white"
       />
     );
   };
@@ -663,6 +710,10 @@ export function BottomBar({
         isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
         tooltip={"View Participants"}
         badge={`${new Map(participants)?.size}`}
+      bgColor={sideBarMode === sideBarModes.PARTICIPANTS ? "bg-gray-600" : "bg-gray-700"} // Active state like MoreOptions
+      hoverBgColor={sideBarMode === sideBarModes.PARTICIPANTS ? "" : "hover:bg-gray-600"}
+      buttonClassName="rounded-lg"
+      focusIconColor="white"
       />
     );
   };
@@ -695,10 +746,52 @@ export function BottomBar({
     );
   };
 
+  // isMobile and isTab are already defined above, no need to redefine here.
+  const MoreOptionsBTN = () => {
+    return (
+      <Popover className="relative">
+        {({ open }) => ( // Destructure open state here
+          <>
+            <Popover.Button as={Fragment}>
+              <OutlinedButton
+                Icon={DotsHorizontalIcon}
+                tooltip="More Options"
+                // Apply bg-gray-600 if open, otherwise bg-gray-700. Keep hover:bg-gray-600 for inactive state.
+                bgColor={open ? "bg-gray-600" : "bg-gray-700"}
+                hoverBgColor={open ? "" : "hover:bg-gray-600"} // No separate hover if already "active"
+                buttonClassName="rounded-lg"
+                focusIconColor="white" // Icon is always white
+              />
+            </Popover.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
+            >
+              {/* Adjusted Popover.Panel styling: specific width, padding, rounded-lg */}
+              <Popover.Panel className="absolute bottom-full left-1/2 z-10 mb-2 w-60 -translate-x-1/2 transform sm:px-0">
+                <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className="relative grid bg-gray-700 p-3 space-y-1"> {/* Increased padding to p-3 */}
+                    <RecordingBTN />
+                    <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
+                    <PipBTN isMobile={isMobile} isTab={isTab} />
+                  </div>
+                </div>
+              </Popover.Panel>
+            </Transition>
+          </>
+        )}
+      </Popover>
+    );
+  };
+
   const tollTipEl = useRef();
-  const isMobile = useIsMobile();
-  const isTab = useIsTab();
   const [open, setOpen] = useState(false);
+  // Cleaned up comments and redundant declarations
 
   const handleClickFAB = () => {
     setOpen(true);
@@ -821,19 +914,21 @@ export function BottomBar({
       </Transition>
     </div>
   ) : (
-    <div className="md:flex lg:px-2 xl:px-6 pb-2 px-2 hidden">
+    <div className="md:flex lg:px-2 xl:px-6 pb-2 px-2 hidden bg-gray-800 items-center">
+      {/* Left side */}
       <MeetingIdCopyBTN />
 
-      <div className="flex flex-1 items-center justify-center" ref={tollTipEl}>
-        <RecordingBTN />
-        <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
+      {/* Center buttons */}
+      <div className="flex flex-1 items-center justify-center space-x-2" ref={tollTipEl}> {/* Added space-x-2 */}
         <MicBTN />
         <WebCamBTN />
         <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
-        <PipBTN isMobile={isMobile} isTab={isTab} />
+        <MoreOptionsBTN />
         <LeaveBTN />
       </div>
-      <div className="flex items-center justify-center">
+
+      {/* Right side */}
+      <div className="flex items-center justify-center space-x-2"> {/* Added space-x-2 */}
         <ChatBTN isMobile={isMobile} isTab={isTab} />
         <ParticipantsBTN isMobile={isMobile} isTab={isTab} />
       </div>
