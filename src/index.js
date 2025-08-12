@@ -9,10 +9,12 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <>
     <ToastContainer
-      toastClassName={() =>
-        "relative flex py-4 px-3 rounded overflow-hidden cursor-pointer bg-white shadow-lg"
+      toastClassName={(context) =>
+        `${context?.defaultClassName} relative flex py-4 px-3 rounded overflow-hidden cursor-pointer bg-white shadow-lg`
       }
-      bodyClassName={() => "text-black text-base font-normal"}
+      bodyClassName={(context) =>
+        `${context?.defaultClassName} text-[#000] text-base font-bold`
+      }
       position="bottom-left"
       autoClose={4000}
       hideProgressBar={true}

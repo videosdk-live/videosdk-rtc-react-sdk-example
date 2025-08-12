@@ -5,11 +5,13 @@ import RefreshCheck from "../icons/NetworkStats/RefreshCheck"
 import { getNetworkStats } from "@videosdk.live/react-sdk";
 import WifiOff from "../icons/NetworkStats/WifiOff";
 import { useEffect, useState } from "react";
+import useIsMobile from "../hooks/useIsMobile";
 
 const NetworkStats = ({ }) => {
   const [error, setError] = useState("no-error-loading")
   const [uploadSpeed, setUploadSpeed] = useState(null)
   const [downloadSpeed, setDownloadSpeed] = useState(null)
+  const isMobile = useIsMobile()
 
   useEffect(() => { getNetworkStatistics(); }, [])
 
@@ -51,11 +53,11 @@ const NetworkStats = ({ }) => {
 
         {error === "no-error" &&
           <>
-            <div className="group  inline-flex items-center gap-2 text-xs text-customGray-250 basis-1/2 w-32">
+            <div className={`group  inline-flex items-center gap-2 text-xs text-customGray-250 basis-1/2 ${!isMobile && "w-32"}`}>
               <DownloadIcon />
               {downloadSpeed} MBPS
             </div>
-            <div className="group inline-flex items-center gap-2 text-xs text-customGray-250 basis-1/2 w-32">
+            <div className={`group  inline-flex items-center gap-2 text-xs text-customGray-250 basis-1/2 ${!isMobile && "w-32"}`}>
               <UploadIcon />
               {uploadSpeed} MBPS
             </div>

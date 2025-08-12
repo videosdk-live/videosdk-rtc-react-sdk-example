@@ -1,4 +1,4 @@
-import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
+import { useMeeting, useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
 import MicOffSmallIcon from "../icons/MicOffSmallIcon";
@@ -10,27 +10,16 @@ import { CornerDisplayName } from "./ParticipantView";
 export function PresenterView({ height }) {
   const mMeeting = useMeeting();
   const presenterId = mMeeting?.presenterId;
-
-  const videoPlayer = useRef();
-
   const {
     micOn,
     webcamOn,
     isLocal,
-    screenShareStream,
     screenShareAudioStream,
     screenShareOn,
     displayName,
     isActiveSpeaker,
   } = useParticipant(presenterId);
 
-  const mediaStream = useMemo(() => {
-    if (screenShareOn) {
-      const mediaStream = new MediaStream();
-      mediaStream.addTrack(screenShareStream.track);
-      return mediaStream;
-    }
-  }, [screenShareStream, screenShareOn]);
 
   const audioPlayer = useRef();
 
@@ -60,35 +49,26 @@ export function PresenterView({ height }) {
 
   return (
     <div
-      className={` bg-gray-750 rounded m-2 relative overflow-hidden w-full h-[${
-        height - "xl:p-6 lg:p-[52px] md:p-[26px] p-1"
-      }] `}
+      className={` bg-gray-750 rounded m-2 relative overflow-hidden w-full h-[${height - "xl:p-6 lg:p-[52px] md:p-[26px] p-1"
+        }] `}
     >
       <audio autoPlay playsInline controls={false} ref={audioPlayer} />
       <div className={"video-contain absolute h-full w-full"}>
-        <ReactPlayer
-          ref={videoPlayer}
-          //
-          playsinline // very very imp prop
-          playIcon={<></>}
-          //
-          pip={false}
-          light={false}
-          controls={false}
-          muted={true}
-          playing={true}
-          //
-          url={mediaStream}
-          //
-          height={"100%"}
-          width={"100%"}
-          style={{
+
+        <VideoPlayer
+          participantId={presenterId} // Required
+          type="share" // "video" or "share"
+          containerStyle={{
+            height: "100%",
+            width: "100%",
+          }}
+          className="h-full"
+          classNameVideo="h-full"
+          videoStyle={{
             filter: isLocal ? "blur(1rem)" : undefined,
           }}
-          onError={(err) => {
-            console.log(err, "presenter video error");
-          }}
         />
+
         <div
           className="bottom-2 left-2 bg-gray-750 p-2 absolute rounded-md flex items-center justify-center"
           style={{

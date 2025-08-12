@@ -188,3 +188,11 @@ input[type="radio"]:checked + label{
 #carousel-3:checked ~ .control-3 {
   display: block;
 }
+
+
+.Toastify__toast-body {
+  display: block !important;
+  white-space: normal !important;
+  color: black;
+  font-weight: bolder;
+}

@@ -2,35 +2,35 @@ import React, { useEffect, useRef, useState } from "react";
 import { MeetingDetailsScreen } from "../MeetingDetailsScreen";
 import { createMeeting, getToken, validateMeeting } from "../../api";
 import ConfirmBox from "../ConfirmBox";
-import { Constants, useMediaDevice } from "@videosdk.live/react-sdk";
-import useMediaStream from "../../hooks/useMediaStream";
-import useIsMobile from "../../hooks/useIsMobile";
 import WebcamOffIcon from "../../icons/WebcamOffIcon";
 import WebcamOnIcon from "../../icons/Bottombar/WebcamOnIcon";
 import MicOffIcon from "../../icons/MicOffIcon";
 import MicOnIcon from "../../icons/Bottombar/MicOnIcon";
+import { toast } from "react-toastify";
+import { Constants, useMediaDevice } from "@videosdk.live/react-sdk";
 import MicPermissionDenied from "../../icons/MicPermissionDenied";
 import CameraPermissionDenied from "../../icons/CameraPermissionDenied";
-import DropDown from "../DropDown";
+import NetworkStats from "../NetworkStats";
 import DropDownCam from "../DropDownCam";
 import DropDownSpeaker from "../DropDownSpeaker";
-import NetworkStats from "../NetworkStats";
+import DropDown from "../DropDown";
+import useMediaStream from "../../hooks/useMediaStream";
+import useIsMobile from "../../hooks/useIsMobile";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
-import { toast } from "react-toastify";
 
 export function JoiningScreen({
   participantName,
   setParticipantName,
   setMeetingId,
   setToken,
-  onClickStartMeeting,
-  micOn,
-  webcamOn,
-  setWebcamOn,
   setMicOn,
+  setWebcamOn,
+  onClickStartMeeting,
   customAudioStream,
   setCustomAudioStream,
   setCustomVideoStream,
+  micOn,
+  webcamOn,
 }) {
   const {
     selectedWebcam,
@@ -42,7 +42,8 @@ export function JoiningScreen({
     isMicrophonePermissionAllowed,
     setIsCameraPermissionAllowed,
     setIsMicrophonePermissionAllowed,
-  } = useMeetingAppContext();
+  } = useMeetingAppContext()
+  const isMobile = useIsMobile();
 
   const [{ webcams, mics, speakers }, setDevices] = useState({
     webcams: [],
@@ -70,7 +71,6 @@ export function JoiningScreen({
   const permissonAvaialble = useRef();
   const webcamRef = useRef();
   const micRef = useRef();
-  const isMobile = useIsMobile();
 
   useEffect(() => {
     webcamRef.current = webcamOn;
@@ -187,13 +187,11 @@ export function JoiningScreen({
       });
       setCustomVideoStream(stream);
       const videoTracks = stream?.getVideoTracks();
-      const videoTrack = videoTracks?.length ? videoTracks[0] : null;
+      const videoTrack = videoTracks.length ? videoTracks[0] : null;
       setVideoTrack(videoTrack);
     }
   };
   const changeMic = async (deviceId) => {
-
-
     if (micOn) {
       const currentAudioTrack = audioTrackRef.current;
       currentAudioTrack && currentAudioTrack.stop();
@@ -209,24 +207,23 @@ export function JoiningScreen({
   };
 
   const getDefaultMediaTracks = async ({ mic, webcam }) => {
-
     if (mic) {
       const stream = await getAudioTrack({
         micId: selectedMic.id,
       });
       setCustomAudioStream(stream);
       const audioTracks = stream?.getAudioTracks();
-      const audioTrack = audioTracks.length ? audioTracks[0] : null;
+      const audioTrack = audioTracks?.length ? audioTracks[0] : null;
       setAudioTrack(audioTrack);
     }
 
     if (webcam) {
       const stream = await getVideoTrack({
-        webcamId: selectedWebcam.id,
+        webcamId: selectedWebcam?.id,
       });
       setCustomVideoStream(stream);
       const videoTracks = stream?.getVideoTracks();
-      const videoTrack = videoTracks?.length ? videoTracks[0] : null;
+      const videoTrack = videoTracks.length ? videoTracks[0] : null;
       setVideoTrack(videoTrack);
     }
   };
@@ -286,7 +283,7 @@ export function JoiningScreen({
         }
       }
     } catch (ex) {
-      console.log("Error in requestPermission", ex);
+      console.log("Error in requestPermission ", ex);
     }
   }
   function onDeviceChanged() {
@@ -345,19 +342,17 @@ export function JoiningScreen({
     }
   };
 
-
-
   const getAudioDevices = async () => {
     try {
       if (permissonAvaialble.current?.isMicrophonePermissionAllowed) {
         let mics = await getMicrophones();
-        console.log(mics)
         let speakers = await getPlaybackDevices();
         const hasMic = mics.length > 0;
         if (hasMic) {
           startMuteListener();
         }
-        await setSelectedSpeaker({
+
+        setSelectedSpeaker({
           id: speakers[0]?.deviceId,
           label: speakers[0]?.label,
         });
@@ -399,15 +394,19 @@ export function JoiningScreen({
   };
 
   return (
-    <div className="fixed inset-0">
-      <div className="overflow-y-auto flex flex-col flex-1 h-screen bg-gray-800">
-        <div className="flex flex-1 flex-col md:flex-row items-center justify-center md:m-[72px] m-16">
+    <>
+      <div className="overflow-y-auto flex flex-col flex-1  h-screen bg-gray-800">
+        <div className="flex flex-1 flex-col md:flex-row  items-center justify-center m-10 md:m-[30px] lg:m-16">
           <div className="container grid  md:grid-flow-col grid-flow-row ">
             <div className="grid grid-cols-12">
               <div className="md:col-span-7 2xl:col-span-7 col-span-12">
                 <div className="flex items-center justify-center p-1.5 sm:p-4 lg:p-6">
-                  <div className="relative w-full md:pl-4 sm:pl-10 pl-5  md:pr-4 sm:pr-10 pr-5">
-                    <div className="w-full relative" style={{ height: "55vh" }}>
+                  <div className="relative w-full md:pl-4  sm:pl-10  pl-5  md:pr-4 sm:pr-10 pr-5">
+
+                    <div className="w-full relative" style={{ height: isMobile ? "45vh" : "55vh" }}>
+                      <div className={`absolute  z-10 ${isMobile ? "right-0" : " right-2 top-2"}`}>
+                        <NetworkStats />
+                      </div>
                       <video
                         autoPlay
                         playsInline
@@ -416,22 +415,14 @@ export function JoiningScreen({
                         controls={false}
                         style={{
                           backgroundColor: "#1c1c1c",
+                          transform: "scaleX(-1)",
+                          WebkitTransform: "scaleX(-1)"
                         }}
                         className={
                           "rounded-[10px] h-full w-full object-cover flex items-center justify-center flip"
                         }
+                      
                       />
-                      {!isMobile ? (
-                        <>
-                          <div className="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center">
-                            {!webcamOn ? (
-                              <p className="text-xl xl:text-lg 2xl:text-xl text-white">
-                                The camera is off
-                              </p>
-                            ) : null}
-                          </div>
-                        </>
-                      ) : null}
 
                       <div className="absolute xl:bottom-6 bottom-4 left-0 right-0">
                         <div className="container grid grid-flow-col space-x-4 items-center justify-center md:-m-2">
@@ -462,34 +453,35 @@ export function JoiningScreen({
                       </div>
                     </div>
 
-                    {!isMobile && (
-                      <>
-                        <div className="absolute top-2 right-10">
-                          <NetworkStats />
+                    <>
+
+
+                      <div className={`flex mt-3  ${isMobile ? "flex-col" : "flex-row "} `}>
+                        <div className={`${isMobile ? "w-full mt-1" : "w-1/3"}`}>
+                          <DropDown
+                            mics={mics}
+                            changeMic={changeMic}
+                            customAudioStream={customAudioStream}
+                            audioTrack={audioTrack}
+                            micOn={micOn}
+                            didDeviceChange={didDeviceChange}
+                            setDidDeviceChange={setDidDeviceChange}
+                          />
+                        </div>
+                        <div className={`lg:ml-3 ${isMobile ? "w-full" : "w-1/3 "}`}>
+                          {!isMobile && <DropDownSpeaker speakers={speakers} />}
+                        </div>
+                        <div className={`lg:ml-3 ${isMobile ? "w-full mt-1" : "w-1/3 "}`}>
+                          <DropDownCam
+                            changeWebcam={changeWebcam}
+                            webcams={webcams}
+                          />
                         </div>
 
-                        <div className="flex mt-3">
-                          {!isFirefox && (
-                            <>
-                              <DropDown
-                                mics={mics}
-                                changeMic={changeMic}
-                                customAudioStream={customAudioStream}
-                                audioTrack={audioTrack}
-                                micOn={micOn}
-                                didDeviceChange={didDeviceChange}
-                                setDidDeviceChange={setDidDeviceChange}
-                              />
-                              <DropDownSpeaker speakers={speakers} />
-                              <DropDownCam
-                                changeWebcam={changeWebcam}
-                                webcams={webcams}
-                              />
-                            </>
-                          )}
-                        </div>
-                      </>
-                    )}
+
+
+                      </div>
+                    </>
                   </div>
                 </div>
               </div>
@@ -551,6 +543,7 @@ export function JoiningScreen({
         subTitle="You're default microphone is muted, please unmute it or increase audio
             input volume from system settings."
       />
+
       <ConfirmBox
         open={dlgDevices}
         successText="DISMISS"
@@ -560,6 +553,6 @@ export function JoiningScreen({
         title="Mic or webcam not available"
         subTitle="Please connect a mic and webcam to speak and share your video in the meeting. You can also join without them."
       />
-    </div>
+    </>
   );
 }

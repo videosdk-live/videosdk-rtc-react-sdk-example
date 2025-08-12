@@ -1,8 +1,7 @@
 import { Popover, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useParticipant } from "@videosdk.live/react-sdk";
+import { useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import ReactPlayer from "react-player";
 import { useMediaQuery } from "react-responsive";
 import useIsMobile from "../hooks/useIsMobile";
 import useIsTab from "../hooks/useIsTab";
@@ -47,12 +46,12 @@ export const CornerDisplayName = ({
   const analyzerSize = isXLDesktop
     ? 32
     : isLGDesktop
-    ? 28
-    : isTab
-    ? 24
-    : isMobile
-    ? 20
-    : 18;
+      ? 28
+      : isTab
+        ? 24
+        : isMobile
+          ? 20
+          : 18;
 
   const show = useMemo(() => mouseOver, [mouseOver]);
 
@@ -125,15 +124,15 @@ export const CornerDisplayName = ({
       audio: audioStats
         ? audioStats[0]?.packetsLost
           ? `${parseFloat(
-              (audioStats[0]?.packetsLost * 100) / audioStats[0]?.totalPackets
-            ).toFixed(2)}%`
+            (audioStats[0]?.packetsLost * 100) / audioStats[0]?.totalPackets
+          ).toFixed(2)}%`
           : "-"
         : "-",
       video: videoStats
         ? videoStats[0]?.packetsLost
           ? `${parseFloat(
-              (videoStats[0]?.packetsLost * 100) / videoStats[0]?.totalPackets
-            ).toFixed(2)}%`
+            (videoStats[0]?.packetsLost * 100) / videoStats[0]?.totalPackets
+          ).toFixed(2)}%`
           : "-"
         : "-",
     },
@@ -153,8 +152,8 @@ export const CornerDisplayName = ({
       audio: "-",
       video:
         videoStats &&
-        (videoStats[0]?.size?.framerate === null ||
-          videoStats[0]?.size?.framerate === undefined)
+          (videoStats[0]?.size?.framerate === null ||
+            videoStats[0]?.size?.framerate === undefined)
           ? "-"
           : `${videoStats ? videoStats[0]?.size?.framerate : "-"}`,
     },
@@ -179,9 +178,8 @@ export const CornerDisplayName = ({
         videoStats && !isLocal
           ? videoStats && videoStats[0]?.currentSpatialLayer === null
             ? "-"
-            : `S:${videoStats[0]?.currentSpatialLayer || 0} T:${
-                videoStats[0]?.currentTemporalLayer || 0
-              }`
+            : `S:${videoStats[0]?.currentSpatialLayer || 0} T:${videoStats[0]?.currentTemporalLayer || 0
+            }`
           : "-",
     },
     {
@@ -191,9 +189,8 @@ export const CornerDisplayName = ({
         videoStats && !isLocal
           ? videoStats && videoStats[0]?.preferredSpatialLayer === null
             ? "-"
-            : `S:${videoStats[0]?.preferredSpatialLayer || 0} T:${
-                videoStats[0]?.preferredTemporalLayer || 0
-              }`
+            : `S:${videoStats[0]?.preferredSpatialLayer || 0} T:${videoStats[0]?.preferredTemporalLayer || 0
+            }`
           : "-",
     },
   ];
@@ -241,8 +238,8 @@ export const CornerDisplayName = ({
               ? `You are presenting`
               : `${nameTructed(displayName, 15)} is presenting`
             : isLocal
-            ? "You"
-            : nameTructed(displayName, 26)}
+              ? "You"
+              : nameTructed(displayName, 26)}
         </p>
       </div>
 
@@ -264,8 +261,8 @@ export const CornerDisplayName = ({
                         score > 7
                           ? "#3BA55D"
                           : score > 4
-                          ? "#faa713"
-                          : "#FF5D5D",
+                            ? "#faa713"
+                            : "#FF5D5D",
                     }}
                     onClick={(e) => {
                       e.stopPropagation();
@@ -325,17 +322,16 @@ export const CornerDisplayName = ({
                                   score > 7
                                     ? "#3BA55D"
                                     : score > 4
-                                    ? "#faa713"
-                                    : "#FF5D5D",
+                                      ? "#faa713"
+                                      : "#FF5D5D",
                               }}
                             >
-                              <p className="text-sm text-white font-semibold">{`Quality Score : ${
-                                score > 7
+                              <p className="text-sm text-white font-semibold">{`Quality Score : ${score > 7
                                   ? "Good"
                                   : score > 4
-                                  ? "Average"
-                                  : "Poor"
-                              }`}</p>
+                                    ? "Average"
+                                    : "Poor"
+                                }`}</p>
 
                               <button
                                 className="cursor-pointer text-white hover:bg-[#ffffff33] rounded-full px-1 text-center"
@@ -414,7 +410,6 @@ export const CornerDisplayName = ({
 export function ParticipantView({ participantId }) {
   const {
     displayName,
-    webcamStream,
     micStream,
     webcamOn,
     micOn,
@@ -429,17 +424,17 @@ export function ParticipantView({ participantId }) {
 
   useEffect(() => {
     const isFirefox =
-          navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+      navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
     if (micRef.current) {
-        try{
-          if (!isFirefox){
-            micRef.current.setSinkId(selectedSpeaker.id);
-          }
-        }catch(err){
-          console.log("Setting speaker device failed", err);
+      try {
+        if (!isFirefox) {
+          micRef.current.setSinkId(selectedSpeaker.id);
         }
-      } 
-  }, [ selectedSpeaker]);
+      } catch (err) {
+        console.log("Setting speaker device failed", err);
+      }
+    }
+  }, [selectedSpeaker]);
 
   useEffect(() => {
     if (micRef.current) {
@@ -452,19 +447,13 @@ export function ParticipantView({ participantId }) {
           .catch((error) =>
             console.error("micRef.current.play() failed", error)
           );
-        }else {
-          micRef.current.srcObject = null;
-        }
+      } else {
+        micRef.current.srcObject = null;
       }
+    }
   }, [micStream, micOn, micRef])
 
-  const webcamMediaStream = useMemo(() => {
-    if (webcamOn && webcamStream) {
-      const mediaStream = new MediaStream();
-      mediaStream.addTrack(webcamStream.track);
-      return mediaStream;
-    }
-  }, [webcamStream, webcamOn]);
+
   return mode === "SEND_AND_RECV" ? (
     <div
       onMouseEnter={() => {
@@ -477,24 +466,16 @@ export function ParticipantView({ participantId }) {
     >
       <audio ref={micRef} autoPlay muted={isLocal} />
       {webcamOn ? (
-        <ReactPlayer
-          //
-          playsinline // very very imp prop
-          playIcon={<></>}
-          //
-          pip={false}
-          light={false}
-          controls={false}
-          muted={true}
-          playing={true}
-          //
-          url={webcamMediaStream}
-          //
-          height={"100%"}
-          width={"100%"}
-          onError={(err) => {
-            console.log(err, "participant video error");
+        <VideoPlayer
+          participantId={participantId} // Required
+          type="video" // "video" or "share"
+          containerStyle={{
+            height: "100%",
+            width: "100%",
           }}
+          className="h-full"
+          classNameVideo="h-full"
+          videoStyle={{}}
         />
       ) : (
         <div className="h-full w-full flex items-center justify-center">

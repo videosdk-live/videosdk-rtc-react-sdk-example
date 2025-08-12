@@ -155,7 +155,7 @@ export default function DropDown({
 
   return (
     <>
-      <Popover className="relative">
+      <Popover className="relative w-full">
         {({ open }) => (
           <>
             <Popover.Button
@@ -167,7 +167,7 @@ export default function DropDown({
                   ? "text-white ring-1 ring-gray-250 bg-black"
                   : "text-customGray-250 hover:text-white"
                 }
-              group inline-flex items-center rounded-md px-1 py-1 w-44 text-base font-normal
+              group inline-flex items-center rounded-md px-1 py-1 w-full text-base font-normal
               ${!isMicrophonePermissionAllowed ? "opacity-50" : ""}`}
               onClick={() => {
                 if (mediaRecorder.current != null && mediaRecorder.current.state == "recording") { stopRecording() }
@@ -175,13 +175,16 @@ export default function DropDown({
                 setRecordingStatus("inactive")
               }}
             >
-              <DropMIC fillColor={isHovered || open ? "#FFF" : "#B4B4B4"} />
-              <span className="overflow-hidden whitespace-nowrap overflow-ellipsis w-28 ml-6">
+              <div>
+                <DropMIC fillColor={isHovered || open ? "#FFF" : "#B4B4B4"} />
+
+              </div>
+              <span className="overflow-hidden whitespace-nowrap overflow-ellipsis w-full ml-6">
                 {isMicrophonePermissionAllowed ? selectedMic?.label : "Permission Needed"}
               </span>
               <ChevronDownIcon
                 className={`${open ? 'text-white' : 'text-customGray-250 hover:text-white'}
-                ml-8 h-5 w-5 transition duration-150 ease-in-out group-hover:text-orange-300/80 mt-1`}
+                ml-8 h-5 w-10 transition duration-150 ease-in-out group-hover:text-orange-300/80 mt-1`}
                 aria-hidden="true"
               />
             </Popover.Button>
@@ -195,7 +198,7 @@ export default function DropDown({
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute bottom-full z-10 mt-3 w-72 px-4 sm:px-0 pb-2">
+              <Popover.Panel className="absolute bottom-full z-10 mt-3 w-full px-4 sm:px-0 pb-2">
                 <div className="rounded-lg shadow-lg">
                   <div className="bg-gray-350 rounded-lg">
                     <div>

@@ -4,11 +4,11 @@ function DropCAM({fillColor}) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="14"
-      height="14"
+      width="18"
+      height="18"
       fill="none"
       viewBox="0 0 14 14"
-      className="ml-2 mt-0.5 fixed"
+      className="ml-1 mt-0.5"
     >
       <g
         stroke={fillColor}

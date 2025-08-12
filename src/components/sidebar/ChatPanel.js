@@ -1,7 +1,8 @@
-import { PaperAirplaneIcon } from "@heroicons/react/solid";
 import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
 import React, { useEffect, useRef, useState } from "react";
 import { formatAMPM, json_verify, nameTructed } from "../../utils/helper";
+import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
+
 
 const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
   const mMeeting = useMeeting();
@@ -66,7 +67,7 @@ const ChatInput = ({ inputHeight }) => {
             }}
           >
             <PaperAirplaneIcon
-              className={`w-6 h-6 ${
+              className={`w-6 h-6 -rotate-90 ${
                 message.length < 2 ? "text-gray-500 " : "text-white"
               }`}
             />

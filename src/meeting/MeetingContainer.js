@@ -28,20 +28,20 @@ export function MeetingContainer({
   const ParticipantMicStream = memo(({ participantId }) => {
     // Individual hook for each participant
     const { micStream } = useParticipant(participantId);
-  
+
     useEffect(() => {
-  
+
       if (micStream) {
         const mediaStream = new MediaStream();
         mediaStream.addTrack(micStream.track);
-  
+
         const audioElement = new Audio();
         audioElement.srcObject = mediaStream;
         audioElement.play();
 
       }
-    }, [micStream, participantId]); 
-  
+    }, [micStream, participantId]);
+
     return null;
   }, [participantsData]);
 
@@ -181,6 +181,18 @@ export function MeetingContainer({
     onParticipantJoined,
     onEntryResponded,
     onMeetingJoined,
+    onMeetingStateChanged: ({state}) => {
+      toast(`Meeting is in ${state} state`, {
+        position: "bottom-left",
+        autoClose: 4000,
+        hideProgressBar: true,
+        closeButton: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    },
     onMeetingLeft,
     onError: _handleOnError,
     onRecordingStateChanged: _handleOnRecordingStateChanged,
@@ -195,7 +207,7 @@ export function MeetingContainer({
 
       setParticipantsData(participantIds);
       console.log("Setting participants");
-    }, 500); 
+    }, 500);
 
 
     return () => clearTimeout(debounceTimeout);
