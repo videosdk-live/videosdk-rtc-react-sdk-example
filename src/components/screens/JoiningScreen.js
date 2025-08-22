@@ -63,8 +63,10 @@ export function JoiningScreen({
   const [dlgMuted, setDlgMuted] = useState(false);
   const [dlgDevices, setDlgDevices] = useState(false);
   const [didDeviceChange, setDidDeviceChange] = useState(false);
+  const [testSpeaker, setTestSpeaker] = useState(false)
 
   const videoPlayerRef = useRef();
+  const audioPlayerRef = useRef();
   const videoTrackRef = useRef();
   const audioTrackRef = useRef();
   const audioAnalyserIntervalRef = useRef();
@@ -91,6 +93,31 @@ export function JoiningScreen({
     if (micOn) {
       audioTrackRef.current = audioTrack;
       startMuteListener();
+    }
+  }, [micOn, audioTrack]);
+
+  useEffect(() => {
+    if (micOn) {
+      // Close the existing audio track if there's a new one
+      if (audioTrackRef.current && audioTrackRef.current !== audioTrack) {
+        audioTrackRef.current.stop();
+      }
+
+      audioTrackRef.current = audioTrack;
+
+      if (audioTrack) {
+        const audioSrcObject = new MediaStream([audioTrack]);
+        if (audioPlayerRef.current) {
+          audioPlayerRef.current.srcObject = audioSrcObject;
+          audioPlayerRef.current
+            .play()
+            .catch((error) => console.log("audio play error", error));
+        }
+      } else {
+        if (audioPlayerRef.current) {
+          audioPlayerRef.current.srcObject = null;
+        }
+      }
     }
   }, [micOn, audioTrack]);
 
@@ -407,6 +434,13 @@ export function JoiningScreen({
                       <div className={`absolute  z-10 ${isMobile ? "right-0" : " right-2 top-2"}`}>
                         <NetworkStats />
                       </div>
+                      {isMobile && <audio
+                        autoPlay
+                        playsInline
+                        muted={!testSpeaker}
+                        ref={audioPlayerRef}
+                        controls={false}
+                      />}
                       <video
                         autoPlay
                         playsInline
@@ -421,7 +455,7 @@ export function JoiningScreen({
                         className={
                           "rounded-[10px] h-full w-full object-cover flex items-center justify-center flip"
                         }
-                      
+
                       />
 
                       <div className="absolute xl:bottom-6 bottom-4 left-0 right-0">
@@ -466,6 +500,8 @@ export function JoiningScreen({
                             micOn={micOn}
                             didDeviceChange={didDeviceChange}
                             setDidDeviceChange={setDidDeviceChange}
+                            testSpeaker={testSpeaker}
+                            setTestSpeaker={setTestSpeaker}
                           />
                         </div>
                         <div className={`lg:ml-3 ${isMobile ? "w-full" : "w-1/3 "}`}>

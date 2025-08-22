@@ -8,7 +8,7 @@ function PauseButton() {
       height="14"
       fill="none"
       viewBox="0 0 14 14"
-      className="ml-6 mt-1.5"
+      className="ml-6 mt-2"
     >
       <g clipPath="url(#clip0_20_538)">
         <path
