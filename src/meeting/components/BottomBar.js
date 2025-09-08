@@ -174,14 +174,14 @@ const MicBTN = () => {
     onDeviceChanged
   })
 
-  function onDeviceChanged(devices){
+  function onDeviceChanged(devices) {
     getMics();
     const newSpeakerList = devices.devices.filter(device => device.kind === 'audiooutput');
 
     if (newSpeakerList.length > 0) {
-      setSelectedSpeaker({id : newSpeakerList[0].deviceId, label : newSpeakerList[0].label});
+      setSelectedSpeaker({ id: newSpeakerList[0].deviceId, label: newSpeakerList[0].label });
     }
-    
+
   }
 
 
@@ -270,16 +270,14 @@ const MicBTN = () => {
                               <div className="flex flex-col">
                                 {mics.map(({ deviceId, label }, index) => (
                                   <div
-                                    className={`px-3 py-1 my-1 pl-6 text-white text-left ${
-                                      deviceId === selectedMic.id &&
+                                    className={`px-3 py-1 my-1 pl-6 text-white text-left ${deviceId === selectedMic.id &&
                                       "bg-gray-150"
-                                    }`}
+                                      }`}
                                   >
                                     <button
-                                      className={`flex flex-1 w-full text-left ${
-                                        deviceId === selectedMic.id &&
+                                      className={`flex flex-1 w-full text-left ${deviceId === selectedMic.id &&
                                         "bg-gray-150"
-                                      }`}
+                                        }`}
                                       key={`mics_${deviceId}`}
                                       onClick={() => {
                                         setSelectedMic({ id: deviceId });
@@ -303,16 +301,14 @@ const MicBTN = () => {
                               <div className="flex flex-col ">
                                 {speakers.map(({ deviceId, label }, index) => (
                                   <div
-                                    className={`px-3 py-1 my-1 pl-6 text-white ${
-                                      deviceId === selectedSpeaker.id &&
+                                    className={`px-3 py-1 my-1 pl-6 text-white ${deviceId === selectedSpeaker.id &&
                                       "bg-gray-150"
-                                    }`}
+                                      }`}
                                   >
                                     <button
-                                      className={`flex flex-1 w-full text-left ${
-                                        deviceId === selectedSpeaker.id &&
+                                      className={`flex flex-1 w-full text-left ${deviceId === selectedSpeaker.id &&
                                         "bg-gray-150"
-                                      }`}
+                                        }`}
                                       key={`speakers_${deviceId}`}
                                       onClick={() => {
                                         setSelectedSpeaker({ id: deviceId });
@@ -334,9 +330,8 @@ const MicBTN = () => {
               </Popover>
               <div
                 style={{ zIndex: 999 }}
-                className={`${
-                  tooltipShow ? "" : "hidden"
-                } overflow-hidden flex flex-col items-center justify-center pb-4`}
+                className={`${tooltipShow ? "" : "hidden"
+                  } overflow-hidden flex flex-col items-center justify-center pb-4`}
                 ref={tooltipRef}
               >
                 <div className={"rounded-md p-1.5 bg-black "}>
@@ -450,16 +445,14 @@ const WebCamBTN = () => {
                               <div className="flex flex-col">
                                 {webcams.map(({ deviceId, label }, index) => (
                                   <div
-                                    className={`px-3 py-1 my-1 pl-6 text-white ${
-                                      deviceId === selectedWebcam.id &&
+                                    className={`px-3 py-1 my-1 pl-6 text-white ${deviceId === selectedWebcam.id &&
                                       "bg-gray-150"
-                                    }`}
+                                      }`}
                                   >
                                     <button
-                                      className={`flex flex-1 w-full text-left ${
-                                        deviceId === selectedWebcam.id &&
+                                      className={`flex flex-1 w-full text-left ${deviceId === selectedWebcam.id &&
                                         "bg-gray-150"
-                                      }`}
+                                        }`}
                                       key={`output_webcams_${deviceId}`}
                                       onClick={() => {
                                         setSelectedWebcam({ id: deviceId });
@@ -482,9 +475,8 @@ const WebCamBTN = () => {
               </Popover>
               <div
                 style={{ zIndex: 999 }}
-                className={`${
-                  tooltipShow ? "" : "hidden"
-                } overflow-hidden flex flex-col items-center justify-center pb-4`}
+                className={`${tooltipShow ? "" : "hidden"
+                  } overflow-hidden flex flex-col items-center justify-center pb-4`}
                 ref={tooltipRef}
               >
                 <div className={"rounded-md p-1.5 bg-black "}>
@@ -504,7 +496,11 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
   const RaiseHandBTN = ({ isMobile, isTab }) => {
     const { publish } = usePubSub("RAISE_HAND");
     const RaiseHand = () => {
-      publish("Raise Hand");
+      try {
+        publish("Raise Hand");
+      } catch (e) {
+        console.log("Error in pubsub", e)
+      }
     };
 
     return isMobile || isTab ? (
@@ -572,12 +568,12 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
           recordingState === Constants.recordingEvents.RECORDING_STARTED
             ? "Stop Recording"
             : recordingState === Constants.recordingEvents.RECORDING_STARTING
-            ? "Starting Recording"
-            : recordingState === Constants.recordingEvents.RECORDING_STOPPED
-            ? "Start Recording"
-            : recordingState === Constants.recordingEvents.RECORDING_STOPPING
-            ? "Stopping Recording"
-            : "Start Recording"
+              ? "Starting Recording"
+              : recordingState === Constants.recordingEvents.RECORDING_STOPPED
+                ? "Start Recording"
+                : recordingState === Constants.recordingEvents.RECORDING_STOPPING
+                  ? "Stopping Recording"
+                  : "Start Recording"
         }
         lottieOption={isRecording ? defaultOptions : null}
         isRequestProcessing={isRequestProcessing}
@@ -616,8 +612,8 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
               ? false
               : true
             : isMobile
-            ? true
-            : false
+              ? true
+              : false
         }
       />
     ) : (
@@ -825,11 +821,10 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
                       {otherFeatures.map(({ icon }) => {
                         return (
                           <div
-                            className={`grid items-center justify-center ${
-                              icon === BottomBarButtonTypes.MEETING_ID_COPY
+                            className={`grid items-center justify-center ${icon === BottomBarButtonTypes.MEETING_ID_COPY
                                 ? "col-span-7 sm:col-span-5 md:col-span-3"
                                 : "col-span-4 sm:col-span-3 md:col-span-2"
-                            }`}
+                              }`}
                           >
                             {icon === BottomBarButtonTypes.RAISE_HAND ? (
                               <RaiseHandBTN isMobile={isMobile} isTab={isTab} />

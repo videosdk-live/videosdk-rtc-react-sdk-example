@@ -17,9 +17,8 @@ const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
       }}
     >
       <div
-        className={`flex ${
-          localSender ? "items-end" : "items-start"
-        } flex-col py-1 px-2 rounded-md bg-gray-700`}
+        className={`flex ${localSender ? "items-end" : "items-start"
+          } flex-col py-1 px-2 rounded-md bg-gray-700`}
       >
         <p style={{ color: "#ffffff80" }}>
           {localSender ? "You" : nameTructed(senderName, 15)}
@@ -58,18 +57,21 @@ const ChatInput = ({ inputHeight }) => {
             onClick={() => {
               const messageText = message.trim();
               if (messageText.length > 0) {
-                publish(messageText, { persist: true });
-                setTimeout(() => {
-                  setMessage("");
-                }, 100);
-                input.current?.focus();
+                try {
+                  publish(messageText, { persist: true });
+                  setTimeout(() => {
+                    setMessage("");
+                  }, 100);
+                  input.current?.focus();
+                } catch (e) {
+                  console.log("Error in pubsub", e)
+                }
               }
             }}
           >
             <PaperAirplaneIcon
-              className={`w-6 h-6 -rotate-90 ${
-                message.length < 2 ? "text-gray-500 " : "text-white"
-              }`}
+              className={`w-6 h-6 -rotate-90 ${message.length < 2 ? "text-gray-500 " : "text-white"
+                }`}
             />
           </button>
         </span>
@@ -89,11 +91,15 @@ const ChatInput = ({ inputHeight }) => {
               const messageText = message.trim();
 
               if (messageText.length > 0) {
-                publish(messageText, { persist: true });
-                setTimeout(() => {
-                  setMessage("");
-                }, 100);
-                input.current?.focus();
+                try {
+                  publish(messageText, { persist: true });
+                  setTimeout(() => {
+                    setMessage("");
+                  }, 100);
+                  input.current?.focus();
+                } catch (e) {
+                  console.log("Error in pubsub", e)
+                }
               }
             }
           }}
