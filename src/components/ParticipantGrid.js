@@ -58,13 +58,15 @@ function ParticipantGrid({
                 : "md:px-0"
       }`}
     >
-      <button
-        disabled={isFirstPage}
-        onClick={(e) => setPage((page) => Math.max(0, page - 1))}
-        className="absolute py-3 px-1.5 bg-gray-750 left-2 top-1/2  disabled:opacity-60 -translate-y-1/2 transition-transform  disabled:cursor-not-allowed  hover:scale-125"
-      >
-        <ChevronLeftIcon width={30} fill="#ffffff"/>
-      </button>
+      {!isPresenting && (
+        <button
+          disabled={isFirstPage}
+          onClick={(e) => setPage((page) => Math.max(0, page - 1))}
+          className="absolute py-3 px-1.5 bg-gray-750 left-2 top-1/2  disabled:opacity-60 -translate-y-1/2 transition-transform  disabled:cursor-not-allowed  hover:scale-125"
+        >
+          <ChevronLeftIcon width={30} fill="#ffffff" />
+        </button>
+      )}
       <div className="flex flex-col w-full h-full">
         {Array.from(
           { length: Math.ceil(participantIds.length / perRow) },
@@ -106,16 +108,18 @@ function ParticipantGrid({
                   })}
               </div>
             );
-          }
+          },
         )}
       </div>
-      <button
-        disabled={isLastPage}
-        onClick={(e) => setPage((page) => Math.min(totalPages - 1, page + 1))}
-        className="absolute py-3 px-1.5 bg-gray-750 right-2  disabled:opacity-60  top-1/2 -translate-y-1/2 transition-transform  disabled:cursor-not-allowed hover:scale-125"
-      >
-        <ChevronRightIcon width={30} fill="#ffffff"/>
-      </button>
+      {!isPresenting && (
+        <button
+          disabled={isLastPage}
+          onClick={(e) => setPage((page) => Math.min(totalPages - 1, page + 1))}
+          className="absolute py-3 px-1.5 bg-gray-750 right-2  disabled:opacity-60  top-1/2 -translate-y-1/2 transition-transform  disabled:cursor-not-allowed hover:scale-125"
+        >
+          <ChevronRightIcon width={30} fill="#ffffff" />
+        </button>
+      )}
     </div>
   );
 }

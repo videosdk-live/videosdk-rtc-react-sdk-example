@@ -11,8 +11,6 @@ function ParticipantsViewer({ isPresenting }) {
     pinnedParticipants,
     activeSpeakerId,
     localParticipant,
-    // localScreenShareOn,
-    // presenterId,
   } = useMeeting();
 
   const [participantIds, setParticipantIds] = useState([]);
@@ -21,6 +19,11 @@ function ParticipantsViewer({ isPresenting }) {
   const scoresRef = useRef(new Map());
   const sortedIDsRef = useRef([]); // Store all sorted IDs
   const pageSize = isPresenting ? 6 : 16;
+
+  useEffect(() => {
+    setPage(0);
+  }, [isPresenting]);
+
 
   // Store latest props in a ref to avoid resetting the interval
   const latestPropsRef = useRef({
@@ -60,6 +63,8 @@ function ParticipantsViewer({ isPresenting }) {
         isPresenting,
         page,
       } = latestPropsRef.current;
+
+      const pageSize = isPresenting ? 6 : 16;
 
       const currentScores = scoresRef.current;
 
