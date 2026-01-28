@@ -1,6 +1,7 @@
 import React from "react";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
 import { ParticipantView } from "./ParticipantView";
+import { ChevronRightIcon, ChevronLeftIcon } from "@heroicons/react/24/outline";
 
 const MemoizedParticipant = React.memo(
   ParticipantView,
@@ -9,45 +10,61 @@ const MemoizedParticipant = React.memo(
   }
 );
 
-function ParticipantGrid({ participantIds, isPresenting }) {
+function ParticipantGrid({
+  participantIds,
+  isPresenting,
+  totalPages,
+  page,
+  setPage,
+}) {
   const { sideBarMode } = useMeetingAppContext();
   const isMobile = window.matchMedia(
-    "only screen and (max-width: 768px)"
+    "only screen and (max-width: 768px)",
   ).matches;
+
+  const isFirstPage = page === 0;
+  const isLastPage = page === totalPages - 1;
 
   const perRow =
     isMobile || isPresenting
       ? participantIds.length < 4
         ? 1
         : participantIds.length < 9
-        ? 2
-        : 3
+          ? 2
+          : 3
       : participantIds.length < 5
-      ? 2
-      : participantIds.length < 7
-      ? 3
-      : participantIds.length < 9
-      ? 4
-      : participantIds.length < 10
-      ? 3
-      : participantIds.length < 11
-      ? 4
-      : 4;
+        ? 2
+        : participantIds.length < 7
+          ? 3
+          : participantIds.length < 9
+            ? 4
+            : participantIds.length < 10
+              ? 3
+              : participantIds.length < 11
+                ? 4
+                : 4;
 
   return (
     <div
-      className={`flex flex-col md:flex-row flex-grow m-3 items-center justify-center ${
+      className={`relative flex flex-col md:flex-row flex-grow m-3 items-center justify-center ${
         participantIds.length < 2 && !sideBarMode && !isPresenting
           ? "md:px-16 md:py-2"
           : participantIds.length < 3 && !sideBarMode && !isPresenting
-          ? "md:px-16 md:py-8"
-          : participantIds.length < 4 && !sideBarMode && !isPresenting
-          ? "md:px-16 md:py-4"
-          : participantIds.length > 4 && !sideBarMode && !isPresenting
-          ? "md:px-14"
-          : "md:px-0"
+            ? "md:px-16 md:py-8"
+            : participantIds.length < 4 && !sideBarMode && !isPresenting
+              ? "md:px-16 md:py-4"
+              : participantIds.length > 4 && !sideBarMode && !isPresenting
+                ? "md:px-14"
+                : "md:px-0"
       }`}
     >
+      <button
+        disabled={isFirstPage}
+        onClick={(e) => setPage((page) => Math.max(0, page - 1))}
+        className="absolute py-3 px-1.5 bg-gray-750 left-2 top-1/2  disabled:opacity-60 -translate-y-1/2 transition-transform  disabled:cursor-not-allowed  hover:scale-125"
+      >
+        <ChevronLeftIcon width={30} fill="#ffffff"/>
+      </button>
       <div className="flex flex-col w-full h-full">
         {Array.from(
           { length: Math.ceil(participantIds.length / perRow) },
@@ -74,8 +91,8 @@ function ParticipantGrid({ participantIds, isPresenting }) {
                             ? participantIds.length === 1
                               ? "md:h-48 md:w-44 xl:w-52 xl:h-48 "
                               : participantIds.length === 2
-                              ? "md:w-44 xl:w-56"
-                              : "md:w-44 xl:w-48"
+                                ? "md:w-44 xl:w-56"
+                                : "md:w-44 xl:w-48"
                             : "w-full"
                         } items-center justify-center h-full ${
                           participantIds.length === 1
@@ -92,6 +109,13 @@ function ParticipantGrid({ participantIds, isPresenting }) {
           }
         )}
       </div>
+      <button
+        disabled={isLastPage}
+        onClick={(e) => setPage((page) => Math.min(totalPages - 1, page + 1))}
+        className="absolute py-3 px-1.5 bg-gray-750 right-2  disabled:opacity-60  top-1/2 -translate-y-1/2 transition-transform  disabled:cursor-not-allowed hover:scale-125"
+      >
+        <ChevronRightIcon width={30} fill="#ffffff"/>
+      </button>
     </div>
   );
 }

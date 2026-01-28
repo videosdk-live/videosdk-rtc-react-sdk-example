@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
 
 const DECAY_RATE = 0.95;
-const UPDATE_INTERVAL = 2000;
+const UPDATE_INTERVAL = 500;
 
 function ParticipantsViewer({ isPresenting }) {
   const {
@@ -11,50 +11,16 @@ function ParticipantsViewer({ isPresenting }) {
     pinnedParticipants,
     activeSpeakerId,
     localParticipant,
-    localScreenShareOn,
-    presenterId,
+    // localScreenShareOn,
+    // presenterId,
   } = useMeeting();
 
-  // const participantIds = useMemo(() => {
-  //   const pinnedParticipantId = [...pinnedParticipants.keys()].filter(
-  //     (participantId) => {
-  //       return participantId !== localParticipant.id;
-  //     }
-  //   );
-  //   const regularParticipantIds = [...participants.keys()].filter(
-  //     (participantId) => {
-  //       return (
-  //         ![...pinnedParticipants.keys()].includes(participantId) &&
-  //         localParticipant.id !== participantId
-  //       );
-  //     }
-  //   );
-
-  //   const ids = [
-  //     localParticipant.id,
-  //     ...pinnedParticipantId,
-  //     ...regularParticipantIds,
-  //   ].slice(0, isPresenting ? 6 : 16);
-
-  //   if (activeSpeakerId) {
-  //     if (!ids.includes(activeSpeakerId)) {
-  //       ids[ids.length - 1] = activeSpeakerId;
-  //     }
-  //   }
-  //   return ids;
-  // }, [
-  //   participants,
-  //   activeSpeakerId,
-  //   pinnedParticipants,
-  //   presenterId,
-  //   localScreenShareOn,
-  // ]);
-
   const [participantIds, setParticipantIds] = useState([]);
+  const [page, setPage] = useState(0);
 
   const scoresRef = useRef(new Map());
+  const sortedIDsRef = useRef([]); // Store all sorted IDs
   const pageSize = isPresenting ? 6 : 16;
-
 
   // Store latest props in a ref to avoid resetting the interval
   const latestPropsRef = useRef({
@@ -63,6 +29,7 @@ function ParticipantsViewer({ isPresenting }) {
     activeSpeakerId,
     localParticipant,
     isPresenting,
+    page,
   });
 
   useEffect(() => {
@@ -72,6 +39,7 @@ function ParticipantsViewer({ isPresenting }) {
       activeSpeakerId,
       localParticipant,
       isPresenting,
+      page,
     };
   }, [
     participants,
@@ -79,6 +47,7 @@ function ParticipantsViewer({ isPresenting }) {
     activeSpeakerId,
     localParticipant,
     isPresenting,
+    page,
   ]);
 
   useEffect(() => {
@@ -89,6 +58,7 @@ function ParticipantsViewer({ isPresenting }) {
         activeSpeakerId,
         localParticipant,
         isPresenting,
+        page,
       } = latestPropsRef.current;
 
       const currentScores = scoresRef.current;
@@ -103,21 +73,20 @@ function ParticipantsViewer({ isPresenting }) {
       participants.forEach((participant, id) => {
         let score = currentScores.get(id) || 0; // Initialize at 0 if new
 
-        // Dynamic Decay: fast decay for high scores (bursts), slow for low
         score *= DECAY_RATE;
 
         // Priority Calculations
         if (participant?.screenShareOn) score += 40;
         if (id === activeSpeakerId) score += 30;
-        if (participant?.webcamOn) score += 10; // Increased from 2
-        if (participant?.micOn) score += 5;     // Decreased from 20 to avoid noise dominance
+        if (participant?.webcamOn) score += 5;
+        if (participant?.micOn) score += 20;
 
         currentScores.set(id, Math.min(score, 100));
       });
 
       const pinnedKeys = new Set([...pinnedParticipants.keys()]);
       const pinnedIds = [...pinnedKeys].filter(
-        (id) => id !== localParticipant.id
+        (id) => id !== localParticipant.id,
       );
 
       const regularSortedIds = [...participants.keys()]
@@ -128,24 +97,38 @@ function ParticipantsViewer({ isPresenting }) {
           return scoreB - scoreA;
         });
 
+      // Validating Page Index
+      const totalIDs = [localParticipant.id, ...pinnedIds, ...regularSortedIds];
+      const totalPages = Math.ceil(totalIDs.length / pageSize);
 
+      // Correct page if out of bounds (e.g. participants left)
+      let invalidPage = false;
+      if (page >= totalPages && page > 0) {
+        setPage(totalPages - 1);
+        invalidPage = true;
+      }
 
-      const newIds = [
-        localParticipant.id,
-        ...pinnedIds,
-        ...regularSortedIds,
-      ].slice(0, pageSize);
+      // If we adjusted the page, we'll let the next tick handle the slice to avoid race conditions
+      // or we can just compute it now with the new page index logic generally,
+      // but modifying state inside interval is tricky.
+      // Ideally, we just compute the slice safely.
+
+      const safePage = invalidPage ? totalPages - 1 : page; // Use safe temporary page for this render
+
+      const startIndex = safePage * pageSize;
+      const endIndex = startIndex + pageSize;
+      const newIds = totalIDs.slice(startIndex, endIndex);
+
+      sortedIDsRef.current = totalIDs; // Store for immediate page switching
 
       setParticipantIds((prev) => {
-        if (prev.length !== newIds.length) return newIds;
+        if (prev.length !== newIds.length) {
+          return newIds;
+        }
 
         for (let i = 0; i < newIds.length; i++) {
           if (prev[i] !== newIds[i]) {
-            return [
-              localParticipant.id,
-              ...pinnedIds,
-              ...regularSortedIds,
-            ];
+            return newIds;
           }
         }
         return prev;
@@ -155,10 +138,29 @@ function ParticipantsViewer({ isPresenting }) {
     return () => clearInterval(interval);
   }, []);
 
+  // Immediate update when page changes
+  useEffect(() => {
+    const totalIDs = sortedIDsRef.current;
+    if (totalIDs.length > 0) {
+      const startIndex = page * pageSize;
+      const endIndex = startIndex + pageSize;
+      const newIds = totalIDs.slice(startIndex, endIndex);
+
+      setParticipantIds(newIds);
+    }
+  }, [page, pageSize]);
+
+  const totalParticipants =
+    sortedIDsRef.current.length || participantIds.length; // Fallback
+  const totalPages = Math.ceil(totalParticipants / pageSize);
+
   return (
     <MemoizedParticipantGrid
       participantIds={participantIds}
       isPresenting={isPresenting}
+      totalPages={totalPages}
+      setPage={setPage}
+      page={page}
     />
   );
 }
