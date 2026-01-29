@@ -9,7 +9,7 @@ export function MeetingDetailsScreen({
   setParticipantName,
   onClickStartMeeting,
 }) {
-  const [meetingId, setMeetingId] = useState("r1y2-0in6-m3uu");
+  const [meetingId, setMeetingId] = useState("");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);
@@ -95,7 +95,6 @@ export function MeetingDetailsScreen({
               className="w-full bg-purple-350 text-white px-2 py-3 rounded-xl"
               onClick={async (e) => {
                 const { meetingId, err } = await _handleOnCreateMeeting();
-              
                 if (meetingId) {
                   setMeetingId(meetingId);
                   setIscreateMeetingClicked(true);
