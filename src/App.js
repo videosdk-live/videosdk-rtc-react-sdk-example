@@ -8,7 +8,7 @@ import { JoiningScreen } from "./components/screens/JoiningScreen"
 
 function App() {
   const [token, setToken] = useState("");
-  const [meetingId, setMeetingId] = useState("");
+  const [meetingId, setMeetingId] = useState("r1y2-0in6-m3uu");
   const [participantName, setParticipantName] = useState("");
   const [micOn, setMicOn] = useState(false);
   const [webcamOn, setWebcamOn] = useState(false);
