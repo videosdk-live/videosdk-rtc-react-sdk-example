@@ -3,11 +3,11 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
 import { ParticipantAudio } from "../../components/ParticipantAudio";
 
-const DECAY_RATE = 0.95;
+const DECAY_RATE = 0.94;
 
-const SCORE_UPDATE_INTERVAL = 1000; // Update scores every 500ms
-const ACTIVE_SPEAKER_UPDATE_INTERVAL = 500; // Update scores every 500ms
-const TILE_UPDATE_INTERVAL = 4000; // Update tiles/participantIds every 2.5 seconds
+const SCORE_UPDATE_INTERVAL = 500; // Update scores every 500ms
+const ACTIVE_SPEAKER_UPDATE_INTERVAL = 300; // Update scores every 500ms
+const TILE_UPDATE_INTERVAL = 1000; // Update tiles/participantIds every 2.5 seconds
 
 function ParticipantsViewer({ isPresenting }) {
   const {
@@ -22,7 +22,7 @@ function ParticipantsViewer({ isPresenting }) {
 
   const scoresRef = useRef(new Map());
   const sortedIDsRef = useRef([]); // Store all sorted IDs
-  const pageSize = 3;
+  const pageSize = 4;
   // isPresenting ? 6 : 16;
 
   useEffect(() => {
@@ -61,7 +61,7 @@ function ParticipantsViewer({ isPresenting }) {
     const { participants, pinnedParticipants, localParticipant, page } =
       latestPropsRef.current;
 
-    const pageSize = 3;
+    const pageSize = 4;
     const currentScores = scoresRef.current;
 
     // Separate pinned and regular participants
@@ -186,7 +186,7 @@ function ParticipantsViewer({ isPresenting }) {
         let score = currentScores.get(id) || 0;
         // Update score based on active speaker
         if (id === activeSpeakerId) {
-          score += 30;
+          score += 1;
         }
         currentScores.set(id, Math.min(score, 100));
       });
@@ -211,9 +211,9 @@ function ParticipantsViewer({ isPresenting }) {
         score *= DECAY_RATE;
 
         // Update scores based on media state
-        if (participant?.screenShareOn) score += 40;
-        if (participant?.webcamOn) score += 10;
-        if (participant?.micOn) score += 2;
+        // if (participant?.screenShareOn) score += 2;
+        // if (participant?.webcamOn) score += 0.5;
+        // if (participant?.micOn) score += 0.3;
 
         currentScores.set(id, Math.min(score, 100));
       });
