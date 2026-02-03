@@ -9,7 +9,7 @@ export function MeetingDetailsScreen({
   setParticipantName,
   onClickStartMeeting,
 }) {
-  const [meetingId, setMeetingId] = useState("");
+  const [meetingId, setMeetingId] = useState("a7te-yx4s-7ife");
   const [meetingIdError, setMeetingIdError] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   const [iscreateMeetingClicked, setIscreateMeetingClicked] = useState(false);

@@ -1,13 +1,8 @@
 import { useMeeting } from "@videosdk.live/react-sdk";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
 import { ParticipantAudio } from "../../components/ParticipantAudio";
-
-const DECAY_RATE = 0.94;
-
-const SCORE_UPDATE_INTERVAL = 500; // Update scores every 500ms
-const ACTIVE_SPEAKER_UPDATE_INTERVAL = 300; // Update scores every 500ms
-const TILE_UPDATE_INTERVAL = 1000; // Update tiles/participantIds every 2.5 seconds
+import { activeSpeakerBasedMainTileAlgoConfig } from "../../constants";
 
 function ParticipantsViewer({ isPresenting }) {
   const {
@@ -17,228 +12,212 @@ function ParticipantsViewer({ isPresenting }) {
     localParticipant,
   } = useMeeting();
 
+  const {
+    SAMPLING_INTERVAL,
+    ANALYZER_INTERVAL,
+    UPDATE_INTERVAL,
+    BASE_SCORE,
+    DECAY_RATE,
+  } = activeSpeakerBasedMainTileAlgoConfig;
+
+  // State for the visible grid & pagination
   const [participantIds, setParticipantIds] = useState([]);
   const [page, setPage] = useState(0);
 
-  const scoresRef = useRef(new Map());
-  const sortedIDsRef = useRef([]); // Store all sorted IDs
-  const pageSize = 4;
-  // isPresenting ? 6 : 16;
-
-  useEffect(() => {
-    setPage(0);
-  }, [isPresenting]);
-
-  // Store latest props in a ref to avoid resetting the interval
+  const scoresRef = useRef(new Map()); // Map<participantId, score> LAYER 3: UPDATER
+  const speakerCountRef = useRef(new Map()); // Map<participantId, count> LAYER 2: ANALYZER
   const latestPropsRef = useRef({
     participants,
     pinnedParticipants,
     activeSpeakerId,
     localParticipant,
-    isPresenting,
-    page,
   });
 
+  // Calculate pages
+  const pageSize = isPresenting ? 3 : 4;
+  const totalPages = Math.ceil(participants.size / pageSize);
+
+  // Reset page when layout changes
+  useEffect(() => {
+    setPage(0);
+  }, [isPresenting]);
+
+  // Keep refs updated
   useEffect(() => {
     latestPropsRef.current = {
       participants,
       pinnedParticipants,
       activeSpeakerId,
       localParticipant,
-      isPresenting,
-      page,
     };
-  }, [
-    participants,
-    pinnedParticipants,
-    activeSpeakerId,
-    localParticipant,
-    isPresenting,
-    page,
-  ]);
+  }, [participants, pinnedParticipants, activeSpeakerId, localParticipant]);
 
-  const updateTiles = useCallback(() => {
-    const { participants, pinnedParticipants, localParticipant, page } =
-      latestPropsRef.current;
+  // LAYER 1: SAMPLER (50ms)
+  // High-frequency sampling of the active speaker signal
+  useEffect(() => {
+    const sampleInterval = setInterval(() => {
+      const { activeSpeakerId, participants } = latestPropsRef.current;
 
-    const pageSize = 4;
-    const currentScores = scoresRef.current;
+      if (activeSpeakerId && participants.has(activeSpeakerId)) {
+        const counts = speakerCountRef.current;
+        counts.set(activeSpeakerId, (counts.get(activeSpeakerId) || 0) + 1);
+      }
+    }, SAMPLING_INTERVAL);
 
-    // Separate pinned and regular participants
-    const pinnedKeys = new Set([...pinnedParticipants.keys()]);
-    const pinnedIds = [...pinnedKeys].filter(
-      (id) => id !== localParticipant.id,
-    );
+    return () => clearInterval(sampleInterval);
+  }, []);
 
-    // Get all regular participants sorted by score
-    const regularSortedIds = [...participants.keys()]
-      .filter((id) => id !== localParticipant.id && !pinnedKeys.has(id))
-      .sort((a, b) => {
-        const scoreA = currentScores.get(a) || 0;
-        const scoreB = currentScores.get(b) || 0;
+  // LAYER 2: ANALYZER (300ms)
+  // Determines dominant speaker in the window and assigns scores
+  useEffect(() => {
+    const analyzeInterval = setInterval(() => {
+      const { participants } = latestPropsRef.current;
+      const counts = speakerCountRef.current;
+      const scores = scoresRef.current;
+
+      // Find dominant speaker in this window
+      let dominantSpeakerId = null;
+      let maxCount = 2;
+
+      for (const [id, count] of counts.entries()) {
+        if (participants.has(id)) {
+          if (count > maxCount) {
+            maxCount = count;
+            dominantSpeakerId = id;
+          }
+        }
+        // Reset count for next window
+        counts.set(id, 0);
+      }
+
+      // Boost dominant speaker score
+      if (dominantSpeakerId) {
+        console.log(
+          participants.get(dominantSpeakerId)?.displayName,
+          "dominantSpeakerId",
+        );
+
+        const currentScore = scores.get(dominantSpeakerId) || 0;
+        scores.set(dominantSpeakerId, Math.min(100, currentScore + 1)); // Significant boost
+      }
+    }, ANALYZER_INTERVAL);
+
+    return () => clearInterval(analyzeInterval);
+  }, []);
+
+  // LAYER 3: UPDATER (600ms)
+  // Decays scores, sorts participants, and updates the UI state
+  // We track page in a ref for the interval to prevent stale closure issues without re-binding
+  const pageRef = useRef(page);
+  useEffect(() => {
+    pageRef.current = page;
+  }, [page]);
+
+  useEffect(() => {
+    const updateInterval = setInterval(() => {
+      const { participants, pinnedParticipants, localParticipant } =
+        latestPropsRef.current;
+      const scores = scoresRef.current;
+      const currentPage = pageRef.current;
+
+      // 1. Garbage Collect & Decay Scores
+      for (const [id, score] of scores.entries()) {
+        if (!participants.has(id)) {
+          scores.delete(id);
+        } else {
+          scores.set(id, Math.max(BASE_SCORE, score * DECAY_RATE));
+        }
+      }
+
+      // 2. Identify Groups
+      const pinnedIds = [...pinnedParticipants.keys()].filter(
+        (id) => id !== localParticipant.id,
+      );
+      const regularIds = [...participants.keys()].filter(
+        (id) => id !== localParticipant.id && !pinnedParticipants.has(id),
+      );
+
+      // 3. Sort Regular Participants by Score
+      regularIds.sort((a, b) => {
+        const scoreA = scores.get(a) || BASE_SCORE;
+        const scoreB = scores.get(b) || BASE_SCORE;
         return scoreB - scoreA;
       });
 
-    // Build the complete ordered list
-    const allSortedIds = [
-      localParticipant.id,
-      ...pinnedIds,
-      ...regularSortedIds,
-    ];
-    const totalPages = Math.ceil(allSortedIds.length / pageSize);
+      // 4. Construct Full Ordered List
+      const allSortedIds = [localParticipant.id, ...pinnedIds, ...regularIds];
 
-    // Correct page if out of bounds (e.g. participants left)
-    let invalidPage = false;
-    if (page >= totalPages && page > 0) {
-      setPage(totalPages - 1);
-      invalidPage = true;
-    }
+      // console.log(allSortedIds.map((id) => ({ "name": participants.get(id)?.displayName, "score": scores.get(id) || 0 })), "allSortedIds")
 
-    const safePage = invalidPage ? totalPages - 1 : page;
+      // 5. Handle Pagination
+      const totalLen = allSortedIds.length;
+      // Ensure page is valid if list shrunk
+      const maxPage = Math.max(0, Math.ceil(totalLen / pageSize) - 1);
+      const validPage = Math.min(currentPage, maxPage);
 
-    // Page-stable sorting algorithm (optimized)
-    const getPageParticipants = (
-      pageIndex,
-      allIds,
-      pageSize,
-      currentPageIds,
-    ) => {
-      const startIdx = pageIndex * pageSize;
-      const endIdx = startIdx + pageSize;
-      const idealPageIds = allIds.slice(startIdx, endIdx);
+      // Page-stable sorting algorithm (Optimized)
+      // Keeps participants stable on the current page if they are still in the ideal list for that page
+      const getPageParticipants = (pageIndex, allIds, size, currentIds) => {
+        const startIdx = pageIndex * size;
+        const endIdx = startIdx + size;
+        const idealPageIds = allIds.slice(startIdx, endIdx);
 
-      // If this is not the current page or we don't have previous state, use ideal sorting
-      if (
-        pageIndex !== safePage ||
-        !currentPageIds ||
-        currentPageIds.length === 0
-      ) {
-        return idealPageIds;
-      }
-
-      // Create Sets for O(1) lookup instead of O(n) array operations
-      const currentSet = new Set(currentPageIds);
-
-      // Single pass: separate participants into keep vs add
-      const toKeep = [];
-      const toAdd = [];
-
-      for (const id of idealPageIds) {
-        if (currentSet.has(id)) {
-          toKeep.push(id);
-        } else {
-          toAdd.push(id);
+        // If not checking stability (switching pages) or no previous state, return ideal
+        if (!currentIds || currentIds.length === 0) {
+          return idealPageIds;
         }
-      }
-      // Build result: preserve existing order, fill gaps with new participants
-      const toKeepSet = new Set(toKeep);
-      const result = [];
-      let addPointer = 0;
 
-      for (const id of currentPageIds) {
-        if (toKeepSet.has(id)) {
-          result.push(id);
-        } else if (addPointer < toAdd.length) {
+        const currentSet = new Set(currentIds);
+        const toKeep = [];
+        const toAdd = [];
+
+        for (const id of idealPageIds) {
+          if (currentSet.has(id)) {
+            toKeep.push(id);
+          } else {
+            toAdd.push(id);
+          }
+        }
+
+        // Build result: preserve existing order, fill gaps with new participants
+        const toKeepSet = new Set(toKeep);
+        const result = [];
+        let addPointer = 0;
+
+        for (const id of currentIds) {
+          if (toKeepSet.has(id)) {
+            result.push(id);
+          } else if (addPointer < toAdd.length) {
+            result.push(toAdd[addPointer++]);
+          }
+          if (result.length >= size) break;
+        }
+
+        while (result.length < size && addPointer < toAdd.length) {
           result.push(toAdd[addPointer++]);
         }
-        if (result.length >= pageSize) break;
-      }
 
-      // Append remaining new participants if space available
-      while (result.length < pageSize && addPointer < toAdd.length) {
-        result.push(toAdd[addPointer++]);
-      }
+        return result;
+      };
 
-      return result;
-    };
-
-    setParticipantIds((prevIds) => {
-      const newIds = getPageParticipants(
-        safePage,
-        allSortedIds,
-        pageSize,
-        prevIds,
-      );
-      return newIds;
-    });
-
-    sortedIDsRef.current = allSortedIds; // Store for immediate page switching
-  }, []);
-
-  useEffect(() => {
-    updateTiles();
-  }, [participants.size]);
-
-  // Tile update interval - updates participantIds based on scores
-  useEffect(() => {
-    const tileUpdateInterval = setInterval(updateTiles, TILE_UPDATE_INTERVAL);
-    return () => clearInterval(tileUpdateInterval);
-  }, [updateTiles]); // Only depends on stable updateTiles function
-
-  // Score update interval - updates scores based on participant state
-  useEffect(() => {
-    // Interval 1: Update scores based on activeSpeakerId
-    const activeSpeakerInterval = setInterval(() => {
-      const { participants, activeSpeakerId } = latestPropsRef.current;
-      const currentScores = scoresRef.current;
-
-      participants.forEach((participant, id) => {
-        let score = currentScores.get(id) || 0;
-        // Update score based on active speaker
-        if (id === activeSpeakerId) {
-          score += 1;
+      setParticipantIds((prevIds) => {
+        if (validPage !== currentPage) {
+          const start = validPage * pageSize;
+          const end = start + pageSize;
+          return allSortedIds.slice(start, end);
         }
-        currentScores.set(id, Math.min(score, 100));
+
+        return getPageParticipants(validPage, allSortedIds, pageSize, prevIds);
       });
-    }, ACTIVE_SPEAKER_UPDATE_INTERVAL);
 
-    // Interval 2: Update scores based on webcam, mic, and screen share
-    const mediaStateInterval = setInterval(() => {
-      const { participants } = latestPropsRef.current;
-      const currentScores = scoresRef.current;
-
-      // Garbage collection for left participants
-      for (const id of currentScores.keys()) {
-        if (!participants.has(id)) {
-          currentScores.delete(id);
-        }
+      // Sync page state if it was auto-corrected
+      if (validPage !== currentPage) {
+        setPage(validPage);
       }
+    }, UPDATE_INTERVAL);
 
-      participants.forEach((participant, id) => {
-        let score = currentScores.get(id) || 0;
-
-        // Apply decay to existing score
-        score *= DECAY_RATE;
-
-        // Update scores based on media state
-        // if (participant?.screenShareOn) score += 2;
-        // if (participant?.webcamOn) score += 0.5;
-        // if (participant?.micOn) score += 0.3;
-
-        currentScores.set(id, Math.min(score, 100));
-      });
-    }, SCORE_UPDATE_INTERVAL);
-
-    return () => {
-      clearInterval(activeSpeakerInterval);
-      clearInterval(mediaStateInterval);
-    };
-  }, []);
-
-  // Immediate update when page changes
-  useEffect(() => {
-    const totalIDs = sortedIDsRef.current;
-    if (totalIDs.length > 0) {
-      const startIndex = page * pageSize;
-      const endIndex = startIndex + pageSize;
-      const newIds = totalIDs.slice(startIndex, endIndex);
-      setParticipantIds(newIds);
-    }
-  }, [page, pageSize]);
-
-  const totalParticipants =
-    sortedIDsRef.current.length || participantIds.length; // Fallback
-  const totalPages = Math.ceil(totalParticipants / pageSize);
+    return () => clearInterval(updateInterval);
+  }, [pageSize]); // Restart if pagesize changes (presenting toggles)
 
   return (
     <>
@@ -249,14 +228,12 @@ function ParticipantsViewer({ isPresenting }) {
         setPage={setPage}
         page={page}
       />
-      <div className="rest-shared-audio">
+      {/* Optimization for hidden participants: Render audio only */}
+      <div className="hidden-participants-audio" style={{ display: "none" }}>
         {[...participants.keys()]
-          .filter((participantId) => !participantIds.includes(participantId))
-          .map((participantId) => (
-            <ParticipantAudio
-              key={participantId}
-              participantId={participantId}
-            />
+          .filter((id) => !participantIds.includes(id))
+          .map((id) => (
+            <ParticipantAudio key={id} participantId={id} />
           ))}
       </div>
     </>

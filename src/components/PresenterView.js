@@ -1,4 +1,4 @@
-import { useMeeting, useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
+import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
 import MicOffSmallIcon from "../icons/MicOffSmallIcon";
@@ -6,6 +6,7 @@ import ScreenShareIcon from "../icons/ScreenShareIcon";
 import SpeakerIcon from "../icons/SpeakerIcon";
 import { nameTructed } from "../utils/helper";
 import { CornerDisplayName } from "./ParticipantView";
+import { VideoPlayer } from "../hooks/useObservers";
 
 export function PresenterView({ height }) {
   const mMeeting = useMeeting();
@@ -19,7 +20,6 @@ export function PresenterView({ height }) {
     displayName,
     isActiveSpeaker,
   } = useParticipant(presenterId);
-
 
   const audioPlayer = useRef();
 
@@ -49,12 +49,12 @@ export function PresenterView({ height }) {
 
   return (
     <div
-      className={` bg-gray-750 rounded m-2 relative overflow-hidden w-full h-[${height - "xl:p-6 lg:p-[52px] md:p-[26px] p-1"
-        }] `}
+      className={` bg-gray-750 rounded m-2 relative overflow-hidden w-full h-[${
+        height - "xl:p-6 lg:p-[52px] md:p-[26px] p-1"
+      }] `}
     >
       <audio autoPlay playsInline controls={false} ref={audioPlayer} />
       <div className={"video-contain absolute h-full w-full"}>
-
         <VideoPlayer
           participantId={presenterId} // Required
           type="share" // "video" or "share"
