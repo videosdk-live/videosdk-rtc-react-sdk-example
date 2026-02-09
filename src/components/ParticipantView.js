@@ -35,12 +35,12 @@ export const CornerDisplayName = ({
 
   const statsBoxHeight = useMemo(
     () => statsBoxHeightRef?.offsetHeight,
-    [statsBoxHeightRef]
+    [statsBoxHeightRef],
   );
 
   const statsBoxWidth = useMemo(
     () => statsBoxWidthRef?.offsetWidth,
-    [statsBoxWidthRef]
+    [statsBoxWidthRef],
   );
 
   const analyzerSize = isXLDesktop
@@ -62,7 +62,7 @@ export const CornerDisplayName = ({
     getVideoStats,
     getAudioStats,
     getShareStats,
-    getShareAudioStats
+    getShareAudioStats,
   } = useParticipant(participantId);
 
   const statsIntervalIdRef = useRef();
@@ -76,7 +76,6 @@ export const CornerDisplayName = ({
     let videoStats = [];
     if (isPresenting) {
       stats = await getShareStats();
-
     } else if (webcamStream) {
       stats = await getVideoStats();
     } else if (micStream) {
@@ -85,7 +84,9 @@ export const CornerDisplayName = ({
 
     if (webcamStream || micStream || isPresenting) {
       videoStats = isPresenting ? await getShareStats() : await getVideoStats();
-      audioStats = isPresenting ? await getShareAudioStats() : await getAudioStats();
+      audioStats = isPresenting
+        ? await getShareAudioStats()
+        : await getAudioStats();
     }
 
     let score = stats
@@ -124,15 +125,15 @@ export const CornerDisplayName = ({
       audio: audioStats
         ? audioStats[0]?.packetsLost
           ? `${parseFloat(
-            (audioStats[0]?.packetsLost * 100) / audioStats[0]?.totalPackets
-          ).toFixed(2)}%`
+              (audioStats[0]?.packetsLost * 100) / audioStats[0]?.totalPackets,
+            ).toFixed(2)}%`
           : "-"
         : "-",
       video: videoStats
         ? videoStats[0]?.packetsLost
           ? `${parseFloat(
-            (videoStats[0]?.packetsLost * 100) / videoStats[0]?.totalPackets
-          ).toFixed(2)}%`
+              (videoStats[0]?.packetsLost * 100) / videoStats[0]?.totalPackets,
+            ).toFixed(2)}%`
           : "-"
         : "-",
     },
@@ -152,8 +153,8 @@ export const CornerDisplayName = ({
       audio: "-",
       video:
         videoStats &&
-          (videoStats[0]?.size?.framerate === null ||
-            videoStats[0]?.size?.framerate === undefined)
+        (videoStats[0]?.size?.framerate === null ||
+          videoStats[0]?.size?.framerate === undefined)
           ? "-"
           : `${videoStats ? videoStats[0]?.size?.framerate : "-"}`,
     },
@@ -178,8 +179,9 @@ export const CornerDisplayName = ({
         videoStats && !isLocal
           ? videoStats && videoStats[0]?.currentSpatialLayer === null
             ? "-"
-            : `S:${videoStats[0]?.currentSpatialLayer || 0} T:${videoStats[0]?.currentTemporalLayer || 0
-            }`
+            : `S:${videoStats[0]?.currentSpatialLayer || 0} T:${
+                videoStats[0]?.currentTemporalLayer || 0
+              }`
           : "-",
     },
     {
@@ -189,8 +191,9 @@ export const CornerDisplayName = ({
         videoStats && !isLocal
           ? videoStats && videoStats[0]?.preferredSpatialLayer === null
             ? "-"
-            : `S:${videoStats[0]?.preferredSpatialLayer || 0} T:${videoStats[0]?.preferredTemporalLayer || 0
-            }`
+            : `S:${videoStats[0]?.preferredSpatialLayer || 0} T:${
+                videoStats[0]?.preferredTemporalLayer || 0
+              }`
           : "-",
     },
   ];
@@ -326,12 +329,13 @@ export const CornerDisplayName = ({
                                       : "#FF5D5D",
                               }}
                             >
-                              <p className="text-sm text-white font-semibold">{`Quality Score : ${score > 7
+                              <p className="text-sm text-white font-semibold">{`Quality Score : ${
+                                score > 7
                                   ? "Good"
                                   : score > 4
                                     ? "Average"
                                     : "Poor"
-                                }`}</p>
+                              }`}</p>
 
                               <button
                                 className="cursor-pointer text-white hover:bg-[#ffffff33] rounded-full px-1 text-center"
@@ -393,7 +397,7 @@ export const CornerDisplayName = ({
                             </div>
                           </div>
                         </div>,
-                        document.body
+                        document.body,
                       )}
                     </Popover.Panel>
                   </Transition>
@@ -423,8 +427,7 @@ export function ParticipantView({ participantId }) {
   const [mouseOver, setMouseOver] = useState(false);
 
   useEffect(() => {
-    const isFirefox =
-      navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
+    const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
     if (micRef.current) {
       try {
         if (!isFirefox) {
@@ -445,14 +448,13 @@ export function ParticipantView({ participantId }) {
         micRef.current
           .play()
           .catch((error) =>
-            console.error("micRef.current.play() failed", error)
+            console.error("micRef.current.play() failed", error),
           );
       } else {
         micRef.current.srcObject = null;
       }
     }
-  }, [micStream, micOn, micRef])
-
+  }, [micStream, micOn, micRef]);
 
   return mode === "SEND_AND_RECV" ? (
     <div

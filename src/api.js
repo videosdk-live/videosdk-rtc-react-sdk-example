@@ -31,7 +31,7 @@ export const createMeeting = async ({ token }) => {
   const data = await response.json()
 
   if (data.roomId) {
-    return { meetingId: data.roomId, err: null }
+    return { meetingId:  data.roomId, err: null }
   } else {
     return { meetingId: null, err: data.error }
   }
