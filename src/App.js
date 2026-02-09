@@ -8,7 +8,7 @@ import { JoiningScreen } from "./components/screens/JoiningScreen"
 
 function App() {
   const [token, setToken] = useState("");
-  const [meetingId, setMeetingId] = useState("a7te-yx4s-7ife");
+  const [meetingId, setMeetingId] = useState("");
   const [participantName, setParticipantName] = useState("");
   const [micOn, setMicOn] = useState(false);
   const [webcamOn, setWebcamOn] = useState(false);
@@ -36,7 +36,7 @@ function App() {
 
           <MeetingProvider
             config={{
-              meetingId: "a7te-yx4s-7ife",
+              meetingId,
               micEnabled: micOn,
               webcamEnabled: webcamOn,
               name: participantName ? participantName : "TestUser",

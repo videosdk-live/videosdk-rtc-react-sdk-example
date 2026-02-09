@@ -1,6 +1,6 @@
 import { Popover, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useParticipant } from "@videosdk.live/react-sdk";
+import { useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import useIsMobile from "../hooks/useIsMobile";
@@ -12,7 +12,6 @@ import SpeakerIcon from "../icons/SpeakerIcon";
 import { getQualityScore, nameTructed } from "../utils/common";
 import * as ReactDOM from "react-dom";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
-import { VideoPlayer } from "../hooks/useObservers";
 export const CornerDisplayName = ({
   participantId,
   isPresenting,

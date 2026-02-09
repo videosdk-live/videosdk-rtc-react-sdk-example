@@ -92,10 +92,6 @@ function ParticipantsViewer({ isPresenting }) {
 
       // Boost dominant speaker score
       if (dominantSpeakerId) {
-        console.log(
-          participants.get(dominantSpeakerId)?.displayName,
-          "dominantSpeakerId",
-        );
 
         const currentScore = scores.get(dominantSpeakerId) || 0;
         scores.set(dominantSpeakerId, Math.min(100, currentScore + 1)); // Significant boost
@@ -146,8 +142,6 @@ function ParticipantsViewer({ isPresenting }) {
 
       // 4. Construct Full Ordered List
       const allSortedIds = [localParticipant.id, ...pinnedIds, ...regularIds];
-
-      // console.log(allSortedIds.map((id) => ({ "name": participants.get(id)?.displayName, "score": scores.get(id) || 0 })), "allSortedIds")
 
       // 5. Handle Pagination
       const totalLen = allSortedIds.length;

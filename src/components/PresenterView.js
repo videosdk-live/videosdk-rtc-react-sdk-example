@@ -1,4 +1,4 @@
-import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
+import { useMeeting, useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
 import { useEffect, useMemo, useRef } from "react";
 import ReactPlayer from "react-player";
 import MicOffSmallIcon from "../icons/MicOffSmallIcon";
@@ -6,7 +6,6 @@ import ScreenShareIcon from "../icons/ScreenShareIcon";
 import SpeakerIcon from "../icons/SpeakerIcon";
 import { nameTructed } from "../utils/helper";
 import { CornerDisplayName } from "./ParticipantView";
-import { VideoPlayer } from "../hooks/useObservers";
 
 export function PresenterView({ height }) {
   const mMeeting = useMeeting();
