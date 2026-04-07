@@ -12,15 +12,40 @@ import SpeakerIcon from "../icons/SpeakerIcon";
 import { getQualityScore, nameTructed } from "../utils/common";
 import * as ReactDOM from "react-dom";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
-export const CornerDisplayName = ({
-  participantId,
-  isPresenting,
-  displayName,
-  isLocal,
-  micOn,
-  mouseOver,
-  isActiveSpeaker,
-}) => {
+
+const CornerDisplayInfo = ({ participantId, isPresenting, show }) => {
+  const { displayName, isLocal, micOn, isActiveSpeaker } =
+    useParticipant(participantId);
+
+  return (
+    <div
+      className="absolute bottom-2 left-2 rounded-md flex items-center justify-center p-2"
+      style={{
+        backgroundColor: "#00000066",
+        transition: "all 200ms",
+        transitionTimingFunction: "linear",
+        transform: `scale(${show ? 1 : 0})`,
+      }}
+    >
+      {!micOn && !isPresenting ? (
+        <MicOffSmallIcon fillcolor="white" />
+      ) : micOn && isActiveSpeaker ? (
+        <SpeakerIcon />
+      ) : null}
+      <p className="text-sm text-white ml-0.5">
+        {isPresenting
+          ? isLocal
+            ? `You are presenting`
+            : `${nameTructed(displayName, 15)} is presenting`
+          : isLocal
+            ? "You"
+            : nameTructed(displayName, 26)}
+      </p>
+    </div>
+  );
+};
+
+const CornerDisplayStats = ({ participantId, isPresenting }) => {
   const isMobile = useIsMobile();
   const isTab = useIsTab();
   const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
@@ -31,7 +56,7 @@ export const CornerDisplayName = ({
   const [statsBoxHeightRef, setStatsBoxHeightRef] = useState(null);
   const [statsBoxWidthRef, setStatsBoxWidthRef] = useState(null);
 
-  const [coords, setCoords] = useState({}); // takes current button coordinates
+  const [coords, setCoords] = useState({});
 
   const statsBoxHeight = useMemo(
     () => statsBoxHeightRef?.offsetHeight,
@@ -53,9 +78,8 @@ export const CornerDisplayName = ({
           ? 20
           : 18;
 
-  const show = useMemo(() => mouseOver, [mouseOver]);
-
   const {
+    isLocal,
     webcamStream,
     micStream,
     screenShareStream,
@@ -76,7 +100,6 @@ export const CornerDisplayName = ({
     let videoStats = [];
     if (isPresenting) {
       stats = await getShareStats();
-
     } else if (webcamStream) {
       stats = await getVideoStats();
     } else if (micStream) {
@@ -216,211 +239,196 @@ export const CornerDisplayName = ({
     };
   }, [webcamStream, micStream, screenShareStream]);
 
+  if (!(webcamStream || micStream || screenShareStream)) {
+    return null;
+  }
+
+  return (
+    <div>
+      <div
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        className="absolute top-2 right-2 rounded-md  p-2 cursor-pointer "
+      >
+        <Popover className="relative ">
+          {({ close }) => (
+            <>
+              <Popover.Button
+                className={`absolute right-0 top-0 rounded-md flex items-center justify-center p-1.5 cursor-pointer`}
+                style={{
+                  backgroundColor:
+                    score > 7
+                      ? "#3BA55D"
+                      : score > 4
+                        ? "#faa713"
+                        : "#FF5D5D",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const rect = e.target.getBoundingClientRect();
+                  setCoords({
+                    left: Math.round(rect.x + rect.width / 2),
+                    top: Math.round(rect.y + window.scrollY),
+                  });
+                }}
+              >
+                <div>
+                  <NetworkIcon
+                    color1={"#ffffff"}
+                    color2={"#ffffff"}
+                    color3={"#ffffff"}
+                    color4={"#ffffff"}
+                    style={{
+                      height: analyzerSize * 0.6,
+                      width: analyzerSize * 0.6,
+                    }}
+                  />
+                </div>
+              </Popover.Button>
+              <Transition
+                as={Fragment}
+                enter="transition ease-out duration-200"
+                enterFrom="opacity-0 translate-y-1"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition ease-in duration-150"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 translate-y-1"
+              >
+                <Popover.Panel style={{ zIndex: 999 }} className="absolute">
+                  {ReactDOM.createPortal(
+                    <div
+                      ref={setStatsBoxWidthRef}
+                      style={{
+                        top:
+                          coords?.top + statsBoxHeight > windowHeight
+                            ? windowHeight - statsBoxHeight - 20
+                            : coords?.top,
+                        left:
+                          coords?.left - statsBoxWidth < 0
+                            ? 12
+                            : coords?.left - statsBoxWidth,
+                      }}
+                      className={`absolute`}
+                    >
+                      <div
+                        ref={setStatsBoxHeightRef}
+                        className="bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 "
+                      >
+                        <div
+                          className={`p-[9px] flex items-center justify-between rounded-t-lg`}
+                          style={{
+                            backgroundColor:
+                              score > 7
+                                ? "#3BA55D"
+                                : score > 4
+                                  ? "#faa713"
+                                  : "#FF5D5D",
+                          }}
+                        >
+                          <p className="text-sm text-white font-semibold">{`Quality Score : ${score > 7
+                              ? "Good"
+                              : score > 4
+                                ? "Average"
+                                : "Poor"
+                            }`}</p>
+
+                          <button
+                            className="cursor-pointer text-white hover:bg-[#ffffff33] rounded-full px-1 text-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              close();
+                            }}
+                          >
+                            <XMarkIcon
+                              className="text-white"
+                              style={{ height: 16, width: 16 }}
+                            />
+                          </button>
+                        </div>
+                        <div className="flex">
+                          <div className="flex flex-col">
+                            {qualityStateArray.map((item, index) => {
+                              return (
+                                <div
+                                  className="flex"
+                                  style={{
+                                    borderBottom:
+                                      index === qualityStateArray.length - 1
+                                        ? ""
+                                        : `1px solid #ffffff33`,
+                                  }}
+                                >
+                                  <div className="flex flex-1 items-center w-[120px]">
+                                    {index !== 0 && (
+                                      <p className="text-xs text-white my-[6px] ml-2">
+                                        {item.label}
+                                      </p>
+                                    )}
+                                  </div>
+                                  <div
+                                    className="flex flex-1 items-center justify-center"
+                                    style={{
+                                      borderLeft: `1px solid #ffffff33`,
+                                    }}
+                                  >
+                                    <p className="text-xs text-white my-[6px] w-[80px] text-center">
+                                      {item.audio}
+                                    </p>
+                                  </div>
+                                  <div
+                                    className="flex flex-1 items-center justify-center"
+                                    style={{
+                                      borderLeft: `1px solid #ffffff33`,
+                                    }}
+                                  >
+                                    <p className="text-xs text-white my-[6px] w-[80px] text-center">
+                                      {item.video}
+                                    </p>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>,
+                    document.body
+                  )}
+                </Popover.Panel>
+              </Transition>
+            </>
+          )}
+        </Popover>
+      </div>
+    </div>
+  );
+};
+
+export const CornerDisplayName = ({
+  participantId,
+  isPresenting,
+  mouseOver,
+}) => {
   return (
     <>
-      <div
-        className="absolute bottom-2 left-2 rounded-md flex items-center justify-center p-2"
-        style={{
-          backgroundColor: "#00000066",
-          transition: "all 200ms",
-          transitionTimingFunction: "linear",
-          transform: `scale(${show ? 1 : 0})`,
-        }}
-      >
-        {!micOn && !isPresenting ? (
-          <MicOffSmallIcon fillcolor="white" />
-        ) : micOn && isActiveSpeaker ? (
-          <SpeakerIcon />
-        ) : null}
-        <p className="text-sm text-white ml-0.5">
-          {isPresenting
-            ? isLocal
-              ? `You are presenting`
-              : `${nameTructed(displayName, 15)} is presenting`
-            : isLocal
-              ? "You"
-              : nameTructed(displayName, 26)}
-        </p>
-      </div>
-
-      {(webcamStream || micStream || screenShareStream) && (
-        <div>
-          <div
-            onClick={(e) => {
-              e.stopPropagation();
-            }}
-            className="absolute top-2 right-2 rounded-md  p-2 cursor-pointer "
-          >
-            <Popover className="relative ">
-              {({ close }) => (
-                <>
-                  <Popover.Button
-                    className={`absolute right-0 top-0 rounded-md flex items-center justify-center p-1.5 cursor-pointer`}
-                    style={{
-                      backgroundColor:
-                        score > 7
-                          ? "#3BA55D"
-                          : score > 4
-                            ? "#faa713"
-                            : "#FF5D5D",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      const rect = e.target.getBoundingClientRect();
-                      setCoords({
-                        left: Math.round(rect.x + rect.width / 2),
-                        top: Math.round(rect.y + window.scrollY),
-                      });
-                    }}
-                  >
-                    <div>
-                      <NetworkIcon
-                        color1={"#ffffff"}
-                        color2={"#ffffff"}
-                        color3={"#ffffff"}
-                        color4={"#ffffff"}
-                        style={{
-                          height: analyzerSize * 0.6,
-                          width: analyzerSize * 0.6,
-                        }}
-                      />
-                    </div>
-                  </Popover.Button>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-200"
-                    enterFrom="opacity-0 translate-y-1"
-                    enterTo="opacity-100 translate-y-0"
-                    leave="transition ease-in duration-150"
-                    leaveFrom="opacity-100 translate-y-0"
-                    leaveTo="opacity-0 translate-y-1"
-                  >
-                    <Popover.Panel style={{ zIndex: 999 }} className="absolute">
-                      {ReactDOM.createPortal(
-                        <div
-                          ref={setStatsBoxWidthRef}
-                          style={{
-                            top:
-                              coords?.top + statsBoxHeight > windowHeight
-                                ? windowHeight - statsBoxHeight - 20
-                                : coords?.top,
-                            left:
-                              coords?.left - statsBoxWidth < 0
-                                ? 12
-                                : coords?.left - statsBoxWidth,
-                          }}
-                          className={`absolute`}
-                        >
-                          <div
-                            ref={setStatsBoxHeightRef}
-                            className="bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 "
-                          >
-                            <div
-                              className={`p-[9px] flex items-center justify-between rounded-t-lg`}
-                              style={{
-                                backgroundColor:
-                                  score > 7
-                                    ? "#3BA55D"
-                                    : score > 4
-                                      ? "#faa713"
-                                      : "#FF5D5D",
-                              }}
-                            >
-                              <p className="text-sm text-white font-semibold">{`Quality Score : ${score > 7
-                                  ? "Good"
-                                  : score > 4
-                                    ? "Average"
-                                    : "Poor"
-                                }`}</p>
-
-                              <button
-                                className="cursor-pointer text-white hover:bg-[#ffffff33] rounded-full px-1 text-center"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  close();
-                                }}
-                              >
-                                <XMarkIcon
-                                  className="text-white"
-                                  style={{ height: 16, width: 16 }}
-                                />
-                              </button>
-                            </div>
-                            <div className="flex">
-                              <div className="flex flex-col">
-                                {qualityStateArray.map((item, index) => {
-                                  return (
-                                    <div
-                                      className="flex"
-                                      style={{
-                                        borderBottom:
-                                          index === qualityStateArray.length - 1
-                                            ? ""
-                                            : `1px solid #ffffff33`,
-                                      }}
-                                    >
-                                      <div className="flex flex-1 items-center w-[120px]">
-                                        {index !== 0 && (
-                                          <p className="text-xs text-white my-[6px] ml-2">
-                                            {item.label}
-                                          </p>
-                                        )}
-                                      </div>
-                                      <div
-                                        className="flex flex-1 items-center justify-center"
-                                        style={{
-                                          borderLeft: `1px solid #ffffff33`,
-                                        }}
-                                      >
-                                        <p className="text-xs text-white my-[6px] w-[80px] text-center">
-                                          {item.audio}
-                                        </p>
-                                      </div>
-                                      <div
-                                        className="flex flex-1 items-center justify-center"
-                                        style={{
-                                          borderLeft: `1px solid #ffffff33`,
-                                        }}
-                                      >
-                                        <p className="text-xs text-white my-[6px] w-[80px] text-center">
-                                          {item.video}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  );
-                                })}
-                              </div>
-                            </div>
-                          </div>
-                        </div>,
-                        document.body
-                      )}
-                    </Popover.Panel>
-                  </Transition>
-                </>
-              )}
-            </Popover>
-          </div>
-        </div>
-      )}
+      <CornerDisplayInfo
+        participantId={participantId}
+        isPresenting={isPresenting}
+        show={mouseOver}
+      />
+      <CornerDisplayStats
+        participantId={participantId}
+        isPresenting={isPresenting}
+      />
     </>
   );
 };
 
-export function ParticipantView({ participantId }) {
-  const {
-    displayName,
-    micStream,
-    webcamOn,
-    micOn,
-    isLocal,
-    mode,
-    isActiveSpeaker,
-  } = useParticipant(participantId);
-
+const ParticipantAudioPlayer = ({ participantId }) => {
+  const { micStream, micOn, isLocal } = useParticipant(participantId);
   const { selectedSpeaker } = useMeetingAppContext();
   const micRef = useRef(null);
-  const [mouseOver, setMouseOver] = useState(false);
 
   useEffect(() => {
     const isFirefox =
@@ -451,10 +459,43 @@ export function ParticipantView({ participantId }) {
         micRef.current.srcObject = null;
       }
     }
-  }, [micStream, micOn, micRef])
+  }, [micStream, micOn]);
 
+  return <audio ref={micRef} autoPlay muted={isLocal} />;
+};
 
-  return mode === "SEND_AND_RECV" ? (
+const ParticipantVideoSection = ({ participantId }) => {
+  const { webcamOn, displayName } = useParticipant(participantId);
+
+  return webcamOn ? (
+    <VideoPlayer
+      participantId={participantId}
+      type="video"
+      containerStyle={{
+        height: "100%",
+        width: "100%",
+      }}
+      className="h-full"
+      classNameVideo="h-full"
+      videoStyle={{}}
+    />
+  ) : (
+    <div className="h-full w-full flex items-center justify-center">
+      <div
+        className={`z-10 flex items-center justify-center rounded-full bg-gray-800 2xl:h-[92px] h-[52px] 2xl:w-[92px] w-[52px]`}
+      >
+        <p className="text-2xl text-white">
+          {String(displayName).charAt(0).toUpperCase()}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+const ParticipantViewContent = ({ participantId }) => {
+  const [mouseOver, setMouseOver] = useState(false);
+
+  return (
     <div
       onMouseEnter={() => {
         setMouseOver(true);
@@ -464,42 +505,23 @@ export function ParticipantView({ participantId }) {
       }}
       className={`h-full w-full  bg-gray-750 relative overflow-hidden rounded-lg video-cover`}
     >
-      <audio ref={micRef} autoPlay muted={isLocal} />
-      {webcamOn ? (
-        <VideoPlayer
-          participantId={participantId} // Required
-          type="video" // "video" or "share"
-          containerStyle={{
-            height: "100%",
-            width: "100%",
-          }}
-          className="h-full"
-          classNameVideo="h-full"
-          videoStyle={{}}
-        />
-      ) : (
-        <div className="h-full w-full flex items-center justify-center">
-          <div
-            className={`z-10 flex items-center justify-center rounded-full bg-gray-800 2xl:h-[92px] h-[52px] 2xl:w-[92px] w-[52px]`}
-          >
-            <p className="text-2xl text-white">
-              {String(displayName).charAt(0).toUpperCase()}
-            </p>
-          </div>
-        </div>
-      )}
+      <ParticipantAudioPlayer participantId={participantId} />
+      <ParticipantVideoSection participantId={participantId} />
       <CornerDisplayName
         {...{
-          isLocal,
-          displayName,
-          micOn,
-          webcamOn,
           isPresenting: false,
           participantId,
           mouseOver,
-          isActiveSpeaker,
         }}
       />
     </div>
+  );
+};
+
+export function ParticipantView({ participantId }) {
+  const { mode } = useParticipant(participantId);
+
+  return mode === "SEND_AND_RECV" ? (
+    <ParticipantViewContent participantId={participantId} />
   ) : null;
 }

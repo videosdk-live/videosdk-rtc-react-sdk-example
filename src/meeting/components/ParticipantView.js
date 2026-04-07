@@ -2,17 +2,44 @@ import React, { useMemo } from "react";
 import { useMeeting } from "@videosdk.live/react-sdk";
 import { MemoizedParticipantGrid } from "../../components/ParticipantGrid";
 
+const ActiveSpeakerAwareGrid = React.memo(
+  ({ baseParticipantIds, isPresenting }) => {
+    const { activeSpeakerId } = useMeeting();
+
+    const participantIds = useMemo(() => {
+      const ids = [...baseParticipantIds];
+      if (activeSpeakerId) {
+        if (!ids.includes(activeSpeakerId)) {
+          ids[ids.length - 1] = activeSpeakerId;
+        }
+      }
+      return ids;
+    }, [baseParticipantIds, activeSpeakerId]);
+
+    return (
+      <MemoizedParticipantGrid
+        participantIds={participantIds}
+        isPresenting={isPresenting}
+      />
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      JSON.stringify(prevProps.baseParticipantIds) ===
+        JSON.stringify(nextProps.baseParticipantIds) &&
+      prevProps.isPresenting === nextProps.isPresenting
+    );
+  }
+);
+
 function ParticipantsViewer({ isPresenting }) {
   const {
     participants,
     pinnedParticipants,
-    activeSpeakerId,
     localParticipant,
-    localScreenShareOn,
-    presenterId,
   } = useMeeting();
 
-  const participantIds = useMemo(() => {
+  const baseParticipantIds = useMemo(() => {
     const pinnedParticipantId = [...pinnedParticipants.keys()].filter(
       (participantId) => {
         return participantId !== localParticipant.id;
@@ -33,23 +60,12 @@ function ParticipantsViewer({ isPresenting }) {
       ...regularParticipantIds,
     ].slice(0, isPresenting ? 6 : 16);
 
-    if (activeSpeakerId) {
-      if (!ids.includes(activeSpeakerId)) {
-        ids[ids.length - 1] = activeSpeakerId;
-      }
-    }
     return ids;
-  }, [
-    participants,
-    activeSpeakerId,
-    pinnedParticipants,
-    presenterId,
-    localScreenShareOn,
-  ]);
+  }, [participants, pinnedParticipants, isPresenting]);
 
   return (
-    <MemoizedParticipantGrid
-      participantIds={participantIds}
+    <ActiveSpeakerAwareGrid
+      baseParticipantIds={baseParticipantIds}
       isPresenting={isPresenting}
     />
   );

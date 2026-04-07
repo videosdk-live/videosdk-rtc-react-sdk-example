@@ -4,9 +4,7 @@ import { formatAMPM, json_verify, nameTructed } from "../../utils/helper";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
 
 
-const ChatMessage = ({ senderId, senderName, text, timestamp }) => {
-  const mMeeting = useMeeting();
-  const localParticipantId = mMeeting?.localParticipant?.id;
+const ChatMessage = ({ senderId, senderName, text, timestamp, localParticipantId }) => {
   const localSender = localParticipantId === senderId;
 
   return (
@@ -111,6 +109,8 @@ const ChatInput = ({ inputHeight }) => {
 
 const ChatMessages = ({ listHeight }) => {
   const listRef = useRef();
+  const { localParticipant } = useMeeting();
+  const localParticipantId = localParticipant?.id;
   const { messages } = usePubSub("CHAT");
 
   const scrollToBottom = (data) => {
@@ -144,7 +144,7 @@ const ChatMessages = ({ listHeight }) => {
           return (
             <ChatMessage
               key={`chat_item_${i}`}
-              {...{ senderId, senderName, text: message, timestamp }}
+              {...{ senderId, senderName, text: message, timestamp, localParticipantId }}
             />
           );
         })}

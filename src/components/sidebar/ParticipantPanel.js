@@ -8,9 +8,24 @@ import VideoCamOnIcon from "../../icons/ParticipantTabPanel/VideoCamOnIcon";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import { nameTructed } from "../../utils/helper";
 
+const ParticipantMicStatus = React.memo(({ participantId }) => {
+  const { micOn } = useParticipant(participantId);
+  return (
+    <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
+  );
+}, (prevProps, nextProps) => prevProps.participantId === nextProps.participantId);
+
+const ParticipantCamStatus = React.memo(({ participantId }) => {
+  const { webcamOn } = useParticipant(participantId);
+  return (
+    <div className="m-1 p-1">
+      {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
+    </div>
+  );
+}, (prevProps, nextProps) => prevProps.participantId === nextProps.participantId);
+
 function ParticipantListItem({ participantId, raisedHand }) {
-  const { micOn, webcamOn, displayName, isLocal } =
-    useParticipant(participantId);
+  const { displayName, isLocal } = useParticipant(participantId);
 
   return (
     <div className="mt-2 m-2 p-2 bg-gray-700 rounded-lg mb-0">
@@ -34,10 +49,8 @@ function ParticipantListItem({ participantId, raisedHand }) {
             <RaiseHand fillcolor={"#fff"} />
           </div>
         )}
-        <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
-        <div className="m-1 p-1">
-          {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
-        </div>
+        <ParticipantMicStatus participantId={participantId} />
+        <ParticipantCamStatus participantId={participantId} />
       </div>
     </div>
   );
