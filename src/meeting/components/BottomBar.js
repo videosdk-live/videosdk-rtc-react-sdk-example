@@ -219,6 +219,9 @@ const MicBTN = () => {
                   <>
                     <Popover.Button
                       disabled={!isMicrophonePermissionAllowed}
+                      onClick={() => {
+                        getMics();
+                      }}
                       className="flex items-center justify-center mt-1 mr-1 focus:outline-none"
                     >
                       <div
@@ -226,18 +229,12 @@ const MicBTN = () => {
                         onMouseEnter={openTooltip}
                         onMouseLeave={closeTooltip}
                       >
-                        <button
-                          onClick={() => {
-                            getMics();
+                        <ChevronDownIcon
+                          className="h-4 w-4"
+                          style={{
+                            color: localMicOn ? "white" : "black",
                           }}
-                        >
-                          <ChevronDownIcon
-                            className="h-4 w-4"
-                            style={{
-                              color: localMicOn ? "white" : "black",
-                            }}
-                          />
-                        </button>
+                        />
                       </div>
                     </Popover.Button>
                     <Transition
@@ -391,6 +388,9 @@ const WebCamBTN = () => {
                   <>
                     <Popover.Button
                       disabled={!isCameraPermissionAllowed}
+                      onClick={() => {
+                        getWebcams();
+                      }}
                       className="flex items-center justify-center mt-1 mr-1 focus:outline-none"
                     >
                       <div
@@ -398,18 +398,12 @@ const WebCamBTN = () => {
                         onMouseEnter={openTooltip}
                         onMouseLeave={closeTooltip}
                       >
-                        <button
-                          onClick={() => {
-                            getWebcams();
+                        <ChevronDownIcon
+                          className="h-4 w-4"
+                          style={{
+                            color: localWebcamOn ? "white" : "black",
                           }}
-                        >
-                          <ChevronDownIcon
-                            className="h-4 w-4"
-                            style={{
-                              color: localWebcamOn ? "white" : "black",
-                            }}
-                          />
-                        </button>
+                        />
                       </div>
                     </Popover.Button>
                     <Transition

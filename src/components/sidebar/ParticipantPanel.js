@@ -13,7 +13,7 @@ const ParticipantMicStatus = React.memo(({ participantId }) => {
   return (
     <div className="m-1 p-1">{micOn ? <MicOnIcon /> : <MicOffIcon />}</div>
   );
-}, (prevProps, nextProps) => prevProps.participantId === nextProps.participantId);
+});
 
 const ParticipantCamStatus = React.memo(({ participantId }) => {
   const { webcamOn } = useParticipant(participantId);
@@ -22,7 +22,7 @@ const ParticipantCamStatus = React.memo(({ participantId }) => {
       {webcamOn ? <VideoCamOnIcon /> : <VideoCamOffIcon />}
     </div>
   );
-}, (prevProps, nextProps) => prevProps.participantId === nextProps.participantId);
+});
 
 function ParticipantListItem({ participantId, raisedHand }) {
   const { displayName, isLocal } = useParticipant(participantId);

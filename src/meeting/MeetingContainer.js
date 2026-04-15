@@ -17,19 +17,24 @@ const ParticipantMicStream = memo(({ participantId }) => {
   const { micStream, isLocal } = useParticipant(participantId);
 
   useEffect(() => {
-    if (micStream) {
-      const mediaStream = new MediaStream();
-      mediaStream.addTrack(micStream.track);
+    if (!micStream) return;
 
-      const audioElement = new Audio();
-      audioElement.srcObject = mediaStream;
-      audioElement.muted = isLocal;
-      audioElement.play();
-    }
-  }, [micStream, participantId]);
+    const mediaStream = new MediaStream();
+    mediaStream.addTrack(micStream.track);
+
+    const audioElement = new Audio();
+    audioElement.srcObject = mediaStream;
+    audioElement.muted = isLocal;
+    audioElement.play().catch(() => {});
+
+    return () => {
+      audioElement.pause();
+      audioElement.srcObject = null;
+    };
+  }, [micStream, isLocal, participantId]);
 
   return null;
-}, (prevProps, nextProps) => prevProps.participantId === nextProps.participantId);
+});
 
 const MeetingContent = React.memo(({
   containerHeight,
@@ -73,13 +78,6 @@ const MeetingContent = React.memo(({
         />
       </div>
     </>
-  );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.containerHeight === nextProps.containerHeight &&
-    prevProps.bottomBarHeight === nextProps.bottomBarHeight &&
-    prevProps.isMobile === nextProps.isMobile &&
-    prevProps.sideBarContainerWidth === nextProps.sideBarContainerWidth
   );
 });
 
@@ -189,9 +187,6 @@ export function MeetingContainer({
     }
   }
 
-  function onMeetingJoined() {
-  }
-
   function onMeetingLeft() {
     setSelectedMic({ id: null, label: null })
     setSelectedWebcam({ id: null, label: null })
@@ -225,7 +220,6 @@ export function MeetingContainer({
   const { isMeetingJoined, localParticipant } = useMeeting({
     onParticipantJoined,
     onEntryResponded,
-    onMeetingJoined,
     onMeetingStateChanged: ({state}) => {
       toast(`Meeting is in ${state} state`, {
         position: "bottom-left",

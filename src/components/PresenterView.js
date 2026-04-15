@@ -39,7 +39,45 @@ const PresenterAudioPlayer = ({ presenterId }) => {
   return <audio autoPlay playsInline controls={false} ref={audioPlayer} />;
 };
 
-const PresenterContent = ({ presenterId, toggleScreenShare }) => {
+const StopPresentingOverlay = ({ presenterId, toggleScreenShare }) => {
+  const { isLocal } = useParticipant(presenterId);
+
+  if (!isLocal) return null;
+
+  return (
+    <>
+      <div className="p-10 rounded-2xl flex flex-col items-center justify-center absolute top-1/2 left-1/2 bg-gray-750 transform -translate-x-1/2 -translate-y-1/2">
+        <ScreenShareIcon style={{ height: 48, width: 48, color: "white" }} />
+        <div className="mt-4">
+          <p className="text-white text-xl font-semibold">
+            You are presenting to everyone
+          </p>
+        </div>
+        <div className="mt-8">
+          <button
+            className="bg-purple-550 text-white px-4 py-2 rounded text-sm text-center font-medium"
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleScreenShare();
+            }}
+          >
+            STOP PRESENTING
+          </button>
+        </div>
+      </div>
+      <CornerDisplayName
+        {...{
+          participantId: presenterId,
+          isPresenting: true,
+          mouseOver: true,
+        }}
+      />
+    </>
+  );
+};
+
+
+const PresenterContent = ({ presenterId }) => {
   const { isLocal, micOn, displayName, isActiveSpeaker } =
     useParticipant(presenterId);
 
@@ -80,40 +118,6 @@ const PresenterContent = ({ presenterId, toggleScreenShare }) => {
             : `${nameTructed(displayName, 15)} is presenting`}
         </p>
       </div>
-      {isLocal ? (
-        <>
-          <div className="p-10 rounded-2xl flex flex-col items-center justify-center absolute top-1/2 left-1/2 bg-gray-750 transform -translate-x-1/2 -translate-y-1/2">
-            <ScreenShareIcon
-              style={{ height: 48, width: 48, color: "white" }}
-            />
-            <div className="mt-4">
-              <p className="text-white text-xl font-semibold">
-                You are presenting to everyone
-              </p>
-            </div>
-            <div className="mt-8">
-              <button
-                className="bg-purple-550 text-white px-4 py-2 rounded text-sm text-center font-medium"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleScreenShare();
-                }}
-              >
-                STOP PRESENTING
-              </button>
-            </div>
-          </div>
-          <CornerDisplayName
-            {...{
-              participantId: presenterId,
-              isPresenting: true,
-              mouseOver: true,
-            }}
-          />
-        </>
-      ) : (
-        <></>
-      )}
     </div>
   );
 };
@@ -127,7 +131,8 @@ export function PresenterView({ height }) {
         }] `}
     >
       <PresenterAudioPlayer presenterId={presenterId} />
-      <PresenterContent
+      <PresenterContent presenterId={presenterId} />
+      <StopPresentingOverlay
         presenterId={presenterId}
         toggleScreenShare={toggleScreenShare}
       />

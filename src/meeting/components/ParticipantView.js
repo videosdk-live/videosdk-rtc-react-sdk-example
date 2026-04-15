@@ -24,10 +24,14 @@ const ActiveSpeakerAwareGrid = React.memo(
     );
   },
   (prevProps, nextProps) => {
-    return (
-      JSON.stringify(prevProps.baseParticipantIds) ===
-        JSON.stringify(nextProps.baseParticipantIds) &&
-      prevProps.isPresenting === nextProps.isPresenting
+    if (prevProps.isPresenting !== nextProps.isPresenting) return false;
+    if (
+      prevProps.baseParticipantIds.length !== nextProps.baseParticipantIds.length
+    ) {
+      return false;
+    }
+    return prevProps.baseParticipantIds.every(
+      (id, i) => id === nextProps.baseParticipantIds[i]
     );
   }
 );
