@@ -13,6 +13,74 @@ import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
 
+const ParticipantMicStream = memo(({ participantId }) => {
+  const { micStream, isLocal } = useParticipant(participantId);
+
+  useEffect(() => {
+    if (!micStream) return;
+
+    const mediaStream = new MediaStream();
+    mediaStream.addTrack(micStream.track);
+
+    const audioElement = new Audio();
+    audioElement.srcObject = mediaStream;
+    audioElement.muted = isLocal;
+    audioElement.play().catch(() => {});
+
+    return () => {
+      audioElement.pause();
+      audioElement.srcObject = null;
+    };
+  }, [micStream, isLocal, participantId]);
+
+  return null;
+});
+
+const MeetingContent = React.memo(({
+  containerHeight,
+  bottomBarHeight,
+  isMobile,
+  sideBarContainerWidth,
+}) => {
+  const { presenterId, participants } = useMeeting();
+  const isPresenting = presenterId ? true : false;
+
+  const [participantsData, setParticipantsData] = useState([]);
+
+  useEffect(() => {
+    const debounceTimeout = setTimeout(() => {
+      const participantIds = Array.from(participants.keys());
+      setParticipantsData(participantIds);
+    }, 500);
+
+    return () => clearTimeout(debounceTimeout);
+  }, [participants]);
+
+  return (
+    <>
+      <div className={` flex flex-1 flex-row bg-gray-800 `}>
+        <div className={`flex flex-1 `}>
+          {isPresenting ? (
+            <PresenterView height={containerHeight - bottomBarHeight} />
+          ) : null}
+          {isPresenting && isMobile ? (
+            participantsData.map((participantId) => (
+              <ParticipantMicStream key={participantId} participantId={participantId} />
+            ))
+          ) : (
+            <MemorizedParticipantView isPresenting={isPresenting} />
+          )}
+        </div>
+
+        <SidebarConatiner
+          height={containerHeight - bottomBarHeight}
+          sideBarContainerWidth={sideBarContainerWidth}
+        />
+      </div>
+    </>
+  );
+});
+
 export function MeetingContainer({
   onMeetingLeave,
   setIsMeetingLeft,
@@ -23,31 +91,9 @@ export function MeetingContainer({
     setSelectedSpeaker,
   } = useMeetingAppContext();
 
-  const [participantsData, setParticipantsData] = useState([]);
-
-  const ParticipantMicStream = memo(({ participantId }) => {
-    // Individual hook for each participant
-    const { micStream, isLocal } = useParticipant(participantId);
-
-    useEffect(() => {
-
-      if (micStream) {
-        const mediaStream = new MediaStream();
-        mediaStream.addTrack(micStream.track);
-
-        const audioElement = new Audio();
-        audioElement.srcObject = mediaStream;
-        audioElement.muted = isLocal
-        audioElement.play();
-
-      }
-    }, [micStream, participantId]);
-
-    return null;
-  }, [participantsData]);
-
   const { useRaisedHandParticipants } = useMeetingAppContext();
   const bottomBarHeight = 60;
+  const localParticipantRef = useRef();
 
   const [containerHeight, setContainerHeight] = useState(0);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -55,7 +101,6 @@ export function MeetingContainer({
   const [meetingErrorVisible, setMeetingErrorVisible] = useState(false);
   const [meetingError, setMeetingError] = useState(false);
 
-  const mMeetingRef = useRef();
   const containerRef = createRef();
   const containerHeightRef = useRef();
   const containerWidthRef = useRef();
@@ -125,13 +170,12 @@ export function MeetingContainer({
   };
 
   function onParticipantJoined(participant) {
-    // Change quality to low, med or high based on resolution
     participant && participant.setQuality("high");
   }
 
 
   function onEntryResponded(participantId, name) {
-    if (mMeetingRef.current?.localParticipant?.id === participantId) {
+    if (localParticipantRef.current?.id === participantId) {
       if (name === "allowed") {
         setLocalParticipantAllowedJoin(true);
       } else {
@@ -143,10 +187,6 @@ export function MeetingContainer({
     }
   }
 
-  function onMeetingJoined() {
-    console.log("onMeetingJoined");
-  }
-
   function onMeetingLeft() {
     setSelectedMic({ id: null, label: null })
     setSelectedWebcam({ id: null, label: null })
@@ -156,7 +196,6 @@ export function MeetingContainer({
 
   const _handleOnError = (data) => {
     const { code, message } = data;
-    console.log("meetingErr", code, message)
 
     const joiningErrCodes = [
       4001, 4002, 4003, 4004, 4005, 4006, 4007, 4008, 4009, 4010,
@@ -178,10 +217,9 @@ export function MeetingContainer({
     });
   };
 
-  const mMeeting = useMeeting({
+  const { isMeetingJoined, localParticipant } = useMeeting({
     onParticipantJoined,
     onEntryResponded,
-    onMeetingJoined,
     onMeetingStateChanged: ({state}) => {
       toast(`Meeting is in ${state} state`, {
         position: "bottom-left",
@@ -199,30 +237,13 @@ export function MeetingContainer({
     onRecordingStateChanged: _handleOnRecordingStateChanged,
   });
 
-  const isPresenting = mMeeting.presenterId ? true : false;
-
   useEffect(() => {
-    const debounceTimeout = setTimeout(() => {
-      const participantIds = Array.from(mMeeting.participants.keys());
-      console.log("Debounced participantIds", participantIds);
-
-      setParticipantsData(participantIds);
-      console.log("Setting participants");
-    }, 500);
-
-
-    return () => clearTimeout(debounceTimeout);
-  }, [mMeeting.participants]);
-
-
-  useEffect(() => {
-    mMeetingRef.current = mMeeting;
-  }, [mMeeting]);
-
+    localParticipantRef.current = localParticipant;
+  }, [localParticipant]);
 
   usePubSub("RAISE_HAND", {
     onMessageReceived: (data) => {
-      const localParticipantId = mMeeting?.localParticipant?.id;
+      const localParticipantId = localParticipantRef.current?.id;
 
       const { senderId, senderName } = data;
 
@@ -249,7 +270,7 @@ export function MeetingContainer({
 
   usePubSub("CHAT", {
     onMessageReceived: (data) => {
-      const localParticipantId = mMeeting?.localParticipant?.id;
+      const localParticipantId = localParticipantRef.current?.id;
 
       const { senderId, senderName, message } = data;
 
@@ -285,25 +306,12 @@ export function MeetingContainer({
         {typeof localParticipantAllowedJoin === "boolean" ? (
           localParticipantAllowedJoin ? (
             <>
-              <div className={` flex flex-1 flex-row bg-gray-800 `}>
-                <div className={`flex flex-1 `}>
-                  {isPresenting ? (
-                    <PresenterView height={containerHeight - bottomBarHeight} />
-                  ) : null}
-                  {isPresenting && isMobile ? (
-                    participantsData.map((participantId) => (
-                      <ParticipantMicStream key={participantId} participantId={participantId} />
-                    ))
-                  ) : (
-                    <MemorizedParticipantView isPresenting={isPresenting} />
-                  )}
-                </div>
-
-                <SidebarConatiner
-                  height={containerHeight - bottomBarHeight}
-                  sideBarContainerWidth={sideBarContainerWidth}
-                />
-              </div>
+              <MeetingContent
+                containerHeight={containerHeight}
+                bottomBarHeight={bottomBarHeight}
+                isMobile={isMobile}
+                sideBarContainerWidth={sideBarContainerWidth}
+              />
 
               <BottomBar
                 bottomBarHeight={bottomBarHeight}
@@ -314,7 +322,7 @@ export function MeetingContainer({
             <></>
           )
         ) : (
-          !mMeeting.isMeetingJoined && <WaitingToJoinScreen />
+          !isMeetingJoined && <WaitingToJoinScreen />
         )}
         <ConfirmBox
           open={meetingErrorVisible}

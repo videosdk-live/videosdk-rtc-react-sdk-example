@@ -162,29 +162,20 @@ const MicBTN = () => {
     isMicrophonePermissionAllowed,
   } = useMeetingAppContext();
 
-  const { getMicrophones, getPlaybackDevices } = useMediaDevice();
+  const { getMicrophones, getPlaybackDevices } = useMediaDevice({
+    onDeviceChanged(devices) {
+      getMics();
+      const newSpeakerList = devices.devices.filter(device => device.kind === 'audiooutput');
 
-  const mMeeting = useMeeting();
+      if (newSpeakerList.length > 0) {
+        setSelectedSpeaker({ id: newSpeakerList[0].deviceId, label: newSpeakerList[0].label });
+      }
+    }
+  });
+
+  const { localMicOn, changeMic, toggleMic } = useMeeting();
   const [mics, setMics] = useState([]);
   const [speakers, setSpeakers] = useState([]);
-  const localMicOn = mMeeting?.localMicOn;
-  const changeMic = mMeeting?.changeMic;
-
-  useMediaDevice({
-    onDeviceChanged
-  })
-
-  function onDeviceChanged(devices) {
-    getMics();
-    const newSpeakerList = devices.devices.filter(device => device.kind === 'audiooutput');
-
-    if (newSpeakerList.length > 0) {
-      setSelectedSpeaker({ id: newSpeakerList[0].deviceId, label: newSpeakerList[0].label });
-    }
-
-  }
-
-
 
   const getMics = async () => {
     const mics = await getMicrophones();
@@ -213,7 +204,7 @@ const MicBTN = () => {
       <OutlinedButton
         Icon={localMicOn ? MicOnIcon : MicOffIcon}
         onClick={() => {
-          mMeeting.toggleMic();
+          toggleMic();
         }}
         bgColor={localMicOn ? "bg-gray-750" : "bg-white"}
         borderColor={localMicOn && "#ffffff33"}
@@ -228,6 +219,9 @@ const MicBTN = () => {
                   <>
                     <Popover.Button
                       disabled={!isMicrophonePermissionAllowed}
+                      onClick={() => {
+                        getMics();
+                      }}
                       className="flex items-center justify-center mt-1 mr-1 focus:outline-none"
                     >
                       <div
@@ -235,18 +229,12 @@ const MicBTN = () => {
                         onMouseEnter={openTooltip}
                         onMouseLeave={closeTooltip}
                       >
-                        <button
-                          onClick={() => {
-                            getMics();
+                        <ChevronDownIcon
+                          className="h-4 w-4"
+                          style={{
+                            color: localMicOn ? "white" : "black",
                           }}
-                        >
-                          <ChevronDownIcon
-                            className="h-4 w-4"
-                            style={{
-                              color: mMeeting.localMicOn ? "white" : "black",
-                            }}
-                          />
-                        </button>
+                        />
                       </div>
                     </Popover.Button>
                     <Transition
@@ -351,12 +339,9 @@ const WebCamBTN = () => {
     useMeetingAppContext();
 
   const { getCameras } = useMediaDevice();
-  const mMeeting = useMeeting();
+  const { localWebcamOn, changeWebcam, toggleWebcam } = useMeeting();
   const [webcams, setWebcams] = useState([]);
   const { getVideoTrack } = useMediaStream();
-
-  const localWebcamOn = mMeeting?.localWebcamOn;
-  const changeWebcam = mMeeting?.changeWebcam;
 
   const getWebcams = async () => {
     let webcams = await getCameras();
@@ -388,7 +373,7 @@ const WebCamBTN = () => {
               webcamId: selectedWebcam.id,
             });
           }
-          mMeeting.toggleWebcam(track);
+          toggleWebcam(track);
         }}
         bgColor={localWebcamOn ? "bg-gray-750" : "bg-white"}
         borderColor={localWebcamOn && "#ffffff33"}
@@ -403,6 +388,9 @@ const WebCamBTN = () => {
                   <>
                     <Popover.Button
                       disabled={!isCameraPermissionAllowed}
+                      onClick={() => {
+                        getWebcams();
+                      }}
                       className="flex items-center justify-center mt-1 mr-1 focus:outline-none"
                     >
                       <div
@@ -410,18 +398,12 @@ const WebCamBTN = () => {
                         onMouseEnter={openTooltip}
                         onMouseLeave={closeTooltip}
                       >
-                        <button
-                          onClick={() => {
-                            getWebcams();
+                        <ChevronDownIcon
+                          className="h-4 w-4"
+                          style={{
+                            color: localWebcamOn ? "white" : "black",
                           }}
-                        >
-                          <ChevronDownIcon
-                            className="h-4 w-4"
-                            style={{
-                              color: localWebcamOn ? "white" : "black",
-                            }}
-                          />
-                        </button>
+                        />
                       </div>
                     </Popover.Button>
                     <Transition
@@ -491,252 +473,255 @@ const WebCamBTN = () => {
   );
 };
 
-export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
+const RaiseHandBTN = ({ isMobile, isTab }) => {
+  const { publish } = usePubSub("RAISE_HAND");
+  const RaiseHand = () => {
+    try {
+      publish("Raise Hand");
+    } catch (e) {
+      console.log("Error in pubsub", e)
+    }
+  };
+
+  return isMobile || isTab ? (
+    <MobileIconButton
+      id="RaiseHandBTN"
+      tooltipTitle={"Raise hand"}
+      Icon={RaiseHandIcon}
+      onClick={RaiseHand}
+      buttonText={"Raise Hand"}
+    />
+  ) : (
+    <OutlinedButton
+      onClick={RaiseHand}
+      tooltip={"Raise Hand"}
+      Icon={RaiseHandIcon}
+    />
+  );
+};
+
+const RecordingBTN = () => {
+  const { startRecording, stopRecording, recordingState } = useMeeting();
+  const defaultOptions = {
+    loop: true,
+    autoplay: true,
+    animationData: recordingBlink,
+    rendererSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+    height: 64,
+    width: 160,
+  };
+
+  const isRecording = useIsRecording();
+  const isRecordingRef = useRef(isRecording);
+
+  useEffect(() => {
+    isRecordingRef.current = isRecording;
+  }, [isRecording]);
+
+  const { isRequestProcessing } = useMemo(
+    () => ({
+      isRequestProcessing:
+        recordingState === Constants.recordingEvents.RECORDING_STARTING ||
+        recordingState === Constants.recordingEvents.RECORDING_STOPPING,
+    }),
+    [recordingState]
+  );
+
+  const _handleClick = () => {
+    const isRecording = isRecordingRef.current;
+
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  return (
+    <OutlinedButton
+      Icon={RecordingIcon}
+      onClick={_handleClick}
+      isFocused={isRecording}
+      tooltip={
+        recordingState === Constants.recordingEvents.RECORDING_STARTED
+          ? "Stop Recording"
+          : recordingState === Constants.recordingEvents.RECORDING_STARTING
+            ? "Starting Recording"
+            : recordingState === Constants.recordingEvents.RECORDING_STOPPED
+              ? "Start Recording"
+              : recordingState === Constants.recordingEvents.RECORDING_STOPPING
+                ? "Stopping Recording"
+                : "Start Recording"
+      }
+      lottieOption={isRecording ? defaultOptions : null}
+      isRequestProcessing={isRequestProcessing}
+    />
+  );
+};
+
+const ScreenShareBTN = ({ isMobile, isTab }) => {
+  const { localScreenShareOn, toggleScreenShare, presenterId } = useMeeting();
+
+  return isMobile || isTab ? (
+    <MobileIconButton
+      id="screen-share-btn"
+      tooltipTitle={
+        presenterId
+          ? localScreenShareOn
+            ? "Stop Presenting"
+            : null
+          : "Present Screen"
+      }
+      buttonText={
+        presenterId
+          ? localScreenShareOn
+            ? "Stop Presenting"
+            : null
+          : "Present Screen"
+      }
+      isFocused={localScreenShareOn}
+      Icon={ScreenShareIcon}
+      onClick={() => {
+        toggleScreenShare();
+      }}
+      disabled={
+        presenterId
+          ? localScreenShareOn
+            ? false
+            : true
+          : isMobile
+            ? true
+            : false
+      }
+    />
+  ) : (
+    <OutlinedButton
+      Icon={ScreenShareIcon}
+      onClick={() => {
+        toggleScreenShare();
+      }}
+      isFocused={localScreenShareOn}
+      tooltip={
+        presenterId
+          ? localScreenShareOn
+            ? "Stop Presenting"
+            : null
+          : "Present Screen"
+      }
+      disabled={presenterId ? (localScreenShareOn ? false : true) : false}
+    />
+  );
+};
+
+const LeaveBTN = ({ setIsMeetingLeft }) => {
+  const { leave } = useMeeting();
+
+  return (
+    <OutlinedButton
+      Icon={EndIcon}
+      bgColor="bg-red-150"
+      onClick={() => {
+        leave();
+        setIsMeetingLeft(true);
+      }}
+      tooltip="Leave Meeting"
+    />
+  );
+};
+
+const ChatBTN = ({ isMobile, isTab }) => {
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
-  const RaiseHandBTN = ({ isMobile, isTab }) => {
-    const { publish } = usePubSub("RAISE_HAND");
-    const RaiseHand = () => {
-      try {
-        publish("Raise Hand");
-      } catch (e) {
-        console.log("Error in pubsub", e)
-      }
-    };
 
-    return isMobile || isTab ? (
-      <MobileIconButton
-        id="RaiseHandBTN"
-        tooltipTitle={"Raise hand"}
-        Icon={RaiseHandIcon}
-        onClick={RaiseHand}
-        buttonText={"Raise Hand"}
-      />
-    ) : (
-      <OutlinedButton
-        onClick={RaiseHand}
-        tooltip={"Raise Hand"}
-        Icon={RaiseHandIcon}
-      />
-    );
-  };
+  return isMobile || isTab ? (
+    <MobileIconButton
+      tooltipTitle={"Chat"}
+      buttonText={"Chat"}
+      Icon={ChatIcon}
+      isFocused={sideBarMode === sideBarModes.CHAT}
+      onClick={() => {
+        setSideBarMode((s) =>
+          s === sideBarModes.CHAT ? null : sideBarModes.CHAT
+        );
+      }}
+    />
+  ) : (
+    <OutlinedButton
+      Icon={ChatIcon}
+      onClick={() => {
+        setSideBarMode((s) =>
+          s === sideBarModes.CHAT ? null : sideBarModes.CHAT
+        );
+      }}
+      isFocused={sideBarMode === "CHAT"}
+      tooltip="View Chat"
+    />
+  );
+};
 
-  const RecordingBTN = () => {
-    const { startRecording, stopRecording, recordingState } = useMeeting();
-    const defaultOptions = {
-      loop: true,
-      autoplay: true,
-      animationData: recordingBlink,
-      rendererSettings: {
-        preserveAspectRatio: "xMidYMid slice",
-      },
-      height: 64,
-      width: 160,
-    };
+const ParticipantsBTN = ({ isMobile, isTab }) => {
+  const { participants } = useMeeting();
+  const { sideBarMode, setSideBarMode } = useMeetingAppContext();
 
-    const isRecording = useIsRecording();
-    const isRecordingRef = useRef(isRecording);
+  return isMobile || isTab ? (
+    <MobileIconButton
+      tooltipTitle={"Participants"}
+      isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
+      buttonText={"Participants"}
+      disabledOpacity={1}
+      Icon={ParticipantsIcon}
+      onClick={() => {
+        setSideBarMode((s) =>
+          s === sideBarModes.PARTICIPANTS ? null : sideBarModes.PARTICIPANTS
+        );
+      }}
+      badge={`${new Map(participants)?.size}`}
+    />
+  ) : (
+    <OutlinedButton
+      Icon={ParticipantsIcon}
+      onClick={() => {
+        setSideBarMode((s) =>
+          s === sideBarModes.PARTICIPANTS ? null : sideBarModes.PARTICIPANTS
+        );
+      }}
+      isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
+      tooltip={"View \nParticipants"}
+      badge={`${new Map(participants)?.size}`}
+    />
+  );
+};
 
-    useEffect(() => {
-      isRecordingRef.current = isRecording;
-    }, [isRecording]);
-
-    const { isRequestProcessing } = useMemo(
-      () => ({
-        isRequestProcessing:
-          recordingState === Constants.recordingEvents.RECORDING_STARTING ||
-          recordingState === Constants.recordingEvents.RECORDING_STOPPING,
-      }),
-      [recordingState]
-    );
-
-    const _handleClick = () => {
-      const isRecording = isRecordingRef.current;
-
-      if (isRecording) {
-        stopRecording();
-      } else {
-        startRecording();
-      }
-    };
-
-    return (
-      <OutlinedButton
-        Icon={RecordingIcon}
-        onClick={_handleClick}
-        isFocused={isRecording}
-        tooltip={
-          recordingState === Constants.recordingEvents.RECORDING_STARTED
-            ? "Stop Recording"
-            : recordingState === Constants.recordingEvents.RECORDING_STARTING
-              ? "Starting Recording"
-              : recordingState === Constants.recordingEvents.RECORDING_STOPPED
-                ? "Start Recording"
-                : recordingState === Constants.recordingEvents.RECORDING_STOPPING
-                  ? "Stopping Recording"
-                  : "Start Recording"
-        }
-        lottieOption={isRecording ? defaultOptions : null}
-        isRequestProcessing={isRequestProcessing}
-      />
-    );
-  };
-
-  const ScreenShareBTN = ({ isMobile, isTab }) => {
-    const { localScreenShareOn, toggleScreenShare, presenterId } = useMeeting();
-
-    return isMobile || isTab ? (
-      <MobileIconButton
-        id="screen-share-btn"
-        tooltipTitle={
-          presenterId
-            ? localScreenShareOn
-              ? "Stop Presenting"
-              : null
-            : "Present Screen"
-        }
-        buttonText={
-          presenterId
-            ? localScreenShareOn
-              ? "Stop Presenting"
-              : null
-            : "Present Screen"
-        }
-        isFocused={localScreenShareOn}
-        Icon={ScreenShareIcon}
-        onClick={() => {
-          toggleScreenShare();
-        }}
-        disabled={
-          presenterId
-            ? localScreenShareOn
-              ? false
-              : true
-            : isMobile
-              ? true
-              : false
-        }
-      />
-    ) : (
-      <OutlinedButton
-        Icon={ScreenShareIcon}
-        onClick={() => {
-          toggleScreenShare();
-        }}
-        isFocused={localScreenShareOn}
-        tooltip={
-          presenterId
-            ? localScreenShareOn
-              ? "Stop Presenting"
-              : null
-            : "Present Screen"
-        }
-        disabled={presenterId ? (localScreenShareOn ? false : true) : false}
-      />
-    );
-  };
-
-  const LeaveBTN = () => {
-    const { leave } = useMeeting();
-
-    return (
-      <OutlinedButton
-        Icon={EndIcon}
-        bgColor="bg-red-150"
-        onClick={() => {
-          leave();
-          setIsMeetingLeft(true);
-        }}
-        tooltip="Leave Meeting"
-      />
-    );
-  };
-
-  const ChatBTN = ({ isMobile, isTab }) => {
-    return isMobile || isTab ? (
-      <MobileIconButton
-        tooltipTitle={"Chat"}
-        buttonText={"Chat"}
-        Icon={ChatIcon}
-        isFocused={sideBarMode === sideBarModes.CHAT}
-        onClick={() => {
-          setSideBarMode((s) =>
-            s === sideBarModes.CHAT ? null : sideBarModes.CHAT
-          );
-        }}
-      />
-    ) : (
-      <OutlinedButton
-        Icon={ChatIcon}
-        onClick={() => {
-          setSideBarMode((s) =>
-            s === sideBarModes.CHAT ? null : sideBarModes.CHAT
-          );
-        }}
-        isFocused={sideBarMode === "CHAT"}
-        tooltip="View Chat"
-      />
-    );
-  };
-
-  const ParticipantsBTN = ({ isMobile, isTab }) => {
-    const { participants } = useMeeting();
-    return isMobile || isTab ? (
-      <MobileIconButton
-        tooltipTitle={"Participants"}
-        isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
-        buttonText={"Participants"}
-        disabledOpacity={1}
-        Icon={ParticipantsIcon}
-        onClick={() => {
-          setSideBarMode((s) =>
-            s === sideBarModes.PARTICIPANTS ? null : sideBarModes.PARTICIPANTS
-          );
-        }}
-        badge={`${new Map(participants)?.size}`}
-      />
-    ) : (
-      <OutlinedButton
-        Icon={ParticipantsIcon}
-        onClick={() => {
-          setSideBarMode((s) =>
-            s === sideBarModes.PARTICIPANTS ? null : sideBarModes.PARTICIPANTS
-          );
-        }}
-        isFocused={sideBarMode === sideBarModes.PARTICIPANTS}
-        tooltip={"View \nParticipants"}
-        badge={`${new Map(participants)?.size}`}
-      />
-    );
-  };
-
-  const MeetingIdCopyBTN = () => {
-    const { meetingId } = useMeeting();
-    const [isCopied, setIsCopied] = useState(false);
-    return (
-      <div className="flex items-center justify-center lg:ml-0 ml-4 mt-4 xl:mt-0">
-        <div className="flex border-2 border-gray-850 p-2 rounded-md items-center justify-center">
-          <h1 className="text-white text-base ">{meetingId}</h1>
-          <button
-            className="ml-2"
-            onClick={() => {
-              navigator.clipboard.writeText(meetingId);
-              setIsCopied(true);
-              setTimeout(() => {
-                setIsCopied(false);
-              }, 3000);
-            }}
-          >
-            {isCopied ? (
-              <CheckIcon className="h-5 w-5 text-green-400" />
-            ) : (
-              <ClipboardIcon className="h-5 w-5 text-white" />
-            )}
-          </button>
-        </div>
+const MeetingIdCopyBTN = () => {
+  const { meetingId } = useMeeting();
+  const [isCopied, setIsCopied] = useState(false);
+  return (
+    <div className="flex items-center justify-center lg:ml-0 ml-4 mt-4 xl:mt-0">
+      <div className="flex border-2 border-gray-850 p-2 rounded-md items-center justify-center">
+        <h1 className="text-white text-base ">{meetingId}</h1>
+        <button
+          className="ml-2"
+          onClick={() => {
+            navigator.clipboard.writeText(meetingId);
+            setIsCopied(true);
+            setTimeout(() => {
+              setIsCopied(false);
+            }, 3000);
+          }}
+        >
+          {isCopied ? (
+            <CheckIcon className="h-5 w-5 text-green-400" />
+          ) : (
+            <ClipboardIcon className="h-5 w-5 text-white" />
+          )}
+        </button>
       </div>
-    );
-  };
+    </div>
+  );
+};
 
+export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
   const tollTipEl = useRef();
   const isMobile = useIsMobile();
   const isTab = useIsTab();
@@ -780,7 +765,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
       className="flex items-center justify-center"
       style={{ height: bottomBarHeight }}
     >
-      <LeaveBTN />
+      <LeaveBTN setIsMeetingLeft={setIsMeetingLeft} />
       <MicBTN />
       <WebCamBTN />
       <RecordingBTN />
@@ -872,7 +857,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
         <WebCamBTN />
         <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
         <PipBTN isMobile={isMobile} isTab={isTab} />
-        <LeaveBTN />
+        <LeaveBTN setIsMeetingLeft={setIsMeetingLeft} />
       </div>
       <div className="flex items-center justify-center">
         <ChatBTN isMobile={isMobile} isTab={isTab} />
