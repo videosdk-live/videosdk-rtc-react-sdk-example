@@ -26,3 +26,4 @@ package-lock.json
 
 
 .env
+.claude/

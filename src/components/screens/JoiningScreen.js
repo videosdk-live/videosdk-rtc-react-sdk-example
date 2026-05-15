@@ -28,6 +28,7 @@ export function JoiningScreen({
   onClickStartMeeting,
   customAudioStream,
   setCustomAudioStream,
+  customVideoStream,
   setCustomVideoStream,
   micOn,
   webcamOn,
@@ -432,7 +433,7 @@ export function JoiningScreen({
 
                     <div className="w-full relative" style={{ height: isMobile ? "45vh" : "55vh" }}>
                       <div className={`absolute  z-10 ${isMobile ? "right-0" : " right-2 top-2"}`}>
-                        <NetworkStats />
+                        <NetworkStats videoStream={customVideoStream} audioStream={customAudioStream} />
                       </div>
                       {isMobile && <audio
                         autoPlay
