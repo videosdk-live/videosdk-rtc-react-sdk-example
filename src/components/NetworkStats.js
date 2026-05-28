@@ -250,6 +250,15 @@ const NetworkStats = ({ videoStream, audioStream }) => {
       label: "Frame rate",
       cells: [fmtFps(up?.video?.fps), "-", fmtFps(down?.video?.fps), "-"],
     },
+    {
+      label: "Resolution",
+      cells: [
+        up?.video?.resolution ?? "-",
+        "-",
+        down?.video?.resolution ?? "-",
+        "-",
+      ],
+    },
   ];
 
   return (
