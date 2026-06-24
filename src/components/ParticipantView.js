@@ -1,6 +1,6 @@
 import { Popover, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
+import { Constants, useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { useMediaQuery } from "react-responsive";
 import useIsMobile from "../hooks/useIsMobile";
@@ -521,7 +521,8 @@ const ParticipantViewContent = ({ participantId }) => {
 export function ParticipantView({ participantId }) {
   const { mode } = useParticipant(participantId);
 
-  return mode === "SEND_AND_RECV" ? (
-    <ParticipantViewContent participantId={participantId} />
-  ) : null;
+  // Exclude SIGNALLING_ONLY (viewer) and RECV_ONLY participants from the video grid
+  if (mode === Constants.modes.SIGNALLING_ONLY || mode === Constants.modes.RECV_ONLY) return null;
+
+  return <ParticipantViewContent participantId={participantId} />;
 }

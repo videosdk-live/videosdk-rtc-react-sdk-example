@@ -1,8 +1,9 @@
 import { useMemo } from "react";
-import { Constants, useMeeting } from "@videosdk.live/react-sdk";
+import { Constants } from "@videosdk.live/react-sdk";
+import { useMeetingStore } from "../store/meetingStore";
 
 const useIsRecording = () => {
-  const { recordingState } = useMeeting();
+  const recordingState = useMeetingStore((s) => s.recordingState);
 
   const isRecording = useMemo(
     () =>

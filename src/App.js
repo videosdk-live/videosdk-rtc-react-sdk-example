@@ -1,10 +1,11 @@
-import { MeetingProvider } from "@videosdk.live/react-sdk";
+import { MeetingProvider, Constants } from "@videosdk.live/react-sdk";
 import { useEffect } from "react";
 import { useState } from "react";
 import { MeetingAppProvider } from "./MeetingAppContextDef";
 import { MeetingContainer } from "./meeting/MeetingContainer";
 import { LeaveScreen } from "./components/screens/LeaveScreen";
-import { JoiningScreen } from "./components/screens/JoiningScreen"
+import { JoiningScreen } from "./components/screens/JoiningScreen";
+import { MeetingStoreBridge } from "./store/MeetingStoreBridge";
 
 function App() {
   const [token, setToken] = useState("");
@@ -16,6 +17,7 @@ function App() {
   const [customVideoStream, setCustomVideoStream] = useState(null)
   const [isMeetingStarted, setMeetingStarted] = useState(false);
   const [isMeetingLeft, setIsMeetingLeft] = useState(false);
+  const [localParticipantMode, setLocalParticipantMode] = useState(Constants.modes.SEND_AND_RECV);
 
   const isMobile = window.matchMedia(
     "only screen and (max-width: 768px)"
@@ -37,17 +39,19 @@ function App() {
           <MeetingProvider
             config={{
               meetingId,
-              micEnabled: micOn,
-              webcamEnabled: webcamOn,
+              micEnabled: localParticipantMode === Constants.modes.SEND_AND_RECV ? micOn : false,
+              webcamEnabled: localParticipantMode === Constants.modes.SEND_AND_RECV ? webcamOn : false,
               name: participantName ? participantName : "TestUser",
               multiStream: true,
-              customCameraVideoTrack: customVideoStream,
-              customMicrophoneAudioTrack: customAudioStream
+              customCameraVideoTrack: (localParticipantMode === Constants.modes.SEND_AND_RECV && webcamOn) ? customVideoStream : null,
+              customMicrophoneAudioTrack: (localParticipantMode === Constants.modes.SEND_AND_RECV && micOn) ? customAudioStream : null,
+              mode: localParticipantMode,
             }}
             token={token}
             reinitialiseMeetingOnConfigChange={true}
             joinWithoutUserInteraction={true}
           >
+            <MeetingStoreBridge />
             <MeetingContainer
               onMeetingLeave={() => {
                 setToken("");
@@ -58,6 +62,7 @@ function App() {
                 setMeetingStarted(false);
               }}
               setIsMeetingLeft={setIsMeetingLeft}
+              localParticipantMode={localParticipantMode}
             />
           </MeetingProvider>
 
@@ -83,6 +88,8 @@ function App() {
             }}
             startMeeting={isMeetingStarted}
             setIsMeetingLeft={setIsMeetingLeft}
+            localParticipantMode={localParticipantMode}
+            setLocalParticipantMode={setLocalParticipantMode}
           />
         )}
       </MeetingAppProvider>

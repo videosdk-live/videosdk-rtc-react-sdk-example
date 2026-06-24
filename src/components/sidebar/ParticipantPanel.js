@@ -1,4 +1,5 @@
-import { useMeeting, useParticipant } from "@videosdk.live/react-sdk";
+import { useParticipant } from "@videosdk.live/react-sdk";
+import { useMeetingStore } from "../../store/meetingStore";
 import React, { useMemo } from "react";
 import MicOffIcon from "../../icons/ParticipantTabPanel/MicOffIcon";
 import MicOnIcon from "../../icons/ParticipantTabPanel/MicOnIcon";
@@ -58,8 +59,7 @@ function ParticipantListItem({ participantId, raisedHand }) {
 
 export function ParticipantPanel({ panelHeight }) {
   const { raisedHandsParticipants } = useMeetingAppContext();
-  const mMeeting = useMeeting();
-  const participants = mMeeting.participants;
+  const participants = useMeetingStore((s) => s.participants);
 
   const sortedRaisedHandsParticipants = useMemo(() => {
     const participantIds = [...participants.keys()];

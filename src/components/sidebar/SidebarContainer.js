@@ -1,5 +1,5 @@
-import { useMeeting } from "@videosdk.live/react-sdk";
 import React, { Fragment } from "react";
+import { useMeetingStore } from "../../store/meetingStore";
 import useIsMobile from "../../hooks/useIsMobile";
 import useIsTab from "../../hooks/useIsTab";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -18,7 +18,7 @@ const SideBarTabView = ({
   panelPadding,
   handleClose,
 }) => {
-  const { participants } = useMeeting();
+  const participants = useMeetingStore((s) => s.participants);
   const { sideBarMode } = useMeetingAppContext();
 
   return (

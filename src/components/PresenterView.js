@@ -1,4 +1,5 @@
-import { useMeeting, useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
+import { useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
+import { useMeetingStore } from "../store/meetingStore";
 import { useEffect, useRef } from "react";
 import MicOffSmallIcon from "../icons/MicOffSmallIcon";
 import ScreenShareIcon from "../icons/ScreenShareIcon";
@@ -123,7 +124,8 @@ const PresenterContent = ({ presenterId }) => {
 };
 
 export function PresenterView({ height }) {
-  const { presenterId, toggleScreenShare } = useMeeting();
+  const presenterId = useMeetingStore((s) => s.presenterId);
+  const toggleScreenShare = useMeetingStore((s) => s.toggleScreenShare);
 
   return (
     <div

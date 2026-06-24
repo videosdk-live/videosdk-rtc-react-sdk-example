@@ -1,4 +1,5 @@
-import { useMeeting, usePubSub } from "@videosdk.live/react-sdk";
+import { usePubSub } from "@videosdk.live/react-sdk";
+import { useMeetingStore } from "../../store/meetingStore";
 import React, { useEffect, useRef, useState } from "react";
 import { formatAMPM, json_verify, nameTructed } from "../../utils/helper";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
@@ -109,7 +110,7 @@ const ChatInput = ({ inputHeight }) => {
 
 const ChatMessages = ({ listHeight }) => {
   const listRef = useRef();
-  const { localParticipant } = useMeeting();
+  const localParticipant = useMeetingStore((s) => s.localParticipant);
   const localParticipantId = localParticipant?.id;
   const { messages } = usePubSub("CHAT");
 

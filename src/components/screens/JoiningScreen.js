@@ -18,6 +18,8 @@ import useMediaStream from "../../hooks/useMediaStream";
 import useIsMobile from "../../hooks/useIsMobile";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 
+const { SEND_AND_RECV, SIGNALLING_ONLY } = Constants.modes;
+
 export function JoiningScreen({
   participantName,
   setParticipantName,
@@ -32,6 +34,8 @@ export function JoiningScreen({
   setCustomVideoStream,
   micOn,
   webcamOn,
+  localParticipantMode,
+  setLocalParticipantMode,
 }) {
   const {
     selectedWebcam,
@@ -524,6 +528,25 @@ export function JoiningScreen({
               </div>
               <div className="md:col-span-5 2xl:col-span-5 col-span-12 md:relative">
                 <div className="flex flex-1 flex-col items-center justify-center xl:m-16 lg:m-6 md:mt-9 lg:mt-14 xl:mt-20 mt-3 md:absolute md:left-0 md:right-0 md:top-0 md:bottom-0">
+                  {/* Host / Viewer mode selector */}
+                  <div className="flex gap-2 mb-4 p-1 bg-gray-700 rounded-lg">
+                    {[
+                      { mode: SEND_AND_RECV, label: "Host" },
+                      { mode: SIGNALLING_ONLY, label: "Viewer" },
+                    ].map(({ mode, label }) => (
+                      <button
+                        key={mode}
+                        onClick={() => setLocalParticipantMode(mode)}
+                        className={`px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                          localParticipantMode === mode
+                            ? "bg-purple-600 text-white"
+                            : "text-gray-300 hover:text-white"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
                   <MeetingDetailsScreen
                     participantName={participantName}
                     setParticipantName={setParticipantName}

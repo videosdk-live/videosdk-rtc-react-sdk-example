@@ -1,9 +1,9 @@
 import {
   Constants,
-  useMeeting,
   usePubSub,
   useMediaDevice,
 } from "@videosdk.live/react-sdk";
+import { useMeetingStore } from "../../store/meetingStore";
 import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import {
   ClipboardIcon,
@@ -24,6 +24,7 @@ import ParticipantsIcon from "../../icons/Bottombar/ParticipantsIcon";
 import EndIcon from "../../icons/Bottombar/EndIcon";
 import RaiseHandIcon from "../../icons/Bottombar/RaiseHandIcon";
 import PipIcon from "../../icons/Bottombar/PipIcon";
+import HLSIcon from "../../icons/Bottombar/HLSIcon";
 import { OutlinedButton } from "../../components/buttons/OutlinedButton";
 import useIsTab from "../../hooks/useIsTab";
 import useIsMobile from "../../hooks/useIsMobile";
@@ -173,7 +174,9 @@ const MicBTN = () => {
     }
   });
 
-  const { localMicOn, changeMic, toggleMic } = useMeeting();
+  const localMicOn = useMeetingStore((s) => s.localMicOn);
+  const changeMic = useMeetingStore((s) => s.changeMic);
+  const toggleMic = useMeetingStore((s) => s.toggleMic);
   const [mics, setMics] = useState([]);
   const [speakers, setSpeakers] = useState([]);
 
@@ -339,7 +342,9 @@ const WebCamBTN = () => {
     useMeetingAppContext();
 
   const { getCameras } = useMediaDevice();
-  const { localWebcamOn, changeWebcam, toggleWebcam } = useMeeting();
+  const localWebcamOn = useMeetingStore((s) => s.localWebcamOn);
+  const changeWebcam = useMeetingStore((s) => s.changeWebcam);
+  const toggleWebcam = useMeetingStore((s) => s.toggleWebcam);
   const [webcams, setWebcams] = useState([]);
   const { getVideoTrack } = useMediaStream();
 
@@ -501,7 +506,9 @@ const RaiseHandBTN = ({ isMobile, isTab }) => {
 };
 
 const RecordingBTN = () => {
-  const { startRecording, stopRecording, recordingState } = useMeeting();
+  const startRecording = useMeetingStore((s) => s.startRecording);
+  const stopRecording = useMeetingStore((s) => s.stopRecording);
+  const recordingState = useMeetingStore((s) => s.recordingState);
   const defaultOptions = {
     loop: true,
     autoplay: true,
@@ -562,7 +569,9 @@ const RecordingBTN = () => {
 };
 
 const ScreenShareBTN = ({ isMobile, isTab }) => {
-  const { localScreenShareOn, toggleScreenShare, presenterId } = useMeeting();
+  const localScreenShareOn = useMeetingStore((s) => s.localScreenShareOn);
+  const toggleScreenShare = useMeetingStore((s) => s.toggleScreenShare);
+  const presenterId = useMeetingStore((s) => s.presenterId);
 
   return isMobile || isTab ? (
     <MobileIconButton
@@ -615,8 +624,59 @@ const ScreenShareBTN = ({ isMobile, isTab }) => {
   );
 };
 
+const HlsBTN = ({ isMobile, isTab }) => {
+  const startHls = useMeetingStore((s) => s.startHls);
+  const stopHls = useMeetingStore((s) => s.stopHls);
+  const hlsState = useMeetingStore((s) => s.hlsState);
+
+  const isHlsActive =
+    hlsState === Constants.hlsEvents.HLS_STARTED ||
+    hlsState === Constants.hlsEvents.HLS_PLAYABLE;
+  const isRequestProcessing =
+    hlsState === Constants.hlsEvents.HLS_STARTING ||
+    hlsState === Constants.hlsEvents.HLS_STOPPING;
+
+  const _handleClick = () => {
+    if (isHlsActive) {
+      stopHls();
+    } else {
+      startHls({
+        layout: { type: "SPOTLIGHT", priority: "PIN", gridSize: 4 },
+        theme: "DARK",
+      });
+    }
+  };
+
+  const tooltip = isHlsActive
+    ? "Stop Live Stream"
+    : isRequestProcessing
+      ? hlsState === Constants.hlsEvents.HLS_STARTING
+        ? "Starting…"
+        : "Stopping…"
+      : "Go Live (HLS)";
+
+  return isMobile || isTab ? (
+    <MobileIconButton
+      tooltipTitle={tooltip}
+      buttonText={tooltip}
+      isFocused={isHlsActive}
+      Icon={HLSIcon}
+      onClick={_handleClick}
+      isRequestProcessing={isRequestProcessing}
+    />
+  ) : (
+    <OutlinedButton
+      Icon={HLSIcon}
+      onClick={_handleClick}
+      isFocused={isHlsActive}
+      tooltip={tooltip}
+      isRequestProcessing={isRequestProcessing}
+    />
+  );
+};
+
 const LeaveBTN = ({ setIsMeetingLeft }) => {
-  const { leave } = useMeeting();
+  const leave = useMeetingStore((s) => s.leave);
 
   return (
     <OutlinedButton
@@ -661,7 +721,7 @@ const ChatBTN = ({ isMobile, isTab }) => {
 };
 
 const ParticipantsBTN = ({ isMobile, isTab }) => {
-  const { participants } = useMeeting();
+  const participants = useMeetingStore((s) => s.participants);
   const { sideBarMode, setSideBarMode } = useMeetingAppContext();
 
   return isMobile || isTab ? (
@@ -694,7 +754,7 @@ const ParticipantsBTN = ({ isMobile, isTab }) => {
 };
 
 const MeetingIdCopyBTN = () => {
-  const { meetingId } = useMeeting();
+  const meetingId = useMeetingStore((s) => s.meetingId);
   const [isCopied, setIsCopied] = useState(false);
   return (
     <div className="flex items-center justify-center lg:ml-0 ml-4 mt-4 xl:mt-0">
@@ -721,7 +781,8 @@ const MeetingIdCopyBTN = () => {
   );
 };
 
-export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
+export function BottomBar({ bottomBarHeight, setIsMeetingLeft, localParticipantMode }) {
+  const isHost = localParticipantMode === Constants.modes.SEND_AND_RECV;
   const tollTipEl = useRef();
   const isMobile = useIsMobile();
   const isTab = useIsTab();
@@ -747,6 +808,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
       RECORDING: "RECORDING",
       PIP: "PIP",
       MEETING_ID_COPY: "MEETING_ID_COPY",
+      HLS: "HLS",
     }),
     []
   );
@@ -755,6 +817,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
     { icon: BottomBarButtonTypes.RAISE_HAND },
     { icon: BottomBarButtonTypes.PIP },
     { icon: BottomBarButtonTypes.SCREEN_SHARE },
+    ...(isHost ? [{ icon: BottomBarButtonTypes.HLS }] : []),
     { icon: BottomBarButtonTypes.CHAT },
     { icon: BottomBarButtonTypes.PARTICIPANTS },
     { icon: BottomBarButtonTypes.MEETING_ID_COPY },
@@ -766,9 +829,9 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
       style={{ height: bottomBarHeight }}
     >
       <LeaveBTN setIsMeetingLeft={setIsMeetingLeft} />
-      <MicBTN />
-      <WebCamBTN />
-      <RecordingBTN />
+      {isHost && <MicBTN />}
+      {isHost && <WebCamBTN />}
+      {isHost && <RecordingBTN />}
       <OutlinedButton Icon={EllipsisHorizontalIcon} onClick={handleClickFAB} />
       <Transition appear show={Boolean(open)} as={Fragment}>
         <Dialog
@@ -833,6 +896,8 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
                               />
                             ) : icon === BottomBarButtonTypes.PIP ? (
                               <PipBTN isMobile={isMobile} isTab={isTab} />
+                            ) : icon === BottomBarButtonTypes.HLS ? (
+                              <HlsBTN isMobile={isMobile} isTab={isTab} />
                             ) : null}
                           </div>
                         );
@@ -851,12 +916,13 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
       <MeetingIdCopyBTN />
 
       <div className="flex flex-1 items-center justify-center" ref={tollTipEl}>
-        <RecordingBTN />
-        <RaiseHandBTN isMobile={isMobile} isTab={isTab} />
-        <MicBTN />
-        <WebCamBTN />
-        <ScreenShareBTN isMobile={isMobile} isTab={isTab} />
-        <PipBTN isMobile={isMobile} isTab={isTab} />
+        {isHost && <RecordingBTN />}
+        {isHost && <HlsBTN />}
+        {isHost && <RaiseHandBTN isMobile={isMobile} isTab={isTab} />}
+        {isHost && <MicBTN />}
+        {isHost && <WebCamBTN />}
+        {isHost && <ScreenShareBTN isMobile={isMobile} isTab={isTab} />}
+        {isHost && <PipBTN isMobile={isMobile} isTab={isTab} />}
         <LeaveBTN setIsMeetingLeft={setIsMeetingLeft} />
       </div>
       <div className="flex items-center justify-center">

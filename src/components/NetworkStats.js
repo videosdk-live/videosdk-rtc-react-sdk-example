@@ -152,24 +152,24 @@ const NetworkStats = ({ videoStream, audioStream }) => {
         setStatus("error");
         return;
       }
-      runPreCallTest({
-        token,
-        videoTrack: videoStream,
-        audioTrack: audioStream,
-        onStatsChange: (stats) => {
-          if (finalReceivedRef.current) return;
-          setNetworkQuality(stats);
-        },
-      })
-        .then((result) => {
-          finalReceivedRef.current = true;
-          setNetworkQuality(result.networkQuality);
-          setStatus("ready");
-        })
-        .catch((err) => {
-          setErrorMsg(err?.message || "Test failed");
-          setStatus("error");
-        });
+      // runPreCallTest({
+      //   token,
+      //   videoTrack: videoStream,
+      //   audioTrack: audioStream,
+      //   onStatsChange: (stats) => {
+      //     if (finalReceivedRef.current) return;
+      //     setNetworkQuality(stats);
+      //   },
+      // })
+      //   .then((result) => {
+      //     finalReceivedRef.current = true;
+      //     setNetworkQuality(result.networkQuality);
+      //     setStatus("ready");
+      //   })
+      //   .catch((err) => {
+      //     setErrorMsg(err?.message || "Test failed");
+      //     setStatus("error");
+      //   });
     } catch (err) {
       setErrorMsg(err?.message || "Test failed");
       setStatus("error");

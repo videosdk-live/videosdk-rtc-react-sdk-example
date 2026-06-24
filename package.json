@@ -2,12 +2,14 @@
   "name": "react-sdk-example",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://lab.videosdk.live/react-rtc-demo/",
+  "homepage": "https://lab.videosdk.live/build/",
   "dependencies": {
+    "@100mslive/hls-player": "^0.5.3",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.2.0",
     "@popperjs/core": "^2.11.8",
-    "@videosdk.live/react-sdk": "^0.11.0",
+    "@videosdk.live/react-sdk": "0.12.6",
+    "hls.js": "^1.6.16",
     "lottie-react": "^2.4.1",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-loader": "^8.1.1",
@@ -17,7 +19,8 @@
     "react-responsive": "^10.0.1",
     "react-scripts": "5.0.1",
     "react-toastify": "^11.0.5",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "zustand": "^5.0.14"
   },
   "overrides": {
     "nth-check": "2.1.1",

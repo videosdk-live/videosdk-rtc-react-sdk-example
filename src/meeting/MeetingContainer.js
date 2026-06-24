@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef, createRef, memo } from "react";
 import { Constants, useMeeting, useParticipant, usePubSub } from "@videosdk.live/react-sdk";
+import { useMeetingStore } from "../store/meetingStore";
 import { BottomBar } from "./components/BottomBar";
 import { SidebarConatiner } from "../components/sidebar/SidebarContainer";
 import MemorizedParticipantView from "./components/ParticipantView";
 import { PresenterView } from "../components/PresenterView";
 import { nameTructed, trimSnackBarText } from "../utils/helper";
+import { HLSPlayer } from "../components/HLSPlayer";
 import WaitingToJoinScreen from "../components/screens/WaitingToJoinScreen";
 import ConfirmBox from "../components/ConfirmBox";
 import useIsMobile from "../hooks/useIsMobile";
@@ -41,9 +43,12 @@ const MeetingContent = React.memo(({
   bottomBarHeight,
   isMobile,
   sideBarContainerWidth,
+  localParticipantMode,
 }) => {
-  const { presenterId, participants } = useMeeting();
+  const presenterId = useMeetingStore((s) => s.presenterId);
+  const participants = useMeetingStore((s) => s.participants);
   const isPresenting = presenterId ? true : false;
+  const isViewer = localParticipantMode === Constants.modes.SIGNALLING_ONLY;
 
   const [participantsData, setParticipantsData] = useState([]);
 
@@ -55,6 +60,14 @@ const MeetingContent = React.memo(({
 
     return () => clearTimeout(debounceTimeout);
   }, [participants]);
+
+  if (isViewer) {
+    return (
+      <div className="flex flex-1 flex-row bg-gray-800">
+        <HLSPlayer />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -84,6 +97,7 @@ const MeetingContent = React.memo(({
 export function MeetingContainer({
   onMeetingLeave,
   setIsMeetingLeft,
+  localParticipantMode,
 }) {
   const {
     setSelectedMic,
@@ -195,6 +209,7 @@ export function MeetingContainer({
   }
 
   const _handleOnError = (data) => {
+    console.log("error ",data);
     const { code, message } = data;
 
     const joiningErrCodes = [
@@ -213,14 +228,18 @@ export function MeetingContainer({
     setMeetingErrorVisible(true);
     setMeetingError({
       code,
-      message: isJoiningError ? "Unable to join meeting!" : message,
+      message: message,
     });
   };
 
+  // localParticipant and isMeetingJoined are read directly from the SDK here
+  // (not the store) to avoid a timing gap: onEntryResponded fires before the
+  // bridge's useEffect has a chance to populate the Zustand store, which would
+  // leave localParticipantRef.current null and gate the UI on forever.
   const { isMeetingJoined, localParticipant } = useMeeting({
     onParticipantJoined,
     onEntryResponded,
-    onMeetingStateChanged: ({state}) => {
+    onMeetingStateChanged: ({ state }) => {
       toast(`Meeting is in ${state} state`, {
         position: "bottom-left",
         autoClose: 4000,
@@ -235,6 +254,27 @@ export function MeetingContainer({
     onMeetingLeft,
     onError: _handleOnError,
     onRecordingStateChanged: _handleOnRecordingStateChanged,
+    onHlsStateChanged: ({ status }) => {
+      const hlsMessages = {
+        [Constants.hlsEvents.HLS_STARTING]: "Live stream is starting…",
+        [Constants.hlsEvents.HLS_STARTED]: "Live stream started.",
+        [Constants.hlsEvents.HLS_PLAYABLE]: "Live stream is now playable.",
+        [Constants.hlsEvents.HLS_STOPPING]: "Live stream is stopping…",
+        [Constants.hlsEvents.HLS_STOPPED]: "Live stream stopped.",
+      };
+      if (hlsMessages[status]) {
+        toast(hlsMessages[status], {
+          position: "bottom-left",
+          autoClose: 4000,
+          hideProgressBar: true,
+          closeButton: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      }
+    },
   });
 
   useEffect(() => {
@@ -311,11 +351,13 @@ export function MeetingContainer({
                 bottomBarHeight={bottomBarHeight}
                 isMobile={isMobile}
                 sideBarContainerWidth={sideBarContainerWidth}
+                localParticipantMode={localParticipantMode}
               />
 
               <BottomBar
                 bottomBarHeight={bottomBarHeight}
                 setIsMeetingLeft={setIsMeetingLeft}
+                localParticipantMode={localParticipantMode}
               />
             </>
           ) : (
