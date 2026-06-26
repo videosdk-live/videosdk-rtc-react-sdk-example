@@ -4,13 +4,13 @@ function RefreshIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="13"
-      height="12"
+      width="16"
+      height="16"
       fill="none"
       viewBox="0 0 13 12"
     >
       <path
-        stroke="#B4B4B4"
+        stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
         strokeWidth="1.25"
