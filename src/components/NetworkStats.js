@@ -123,6 +123,21 @@ const StatsPanelPositioner = ({ buttonRef, children }) => {
   );
 };
 
+const QUALITY_BG = {
+  5: "#3BA55D",
+  4: "#7BC96F",
+  3: "#faa713",
+  2: "#FF8A4C",
+  1: "#FF5D5D",
+};
+const QUALITY_LABEL = {
+  5: "Excellent",
+  4: "Good",
+  3: "Fair",
+  2: "Poor",
+  1: "Bad",
+};
+
 const NetworkStats = ({ videoStream, audioStream }) => {
   const isMobile = useIsMobile();
   const isTab = useIsTab();
@@ -198,21 +213,6 @@ const NetworkStats = ({ videoStream, audioStream }) => {
       runTest();
     }
   }, [videoStream, audioStream, runTest]);
-
-  const QUALITY_BG = {
-    5: "#3BA55D",
-    4: "#7BC96F",
-    3: "#faa713",
-    2: "#FF8A4C",
-    1: "#FF5D5D",
-  };
-  const QUALITY_LABEL = {
-    5: "Excellent",
-    4: "Good",
-    3: "Fair",
-    2: "Poor",
-    1: "Bad",
-  };
 
   const overall = overallQuality(networkQuality);
   const overallBg = QUALITY_BG[overall] || "#3F4346";
