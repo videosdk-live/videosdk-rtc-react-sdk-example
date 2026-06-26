@@ -18,36 +18,39 @@ import { getToken } from "../api";
 import useIsMobile from "../hooks/useIsMobile";
 import useIsTab from "../hooks/useIsTab";
 
-const STATS_PANEL_WIDTH = 440;
-const LABEL_COL_PX = 120;
-const DATA_COL_PX = 80;
-const VIEWPORT_MARGIN = 8;
+const NETWORK_QUALITY_PANEL_WIDTH = 440;
+const METRIC_LABEL_COL_WIDTH = 120;
+const METRIC_DATA_COL_WIDTH = 80;
+const PANEL_VIEWPORT_MARGIN = 8;
 
-const fmtMs = (v) => (v == null ? "-" : `${Math.round(v)} ms`);
-const fmtPct = (v) => (v == null ? "-" : `${v.toFixed(2)}%`);
-const fmtKbps = (bps) => (bps == null ? "-" : `${Math.round(bps / 1000)} kb/s`);
-const fmtFps = (v) => (v == null ? "-" : `${Math.round(v)}`);
+const formatMs = (v) => (v == null ? "-" : `${Math.round(v)} ms`);
+const formatPercent = (v) => (v == null ? "-" : `${v.toFixed(2)}%`);
+const formatKbps = (bps) => (bps == null ? "-" : `${Math.round(bps / 1000)} kb/s`);
+const formatFps = (v) => (v == null ? "-" : `${Math.round(v)}`);
 
-const overallQuality = (nq) => {
-  if (!nq) return 0;
-  const u = nq.uplink?.quality ?? 0;
-  const d = nq.downlink?.quality ?? 0;
-  if (!u && !d) return 0;
-  if (!u) return d;
-  if (!d) return u;
-  return Math.min(u, d);
+const overallQuality = (networkQuality) => {
+  if (!networkQuality) return 0;
+  const uplinkQuality = networkQuality.uplink?.quality ?? 0;
+  const downlinkQuality = networkQuality.downlink?.quality ?? 0;
+  if (!uplinkQuality && !downlinkQuality) return 0;
+  if (!uplinkQuality) return downlinkQuality;
+  if (!downlinkQuality) return uplinkQuality;
+  return Math.min(uplinkQuality, downlinkQuality);
 };
 
 const StatsPanelPositioner = ({ buttonRef, children }) => {
-  const [el, setEl] = useState(null);
-  const [btnRect, setBtnRect] = useState(null);
+  const [panelEl, setPanelEl] = useState(null);
+  const [buttonRect, setButtonRect] = useState(null);
   const [panelHeight, setPanelHeight] = useState(0);
+  const [viewportWidth, setViewportWidth] = useState(
+    typeof window !== "undefined" ? window.innerWidth : NETWORK_QUALITY_PANEL_WIDTH
+  );
 
-  const updateRect = useCallback(() => {
-    const btn = buttonRef.current;
-    if (!btn) return;
-    const rect = btn.getBoundingClientRect();
-    setBtnRect({
+  const updateButtonRect = useCallback(() => {
+    const button = buttonRef.current;
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
+    setButtonRect({
       top: rect.top,
       bottom: rect.bottom,
       left: rect.left,
@@ -56,54 +59,61 @@ const StatsPanelPositioner = ({ buttonRef, children }) => {
   }, [buttonRef]);
 
   useLayoutEffect(() => {
-    updateRect();
-    window.addEventListener("resize", updateRect);
-    window.addEventListener("scroll", updateRect, true);
-    return () => {
-      window.removeEventListener("resize", updateRect);
-      window.removeEventListener("scroll", updateRect, true);
+    const handleResize = () => {
+      setViewportWidth(window.innerWidth);
+      updateButtonRect();
     };
-  }, [updateRect]);
+    updateButtonRect();
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("scroll", updateButtonRect, true);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("scroll", updateButtonRect, true);
+    };
+  }, [updateButtonRect]);
 
   useLayoutEffect(() => {
-    if (!el) return;
-    const measure = () => setPanelHeight(el.offsetHeight);
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [el]);
+    if (!panelEl) return;
+    const measureHeight = () => setPanelHeight(panelEl.offsetHeight);
+    measureHeight();
+    const resizeObserver = new ResizeObserver(measureHeight);
+    resizeObserver.observe(panelEl);
+    return () => resizeObserver.disconnect();
+  }, [panelEl]);
+
+  const effectivePanelWidth = Math.min(
+    NETWORK_QUALITY_PANEL_WIDTH,
+    viewportWidth - PANEL_VIEWPORT_MARGIN * 2
+  );
 
   const positionStyle = (() => {
-    if (!btnRect) {
+    if (!buttonRect) {
       return { top: -9999, left: -9999, visibility: "hidden" };
     }
-    const vw =
-      typeof window !== "undefined" ? window.innerWidth : STATS_PANEL_WIDTH;
 
-    const leftIfRightAnchored = btnRect.right - STATS_PANEL_WIDTH;
+    const leftIfRightAnchored = buttonRect.right - effectivePanelWidth;
     const horizontal =
-      leftIfRightAnchored < VIEWPORT_MARGIN
-        ? { left: VIEWPORT_MARGIN, right: "auto" }
+      leftIfRightAnchored < PANEL_VIEWPORT_MARGIN
+        ? { left: PANEL_VIEWPORT_MARGIN, right: "auto" }
         : {
-            right: Math.max(VIEWPORT_MARGIN, vw - btnRect.right),
+            right: Math.max(PANEL_VIEWPORT_MARGIN, viewportWidth - buttonRect.right),
             left: "auto",
           };
 
     const vertical =
       panelHeight === 0
-        ? { top: btnRect.top, visibility: "hidden" }
-        : { top: Math.max(VIEWPORT_MARGIN, btnRect.top) };
+        ? { top: buttonRect.top, visibility: "hidden" }
+        : { top: Math.max(PANEL_VIEWPORT_MARGIN, buttonRect.top) };
 
     return { ...horizontal, ...vertical };
   })();
 
   return (
     <div
-      ref={setEl}
+      ref={setPanelEl}
       style={{
         position: "fixed",
-        width: STATS_PANEL_WIDTH,
+        width: effectivePanelWidth,
         zIndex: 999,
         ...positionStyle,
       }}
@@ -135,10 +145,13 @@ const NetworkStats = ({ videoStream, audioStream }) => {
   const hasRunInitial = useRef(false);
   const inFlight = useRef(false);
   const finalReceivedRef = useRef(false);
+  const mountedRef = useRef(true);
 
   const buttonRef = useRef(null);
 
-  const runTest = async () => {
+  useEffect(() => () => { mountedRef.current = false; }, []);
+
+  const runTest = useCallback(async () => {
     if (inFlight.current) return;
     inFlight.current = true;
     setStatus("running");
@@ -148,35 +161,35 @@ const NetworkStats = ({ videoStream, audioStream }) => {
     try {
       const token = await getToken();
       if (!token) {
-        setErrorMsg("Missing token");
-        setStatus("error");
+        if (mountedRef.current) {
+          setErrorMsg("Missing token");
+          setStatus("error");
+        }
         return;
       }
-      runPreCallTest({
+      const result = await runPreCallTest({
         token,
         videoTrack: videoStream,
         audioTrack: audioStream,
         onStatsChange: (stats) => {
-          if (finalReceivedRef.current) return;
+          if (finalReceivedRef.current || !mountedRef.current) return;
           setNetworkQuality(stats);
         },
-      })
-        .then((result) => {
-          finalReceivedRef.current = true;
-          setNetworkQuality(result.networkQuality);
-          setStatus("ready");
-        })
-        .catch((err) => {
-          setErrorMsg(err?.message || "Test failed");
-          setStatus("error");
-        });
+      });
+      if (mountedRef.current) {
+        finalReceivedRef.current = true;
+        setNetworkQuality(result.networkQuality);
+        setStatus("ready");
+      }
     } catch (err) {
-      setErrorMsg(err?.message || "Test failed");
-      setStatus("error");
+      if (mountedRef.current) {
+        setErrorMsg(err?.message || "Test failed");
+        setStatus("error");
+      }
     } finally {
       inFlight.current = false;
     }
-  };
+  }, [videoStream, audioStream]);
 
   useEffect(() => {
     if (hasRunInitial.current) return;
@@ -184,8 +197,7 @@ const NetworkStats = ({ videoStream, audioStream }) => {
       hasRunInitial.current = true;
       runTest();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [videoStream, audioStream]);
+  }, [videoStream, audioStream, runTest]);
 
   const QUALITY_BG = {
     5: "#3BA55D",
@@ -206,56 +218,61 @@ const NetworkStats = ({ videoStream, audioStream }) => {
   const overallBg = QUALITY_BG[overall] || "#3F4346";
   const overallLabel = QUALITY_LABEL[overall] || "—";
 
-  const up = networkQuality?.uplink;
-  const down = networkQuality?.downlink;
+  const uplinkStats = networkQuality?.uplink;
+  const downlinkStats = networkQuality?.downlink;
 
   const metricRows = [
     {
       label: "Latency",
       cells: [
-        fmtMs(up?.video?.rtt),
-        fmtMs(up?.audio?.rtt),
-        fmtMs(down?.video?.rtt),
-        fmtMs(down?.audio?.rtt),
+        formatMs(uplinkStats?.video?.rtt),
+        formatMs(uplinkStats?.audio?.rtt),
+        formatMs(downlinkStats?.video?.rtt),
+        formatMs(downlinkStats?.audio?.rtt),
       ],
     },
     {
       label: "Jitter",
       cells: [
-        fmtMs(up?.video?.jitter),
-        fmtMs(up?.audio?.jitter),
-        fmtMs(down?.video?.jitter),
-        fmtMs(down?.audio?.jitter),
+        formatMs(uplinkStats?.video?.jitter),
+        formatMs(uplinkStats?.audio?.jitter),
+        formatMs(downlinkStats?.video?.jitter),
+        formatMs(downlinkStats?.audio?.jitter),
       ],
     },
     {
       label: "Packet Loss",
       cells: [
-        fmtPct(up?.video?.packetLoss),
-        fmtPct(up?.audio?.packetLoss),
-        fmtPct(down?.video?.packetLoss),
-        fmtPct(down?.audio?.packetLoss),
+        formatPercent(uplinkStats?.video?.packetLoss),
+        formatPercent(uplinkStats?.audio?.packetLoss),
+        formatPercent(downlinkStats?.video?.packetLoss),
+        formatPercent(downlinkStats?.audio?.packetLoss),
       ],
     },
     {
       label: "Bitrate",
       cells: [
-        fmtKbps(up?.video?.bitrate),
-        fmtKbps(up?.audio?.bitrate),
-        fmtKbps(down?.video?.bitrate),
-        fmtKbps(down?.audio?.bitrate),
+        formatKbps(uplinkStats?.video?.bitrate),
+        formatKbps(uplinkStats?.audio?.bitrate),
+        formatKbps(downlinkStats?.video?.bitrate),
+        formatKbps(downlinkStats?.audio?.bitrate),
       ],
     },
     {
       label: "Frame rate",
-      cells: [fmtFps(up?.video?.fps), "-", fmtFps(down?.video?.fps), "-"],
+      cells: [
+        formatFps(uplinkStats?.video?.fps),
+        "-",
+        formatFps(downlinkStats?.video?.fps),
+        "-",
+      ],
     },
     {
       label: "Resolution",
       cells: [
-        up?.video?.resolution ?? "-",
+        uplinkStats?.video?.resolution ?? "-",
         "-",
-        down?.video?.resolution ?? "-",
+        downlinkStats?.video?.resolution ?? "-",
         "-",
       ],
     },
@@ -273,6 +290,7 @@ const NetworkStats = ({ videoStream, audioStream }) => {
           <>
             <Popover.Button
               ref={buttonRef}
+              aria-label={`Network quality: ${overallLabel}`}
               className={`rounded-md flex items-center justify-center p-1.5 cursor-pointer`}
               style={{ backgroundColor: overallBg }}
               onClick={(e) => {
@@ -306,7 +324,7 @@ const NetworkStats = ({ videoStream, audioStream }) => {
                   <StatsPanelPositioner buttonRef={buttonRef}>
                     <div
                       className="bg-gray-800 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5"
-                      style={{ width: STATS_PANEL_WIDTH }}
+                      style={{ width: "100%" }}
                     >
                       <div
                         className={`p-[9px] flex items-center justify-between rounded-t-lg`}
@@ -366,11 +384,11 @@ const NetworkStats = ({ videoStream, audioStream }) => {
                             className="flex"
                             style={{ borderBottom: `1px solid #ffffff33` }}
                           >
-                            <div style={{ width: LABEL_COL_PX }} />
+                            <div style={{ width: METRIC_LABEL_COL_WIDTH }} />
                             <div
                               className="flex items-center justify-center"
                               style={{
-                                width: DATA_COL_PX * 2,
+                                width: METRIC_DATA_COL_WIDTH * 2,
                                 borderLeft: `1px solid #ffffff33`,
                               }}
                             >
@@ -381,7 +399,7 @@ const NetworkStats = ({ videoStream, audioStream }) => {
                             <div
                               className="flex items-center justify-center"
                               style={{
-                                width: DATA_COL_PX * 2,
+                                width: METRIC_DATA_COL_WIDTH * 2,
                                 borderLeft: `1px solid #ffffff33`,
                               }}
                             >
@@ -395,14 +413,14 @@ const NetworkStats = ({ videoStream, audioStream }) => {
                             className="flex"
                             style={{ borderBottom: `1px solid #ffffff33` }}
                           >
-                            <div style={{ width: LABEL_COL_PX }} />
+                            <div style={{ width: METRIC_LABEL_COL_WIDTH }} />
                             {["Video", "Audio", "Video", "Audio"].map(
                               (h, i) => (
                                 <div
                                   key={i}
                                   className="flex items-center justify-center"
                                   style={{
-                                    width: DATA_COL_PX,
+                                    width: METRIC_DATA_COL_WIDTH,
                                     borderLeft: `1px solid #ffffff33`,
                                   }}
                                 >
@@ -427,7 +445,7 @@ const NetworkStats = ({ videoStream, audioStream }) => {
                             >
                               <div
                                 className="flex items-center"
-                                style={{ width: LABEL_COL_PX }}
+                                style={{ width: METRIC_LABEL_COL_WIDTH }}
                               >
                                 <p className="text-xs text-white my-[6px] ml-2">
                                   {item.label}
@@ -438,7 +456,7 @@ const NetworkStats = ({ videoStream, audioStream }) => {
                                   key={cIdx}
                                   className="flex items-center justify-center"
                                   style={{
-                                    width: DATA_COL_PX,
+                                    width: METRIC_DATA_COL_WIDTH,
                                     borderLeft: `1px solid #ffffff33`,
                                   }}
                                 >
