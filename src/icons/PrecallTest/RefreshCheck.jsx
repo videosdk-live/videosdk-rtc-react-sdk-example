@@ -4,15 +4,15 @@ function RefreshCheck() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      width="14"
-      height="14"
+      width="16"
+      height="16"
       fill="none"
       viewBox="0 0 14 14"
-      className="animate-spin mr-2"
+      className="animate-spin"
     >
       <g clipPath="url(#clip0_20_477)">
         <path
-          stroke="#B4B4B4"
+          stroke="currentColor"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="1.25"

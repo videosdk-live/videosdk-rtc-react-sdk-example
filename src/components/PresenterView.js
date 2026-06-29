@@ -1,5 +1,5 @@
 import { useMeeting, useParticipant, VideoPlayer } from "@videosdk.live/react-sdk";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import MicOffSmallIcon from "../icons/MicOffSmallIcon";
 import ScreenShareIcon from "../icons/ScreenShareIcon";
 import SpeakerIcon from "../icons/SpeakerIcon";
@@ -80,9 +80,14 @@ const StopPresentingOverlay = ({ presenterId, toggleScreenShare }) => {
 const PresenterContent = ({ presenterId }) => {
   const { isLocal, micOn, displayName, isActiveSpeaker } =
     useParticipant(presenterId);
+  const [mouseOver, setMouseOver] = useState(false);
 
   return (
-    <div className={"video-contain absolute h-full w-full"}>
+    <div
+      className={"video-contain absolute h-full w-full"}
+      onMouseEnter={() => setMouseOver(true)}
+      onMouseLeave={() => setMouseOver(false)}
+    >
       <VideoPlayer
         participantId={presenterId}
         type="share"
@@ -118,6 +123,14 @@ const PresenterContent = ({ presenterId }) => {
             : `${nameTructed(displayName, 15)} is presenting`}
         </p>
       </div>
+
+      {!isLocal && (
+        <CornerDisplayName
+          participantId={presenterId}
+          isPresenting={true}
+          mouseOver={mouseOver}
+        />
+      )}
     </div>
   );
 };
