@@ -2,8 +2,8 @@ import { Popover, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import * as ReactDOM from "react-dom";
 import { useMediaQuery } from "react-responsive";
-import RefreshIcon from "../icons/NetworkStats/RefreshIcon";
-import RefreshCheck from "../icons/NetworkStats/RefreshCheck";
+import RefreshIcon from "../icons/PrecallTest/RefreshIcon";
+import RefreshCheck from "../icons/PrecallTest/RefreshCheck";
 import NetworkIcon from "../icons/NetworkIcon";
 import { runPreCallTest } from "@videosdk.live/react-sdk";
 import {
@@ -138,7 +138,7 @@ const QUALITY_LABEL = {
   1: "Bad",
 };
 
-const NetworkStats = ({ videoStream, audioStream }) => {
+const RunPrecallTest = ({ videoStream, audioStream }) => {
   const isMobile = useIsMobile();
   const isTab = useIsTab();
   const isLGDesktop = useMediaQuery({ minWidth: 1024, maxWidth: 1439 });
@@ -482,4 +482,4 @@ const NetworkStats = ({ videoStream, audioStream }) => {
   );
 };
 
-export default NetworkStats;
+export default RunPrecallTest;

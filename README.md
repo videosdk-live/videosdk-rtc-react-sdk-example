@@ -147,7 +147,7 @@ The token is used to create and validate a meeting using API and also initialize
 
 - **[components/DropDownSpeaker.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/DropDownSpeaker.js)** : Allows users to select speakers, test them with sample sounds, and track playback progress for confirmation.
 
-- **[components/NetworkStats.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/NetworkStats.js)** : Displays real-time network statistics, such as upload and download speeds.
+- **[components/RunPrecallTest.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/RunPrecallTest.js)** : Runs a pre-call test to measure network quality (uplink/downlink latency, jitter, packet loss, bitrate, frame rate, and resolution) before joining the meeting.
 
 <p align="center">
 <img width="600" height="338" src="public/precall-screen.gif"/>

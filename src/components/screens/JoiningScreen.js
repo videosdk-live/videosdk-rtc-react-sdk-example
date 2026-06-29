@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 import { Constants, useMediaDevice } from "@videosdk.live/react-sdk";
 import MicPermissionDenied from "../../icons/MicPermissionDenied";
 import CameraPermissionDenied from "../../icons/CameraPermissionDenied";
-import NetworkStats from "../NetworkStats";
+import RunPrecallTest from "../RunPrecallTest";
 import DropDownCam from "../DropDownCam";
 import DropDownSpeaker from "../DropDownSpeaker";
 import DropDown from "../DropDown";
@@ -433,7 +433,7 @@ export function JoiningScreen({
 
                     <div className="w-full relative" style={{ height: isMobile ? "45vh" : "55vh" }}>
                       <div className={`absolute  z-10 ${isMobile ? "right-0" : " right-2 top-2"}`}>
-                        <NetworkStats videoStream={customVideoStream} audioStream={customAudioStream} />
+                        <RunPrecallTest videoStream={customVideoStream} audioStream={customAudioStream} />
                       </div>
                       {isMobile && <audio
                         autoPlay
