@@ -98,17 +98,26 @@ const CornerDisplayStats = ({ participantId, isPresenting }) => {
     let stats = [];
     let audioStats = [];
     let videoStats = [];
-    if (isPresenting) {
-      stats = await getShareStats();
-    } else if (webcamStream) {
-      stats = await getVideoStats();
-    } else if (micStream) {
-      stats = await getAudioStats();
-    }
+    try {
+      if (isPresenting) {
+        stats = await getShareStats();
+      } else if (webcamStream) {
+        stats = await getVideoStats();
+      } else if (micStream) {
+        stats = await getAudioStats();
+      }
 
-    if (webcamStream || micStream || isPresenting) {
-      videoStats = isPresenting ? await getShareStats() : await getVideoStats();
-      audioStats = isPresenting ? await getShareAudioStats() : await getAudioStats();
+      if (webcamStream || micStream || isPresenting) {
+        videoStats = isPresenting
+          ? await getShareStats()
+          : await getVideoStats();
+        audioStats = isPresenting
+          ? await getShareAudioStats()
+          : await getAudioStats();
+      }
+    } catch (e) {
+      console.log("Error in fetching participant stats", e);
+      return;
     }
 
     let score = stats

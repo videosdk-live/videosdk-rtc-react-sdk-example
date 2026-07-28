@@ -178,11 +178,15 @@ const MicBTN = () => {
   const [speakers, setSpeakers] = useState([]);
 
   const getMics = async () => {
-    const mics = await getMicrophones();
-    const speakers = await getPlaybackDevices();
+    try {
+      const mics = await getMicrophones();
+      const speakers = await getPlaybackDevices();
 
-    mics && mics?.length && setMics(mics);
-    speakers && speakers?.length && setSpeakers(speakers);
+      mics && mics?.length && setMics(mics);
+      speakers && speakers?.length && setSpeakers(speakers);
+    } catch (e) {
+      console.log("Error in getMicrophones/getPlaybackDevices", e);
+    }
   };
 
   const [tooltipShow, setTooltipShow] = useState(false);
@@ -203,8 +207,12 @@ const MicBTN = () => {
     <>
       <OutlinedButton
         Icon={localMicOn ? MicOnIcon : MicOffIcon}
-        onClick={() => {
-          toggleMic();
+        onClick={async () => {
+          try {
+            await toggleMic();
+          } catch (e) {
+            console.log("Error in toggleMic", e);
+          }
         }}
         bgColor={localMicOn ? "bg-gray-750" : "bg-white"}
         borderColor={localMicOn && "#ffffff33"}
@@ -267,9 +275,13 @@ const MicBTN = () => {
                                         "bg-gray-150"
                                         }`}
                                       key={`mics_${deviceId}`}
-                                      onClick={() => {
+                                      onClick={async () => {
                                         setSelectedMic({ id: deviceId });
-                                        changeMic(deviceId);
+                                        try {
+                                          await changeMic(deviceId);
+                                        } catch (e) {
+                                          console.log("Error in changeMic", e);
+                                        }
                                         close();
                                       }}
                                     >
@@ -344,8 +356,12 @@ const WebCamBTN = () => {
   const { getVideoTrack } = useMediaStream();
 
   const getWebcams = async () => {
-    let webcams = await getCameras();
-    webcams && webcams?.length && setWebcams(webcams);
+    try {
+      let webcams = await getCameras();
+      webcams && webcams?.length && setWebcams(webcams);
+    } catch (e) {
+      console.log("Error in getCameras", e);
+    }
   };
 
   const [tooltipShow, setTooltipShow] = useState(false);
@@ -367,13 +383,17 @@ const WebCamBTN = () => {
       <OutlinedButton
         Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
         onClick={async () => {
-          let track;
-          if (!localWebcamOn) {
-            track = await getVideoTrack({
-              webcamId: selectedWebcam.id,
-            });
+          try {
+            let track;
+            if (!localWebcamOn) {
+              track = await getVideoTrack({
+                webcamId: selectedWebcam.id,
+              });
+            }
+            await toggleWebcam(track);
+          } catch (e) {
+            console.log("Error in toggleWebcam", e);
           }
-          toggleWebcam(track);
         }}
         bgColor={localWebcamOn ? "bg-gray-750" : "bg-white"}
         borderColor={localWebcamOn && "#ffffff33"}
@@ -436,9 +456,13 @@ const WebCamBTN = () => {
                                         "bg-gray-150"
                                         }`}
                                       key={`output_webcams_${deviceId}`}
-                                      onClick={() => {
+                                      onClick={async () => {
                                         setSelectedWebcam({ id: deviceId });
-                                        changeWebcam(deviceId);
+                                        try {
+                                          await changeWebcam(deviceId);
+                                        } catch (e) {
+                                          console.log("Error in changeWebcam", e);
+                                        }
                                         close();
                                       }}
                                     >
@@ -474,12 +498,12 @@ const WebCamBTN = () => {
 };
 
 const RaiseHandBTN = ({ isMobile, isTab }) => {
-  const { publish } = usePubSub("RAISE_HAND");
-  const RaiseHand = () => {
+  const { publish } = usePubSub("RAISE_HAND", {});
+  const RaiseHand = async () => {
     try {
-      publish("Raise Hand");
+      await publish("Raise Hand");
     } catch (e) {
-      console.log("Error in pubsub", e)
+      console.log("Error in pubsub publish (RAISE_HAND)", e);
     }
   };
 
@@ -529,13 +553,20 @@ const RecordingBTN = () => {
     [recordingState]
   );
 
-  const _handleClick = () => {
+  const _handleClick = async () => {
     const isRecording = isRecordingRef.current;
 
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
+    try {
+      if (isRecording) {
+        await stopRecording();
+      } else {
+        await startRecording();
+      }
+    } catch (e) {
+      console.log(
+        `Error in ${isRecording ? "stopRecording" : "startRecording"}`,
+        e
+      );
     }
   };
 
@@ -583,8 +614,12 @@ const ScreenShareBTN = ({ isMobile, isTab }) => {
       }
       isFocused={localScreenShareOn}
       Icon={ScreenShareIcon}
-      onClick={() => {
-        toggleScreenShare();
+      onClick={async () => {
+        try {
+          await toggleScreenShare();
+        } catch (e) {
+          console.log("Error in toggleScreenShare", e);
+        }
       }}
       disabled={
         presenterId
@@ -599,8 +634,12 @@ const ScreenShareBTN = ({ isMobile, isTab }) => {
   ) : (
     <OutlinedButton
       Icon={ScreenShareIcon}
-      onClick={() => {
-        toggleScreenShare();
+      onClick={async () => {
+        try {
+          await toggleScreenShare();
+        } catch (e) {
+          console.log("Error in toggleScreenShare", e);
+        }
       }}
       isFocused={localScreenShareOn}
       tooltip={
@@ -622,8 +661,12 @@ const LeaveBTN = ({ setIsMeetingLeft }) => {
     <OutlinedButton
       Icon={EndIcon}
       bgColor="bg-red-150"
-      onClick={() => {
-        leave();
+      onClick={async () => {
+        try {
+          await leave();
+        } catch (err) {
+          console.error('leave failed', err);
+        }
         setIsMeetingLeft(true);
       }}
       tooltip="Leave Meeting"

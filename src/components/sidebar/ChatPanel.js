@@ -38,8 +38,20 @@ const ChatMessage = ({ senderId, senderName, text, timestamp, localParticipantId
 
 const ChatInput = ({ inputHeight }) => {
   const [message, setMessage] = useState("");
-  const { publish } = usePubSub("CHAT");
+  const { publish } = usePubSub("CHAT", {});
   const input = useRef();
+
+  const sendMessage = async (messageText) => {
+    try {
+      await publish(messageText, { persist: true, sendOnly: [] }, {});
+      setTimeout(() => {
+        setMessage("");
+      }, 100);
+      input.current?.focus();
+    } catch (e) {
+      console.log("Error in pubsub publish (CHAT)", e);
+    }
+  };
 
   return (
     <div
@@ -52,18 +64,10 @@ const ChatInput = ({ inputHeight }) => {
             disabled={message.length < 2}
             type="submit"
             className="p-1 focus:outline-none focus:shadow-outline"
-            onClick={() => {
+            onClick={async () => {
               const messageText = message.trim();
               if (messageText.length > 0) {
-                try {
-                  publish(messageText, { persist: true });
-                  setTimeout(() => {
-                    setMessage("");
-                  }, 100);
-                  input.current?.focus();
-                } catch (e) {
-                  console.log("Error in pubsub", e)
-                }
+                await sendMessage(messageText);
               }
             }}
           >
@@ -83,21 +87,13 @@ const ChatInput = ({ inputHeight }) => {
           onChange={(e) => {
             setMessage(e.target.value);
           }}
-          onKeyPress={(e) => {
+          onKeyPress={async (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               const messageText = message.trim();
 
               if (messageText.length > 0) {
-                try {
-                  publish(messageText, { persist: true });
-                  setTimeout(() => {
-                    setMessage("");
-                  }, 100);
-                  input.current?.focus();
-                } catch (e) {
-                  console.log("Error in pubsub", e)
-                }
+                await sendMessage(messageText);
               }
             }
           }}
@@ -111,7 +107,10 @@ const ChatMessages = ({ listHeight }) => {
   const listRef = useRef();
   const { localParticipant } = useMeeting();
   const localParticipantId = localParticipant?.id;
-  const { messages } = usePubSub("CHAT");
+  const { messages } = usePubSub(
+    "CHAT",
+    {},
+  );
 
   const scrollToBottom = (data) => {
     if (!data) {

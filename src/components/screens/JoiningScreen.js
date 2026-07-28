@@ -210,49 +210,65 @@ export function JoiningScreen({
         currentvideoTrack.stop();
       }
 
-      const stream = await getVideoTrack({
-        webcamId: deviceId,
-      });
-      setCustomVideoStream(stream);
-      const videoTracks = stream?.getVideoTracks();
-      const videoTrack = videoTracks.length ? videoTracks[0] : null;
-      setVideoTrack(videoTrack);
+      try {
+        const stream = await getVideoTrack({
+          webcamId: deviceId,
+        });
+        setCustomVideoStream(stream);
+        const videoTracks = stream?.getVideoTracks();
+        const videoTrack = videoTracks.length ? videoTracks[0] : null;
+        setVideoTrack(videoTrack);
+      } catch (e) {
+        console.log("Error in getVideoTrack (changeWebcam)", e);
+      }
     }
   };
   const changeMic = async (deviceId) => {
     if (micOn) {
       const currentAudioTrack = audioTrackRef.current;
       currentAudioTrack && currentAudioTrack.stop();
-      const stream = await getAudioTrack({
-        micId: deviceId,
-      });
-      setCustomAudioStream(stream);
-      const audioTracks = stream?.getAudioTracks();
-      const audioTrack = audioTracks.length ? audioTracks[0] : null;
-      clearInterval(audioAnalyserIntervalRef.current);
-      setAudioTrack(audioTrack);
+      try {
+        const stream = await getAudioTrack({
+          micId: deviceId,
+        });
+        setCustomAudioStream(stream);
+        const audioTracks = stream?.getAudioTracks();
+        const audioTrack = audioTracks.length ? audioTracks[0] : null;
+        clearInterval(audioAnalyserIntervalRef.current);
+        setAudioTrack(audioTrack);
+      } catch (e) {
+        console.log("Error in getAudioTrack (changeMic)", e);
+      }
     }
   };
 
   const getDefaultMediaTracks = async ({ mic, webcam }) => {
     if (mic) {
-      const stream = await getAudioTrack({
-        micId: selectedMic.id,
-      });
-      setCustomAudioStream(stream);
-      const audioTracks = stream?.getAudioTracks();
-      const audioTrack = audioTracks?.length ? audioTracks[0] : null;
-      setAudioTrack(audioTrack);
+      try {
+        const stream = await getAudioTrack({
+          micId: selectedMic.id,
+        });
+        setCustomAudioStream(stream);
+        const audioTracks = stream?.getAudioTracks();
+        const audioTrack = audioTracks?.length ? audioTracks[0] : null;
+        setAudioTrack(audioTrack);
+      } catch (e) {
+        console.log("Error in getAudioTrack (getDefaultMediaTracks)", e);
+      }
     }
 
     if (webcam) {
-      const stream = await getVideoTrack({
-        webcamId: selectedWebcam?.id,
-      });
-      setCustomVideoStream(stream);
-      const videoTracks = stream?.getVideoTracks();
-      const videoTrack = videoTracks.length ? videoTracks[0] : null;
-      setVideoTrack(videoTrack);
+      try {
+        const stream = await getVideoTrack({
+          webcamId: selectedWebcam?.id,
+        });
+        setCustomVideoStream(stream);
+        const videoTracks = stream?.getVideoTracks();
+        const videoTrack = videoTracks.length ? videoTracks[0] : null;
+        setVideoTrack(videoTrack);
+      } catch (e) {
+        console.log("Error in getVideoTrack (getDefaultMediaTracks)", e);
+      }
     }
   };
 
