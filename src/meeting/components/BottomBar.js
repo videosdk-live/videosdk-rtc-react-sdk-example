@@ -1,6 +1,7 @@
 import {
   Constants,
   useMeeting,
+  useParticipant,
   usePubSub,
   useMediaDevice,
 } from "@videosdk.live/react-sdk";
@@ -33,99 +34,184 @@ import { Dialog, Popover, Transition } from "@headlessui/react";
 import { createPopper } from "@popperjs/core";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
 import useMediaStream from "../../hooks/useMediaStream";
+import { toast } from "react-toastify";
+
+const pipToastOptions = {
+  position: "bottom-left",
+  autoClose: 4000,
+  hideProgressBar: true,
+  closeButton: false,
+  pauseOnHover: true,
+  draggable: true,
+  progress: undefined,
+  theme: "light",
+};
 
 function PipBTN({ isMobile, isTab }) {
   const { pipMode, setPipMode } = useMeetingAppContext();
+  const { localParticipant } = useMeeting();
+  const { webcamStream, webcamOn } = useParticipant(
+    localParticipant?.id || ""
+  );
 
-  const getRowCount = (length) => {
-    return length > 2 ? 2 : length > 0 ? 1 : 0;
-  };
-  const getColCount = (length) => {
-    return length < 2 ? 1 : length < 5 ? 2 : 3;
-  };
+  const pipVideoRef = useRef(null);
+  const clonedTrackRef = useRef(null);
 
-  const pipWindowRef = useRef(null);
-  const togglePipMode = async () => {
-    //Check if PIP Window is active or not
-    //If active we will turn it off
-    if (pipWindowRef.current) {
-      await document.exitPictureInPicture();
-      pipWindowRef.current = null;
+  // iOS browsers are all WebKit and only expose webkitSetPresentationMode.
+  const isIOS =
+    typeof navigator !== "undefined" &&
+    (/iP(hone|ad|od)/.test(navigator.userAgent) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+  const isSafari =
+    typeof navigator !== "undefined" &&
+    (/^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent) ||
+      isIOS);
+
+  useEffect(() => {
+    const supportsStandardPip = "pictureInPictureEnabled" in document;
+    const supportsWebkitPip =
+      typeof HTMLVideoElement !== "undefined" &&
+      typeof HTMLVideoElement.prototype.webkitSetPresentationMode ===
+        "function";
+    if (!supportsStandardPip && !supportsWebkitPip) return;
+
+    const video = document.createElement("video");
+    video.muted = true;
+    video.playsInline = true;
+    video.autoplay = true;
+    video.style.position = "fixed";
+    video.style.pointerEvents = "none";
+    if (isSafari) {
+      // Safari stops decoding fully off-screen/transparent videos, so
+      // keep a 16:9 near-invisible tile visible in the corner.
+      video.style.right = "0";
+      video.style.bottom = "0";
+      video.style.width = "16px";
+      video.style.height = "9px";
+      video.style.objectFit = "cover";
+      video.style.opacity = "0.01";
+      video.style.zIndex = "0";
+    } else {
+      video.style.left = "-9999px";
+      video.style.top = "0";
+      video.style.width = "1px";
+      video.style.height = "1px";
+    }
+    document.body.appendChild(video);
+
+    const onEnter = () => setPipMode(true);
+    const onLeave = () => setPipMode(false);
+    const onWebkitModeChange = () => {
+      setPipMode(video.webkitPresentationMode === "picture-in-picture");
+    };
+    video.addEventListener("enterpictureinpicture", onEnter);
+    video.addEventListener("leavepictureinpicture", onLeave);
+    video.addEventListener(
+      "webkitpresentationmodechanged",
+      onWebkitModeChange
+    );
+
+    pipVideoRef.current = video;
+
+    return () => {
+      video.removeEventListener("enterpictureinpicture", onEnter);
+      video.removeEventListener("leavepictureinpicture", onLeave);
+      video.removeEventListener(
+        "webkitpresentationmodechanged",
+        onWebkitModeChange
+      );
+      if (document.pictureInPictureElement === video) {
+        document.exitPictureInPicture().catch(() => {});
+      }
+      if (video.webkitPresentationMode === "picture-in-picture") {
+        try {
+          video.webkitSetPresentationMode("inline");
+        } catch (e) {}
+      }
+      if (clonedTrackRef.current) {
+        try {
+          clonedTrackRef.current.stop();
+        } catch (e) {}
+        clonedTrackRef.current = null;
+      }
+      video.srcObject = null;
+      video.remove();
+      pipVideoRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Clone the local webcam track into the hidden video. Cloning keeps
+  // PiP decoding independent from the main render (Safari can't share
+  // a single track across two <video> elements without one going black).
+  useEffect(() => {
+    const video = pipVideoRef.current;
+    if (!video) return;
+
+    if (clonedTrackRef.current) {
+      try {
+        clonedTrackRef.current.stop();
+      } catch (e) {}
+      clonedTrackRef.current = null;
+    }
+
+    if (webcamOn && webcamStream && webcamStream.track) {
+      try {
+        const cloned = webcamStream.track.clone();
+        clonedTrackRef.current = cloned;
+        video.srcObject = new MediaStream([cloned]);
+        video.play().catch(() => {});
+      } catch (e) {
+        console.log("Failed to prepare local webcam for PiP", e);
+        video.srcObject = null;
+      }
+    } else {
+      video.srcObject = null;
+    }
+  }, [webcamStream, webcamOn]);
+
+  const togglePipMode = () => {
+    const video = pipVideoRef.current;
+    if (!video) {
+      toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
+      return;
+    }
+    if (!video.srcObject) {
+      toast("Turn on your camera to use Picture-in-Picture", pipToastOptions);
       return;
     }
 
-    //Check if browser supports PIP mode else show a message to user
-    if ("pictureInPictureEnabled" in document) {
-      //Creating a Canvas which will render our PIP Stream
-      const source = document.createElement("canvas");
-      const ctx = source.getContext("2d");
-
-      //Create a Video tag which we will popout for PIP
-      const pipVideo = document.createElement("video");
-      pipWindowRef.current = pipVideo;
-      pipVideo.autoplay = true;
-
-      //Creating stream from canvas which we will play
-      const stream = source.captureStream();
-      pipVideo.srcObject = stream;
-      drawCanvas();
-
-      //When Video is ready we will start PIP mode
-      pipVideo.onloadedmetadata = () => {
-        pipVideo.requestPictureInPicture();
-      };
-      await pipVideo.play();
-
-      //When the PIP mode starts, we will start drawing canvas with PIP view
-      pipVideo.addEventListener("enterpictureinpicture", (event) => {
-        drawCanvas();
-        setPipMode(true);
-      });
-
-      //When PIP mode exits, we will dispose the track we created earlier
-      pipVideo.addEventListener("leavepictureinpicture", (event) => {
-        pipWindowRef.current = null;
-        setPipMode(false);
-        pipVideo.srcObject.getTracks().forEach((track) => track.stop());
-      });
-
-      //These will draw all the video elements in to the Canvas
-      function drawCanvas() {
-        //Getting all the video elements in the document
-        const videos = document.querySelectorAll("video");
-        try {
-          //Perform initial black paint on the canvas
-          ctx.fillStyle = "black";
-          ctx.fillRect(0, 0, source.width, source.height);
-
-          //Drawing the participant videos on the canvas in the grid format
-          const rows = getRowCount(videos.length);
-          const columns = getColCount(videos.length);
-          for (let i = 0; i < rows; i++) {
-            for (let j = 0; j < columns; j++) {
-              if (j + i * columns <= videos.length || videos.length === 1) {
-                ctx.drawImage(
-                  videos[j + i * columns],
-                  j < 1 ? 0 : source.width / (columns / j),
-                  i < 1 ? 0 : source.height / (rows / i),
-                  source.width / columns,
-                  source.height / rows
-                );
-              }
-            }
-          }
-        } catch (error) {
-          console.log(error);
-        }
-
-        //If pip mode is on, keep drawing the canvas when ever new frame is requested
-        if (document.pictureInPictureElement === pipVideo) {
-          requestAnimationFrame(drawCanvas);
-        }
+    if (isSafari) {
+      if (video.webkitPresentationMode === "picture-in-picture") {
+        video.webkitSetPresentationMode("inline");
+        return;
       }
-    } else {
-      alert("PIP is not supported by your browser");
+      if (
+        typeof video.webkitSupportsPresentationMode !== "function" ||
+        !video.webkitSupportsPresentationMode("picture-in-picture")
+      ) {
+        toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
+        return;
+      }
+      try {
+        video.webkitSetPresentationMode("picture-in-picture");
+      } catch (e) {
+        console.log("Safari PiP failed", e);
+      }
+      return;
     }
+
+    if (document.pictureInPictureElement) {
+      document.exitPictureInPicture().catch((e) => console.log(e));
+      return;
+    }
+    if (!("pictureInPictureEnabled" in document)) {
+      toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
+      return;
+    }
+    video
+      .requestPictureInPicture()
+      .catch((e) => console.log("Failed to enter PiP mode", e));
   };
 
   return isMobile || isTab ? (
