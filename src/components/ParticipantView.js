@@ -442,10 +442,13 @@ const ParticipantAudioPlayer = ({ participantId }) => {
   useEffect(() => {
     const isFirefox =
       navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-    if (micRef.current) {
+    if (micRef.current && !isFirefox && selectedSpeaker?.id) {
       try {
-        if (!isFirefox) {
-          micRef.current.setSinkId(selectedSpeaker.id);
+        const result = micRef.current.setSinkId(selectedSpeaker.id);
+        if (result && typeof result.catch === "function") {
+          result.catch((err) =>
+            console.log("Setting speaker device failed", err)
+          );
         }
       } catch (err) {
         console.log("Setting speaker device failed", err);
@@ -528,7 +531,17 @@ const ParticipantViewContent = ({ participantId }) => {
 };
 
 export function ParticipantView({ participantId }) {
-  const { mode } = useParticipant(participantId);
+  const { mode, isLocal, setQuality } = useParticipant(participantId, {
+    onStreamEnabled: (stream) => {
+      if (!isLocal && stream?.kind === "video") {
+        try {
+          setQuality("high");
+        } catch (e) {
+          console.log("Error in setQuality", e);
+        }
+      }
+    },
+  });
 
   return mode === "SEND_AND_RECV" ? (
     <ParticipantViewContent participantId={participantId} />

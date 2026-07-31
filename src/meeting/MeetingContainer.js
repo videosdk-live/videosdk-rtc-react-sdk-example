@@ -169,11 +169,6 @@ export function MeetingContainer({
     }
   };
 
-  function onParticipantJoined(participant) {
-    participant && participant.setQuality("high");
-  }
-
-
   function onEntryResponded(participantId, name) {
     if (localParticipantRef.current?.id === participantId) {
       if (name === "allowed") {
@@ -213,7 +208,6 @@ export function MeetingContainer({
   };
 
   const { isMeetingJoined, localParticipant } = useMeeting({
-    onParticipantJoined,
     onEntryResponded,
     onMeetingStateChanged: ({state}) => {
       toast(`Meeting is in ${state} state`, {

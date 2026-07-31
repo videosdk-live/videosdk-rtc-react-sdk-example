@@ -79,7 +79,7 @@ export default function DropDownCam({
                                   <button
                                     className={`flex flex-1 w-full text-left`}
                                     value={item?.deviceId}
-                                    onClick={() => {
+                                    onClick={async () => {
                                       setSelectedWebcam(
                                         (s) => ({
                                           ...s,
@@ -87,7 +87,11 @@ export default function DropDownCam({
                                           label: item?.label
                                         })
                                       );
-                                      changeWebcam(item?.deviceId);
+                                      try {
+                                        await changeWebcam(item?.deviceId);
+                                      } catch (e) {
+                                        console.log("Error in changeWebcam", e);
+                                      }
                                     }}
                                   >
                                     {item?.label ? (

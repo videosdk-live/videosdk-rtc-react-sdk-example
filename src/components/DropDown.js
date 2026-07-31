@@ -229,7 +229,7 @@ export default function DropDown({
                                   <button
                                     className={`flex flex-1 w-full text-left`}
                                     value={item?.deviceId}
-                                    onClick={() => {
+                                    onClick={async () => {
                                       setSelectedMic(
                                         (s) => ({
                                           ...s,
@@ -237,7 +237,11 @@ export default function DropDown({
                                           id: item?.deviceId,
                                         })
                                       );
-                                      changeMic(item?.deviceId);
+                                      try {
+                                        await changeMic(item?.deviceId);
+                                      } catch (e) {
+                                        console.log("Error in changeMic", e);
+                                      }
                                       if (mediaRecorder.current != null && mediaRecorder.current.state == "recording") { stopRecording() }
                                       setRecordingProgress(0)
                                       setRecordingStatus("inactive")
