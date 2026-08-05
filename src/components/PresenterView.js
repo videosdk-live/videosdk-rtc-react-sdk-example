@@ -5,6 +5,10 @@ import ScreenShareIcon from "../icons/ScreenShareIcon";
 import SpeakerIcon from "../icons/SpeakerIcon";
 import { nameTructed } from "../utils/helper";
 import { CornerDisplayName } from "./ParticipantView";
+import {
+  connectTrackToRelay,
+  shouldUseAudioRelay,
+} from "../utils/audioOutputRelay";
 
 const PresenterAudioPlayer = ({ presenterId }) => {
   const { isLocal, screenShareAudioStream, screenShareOn } =
@@ -31,12 +35,24 @@ const PresenterAudioPlayer = ({ presenterId }) => {
           console.error("audio" + err.message);
         }
       });
+      if (shouldUseAudioRelay()) {
+        audioPlayer.current.volume = 0;
+        return connectTrackToRelay(screenShareAudioStream.track, mediaStream);
+      }
     } else {
       audioPlayer.current.srcObject = null;
     }
   }, [screenShareAudioStream, screenShareOn, isLocal]);
 
-  return <audio autoPlay playsInline controls={false} ref={audioPlayer} />;
+  return (
+    <audio
+      autoPlay
+      playsInline
+      controls={false}
+      muted={shouldUseAudioRelay()}
+      ref={audioPlayer}
+    />
+  );
 };
 
 const StopPresentingOverlay = ({ presenterId, toggleScreenShare }) => {

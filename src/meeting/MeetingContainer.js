@@ -12,6 +12,10 @@ import useIsTab from "../hooks/useIsTab";
 import { useMediaQuery } from "react-responsive";
 import { toast } from "react-toastify";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
+import {
+  connectTrackToRelay,
+  shouldUseAudioRelay,
+} from "../utils/audioOutputRelay";
 
 const ParticipantMicStream = memo(({ participantId }) => {
   const { micStream, isLocal } = useParticipant(participantId);
@@ -24,10 +28,16 @@ const ParticipantMicStream = memo(({ participantId }) => {
 
     const audioElement = new Audio();
     audioElement.srcObject = mediaStream;
-    audioElement.muted = isLocal;
+    audioElement.muted = isLocal || shouldUseAudioRelay();
+    if (shouldUseAudioRelay()) audioElement.volume = 0;
     audioElement.play().catch(() => {});
 
+    const disconnectRelay = isLocal
+      ? null
+      : connectTrackToRelay(micStream.track, mediaStream);
+
     return () => {
+      if (disconnectRelay) disconnectRelay();
       audioElement.pause();
       audioElement.srcObject = null;
     };
