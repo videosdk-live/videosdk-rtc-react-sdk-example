@@ -35,10 +35,7 @@ const PresenterAudioPlayer = ({ presenterId }) => {
           console.error("audio" + err.message);
         }
       });
-      if (shouldUseAudioRelay()) {
-        audioPlayer.current.volume = 0;
-        return connectTrackToRelay(screenShareAudioStream.track, mediaStream);
-      }
+      return connectTrackToRelay(screenShareAudioStream.track);
     } else {
       audioPlayer.current.srcObject = null;
     }

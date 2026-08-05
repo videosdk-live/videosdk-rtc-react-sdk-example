@@ -439,8 +439,10 @@ const ParticipantAudioPlayer = ({ participantId }) => {
     const isFirefox =
       navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
     if (shouldUseAudioRelay()) {
+      console.log("Setting relay sink id", selectedSpeaker.id);
       setRelaySinkId(selectedSpeaker.id);
     } else if (micRef.current) {
+      console.log("Setting sink id", selectedSpeaker.id);
       try {
         if (!isFirefox) {
           micRef.current.setSinkId(selectedSpeaker.id);
@@ -462,9 +464,8 @@ const ParticipantAudioPlayer = ({ participantId }) => {
           .catch((error) =>
             console.error("micRef.current.play() failed", error)
           );
-        if (!isLocal && shouldUseAudioRelay()) {
-          micRef.current.volume = 0;
-          return connectTrackToRelay(micStream.track, mediaStream);
+        if (!isLocal) {
+          return connectTrackToRelay(micStream.track);
         }
       } else {
         micRef.current.srcObject = null;

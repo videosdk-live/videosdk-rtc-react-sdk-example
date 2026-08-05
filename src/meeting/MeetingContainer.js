@@ -29,12 +29,11 @@ const ParticipantMicStream = memo(({ participantId }) => {
     const audioElement = new Audio();
     audioElement.srcObject = mediaStream;
     audioElement.muted = isLocal || shouldUseAudioRelay();
-    if (shouldUseAudioRelay()) audioElement.volume = 0;
     audioElement.play().catch(() => {});
 
     const disconnectRelay = isLocal
       ? null
-      : connectTrackToRelay(micStream.track, mediaStream);
+      : connectTrackToRelay(micStream.track);
 
     return () => {
       if (disconnectRelay) disconnectRelay();
