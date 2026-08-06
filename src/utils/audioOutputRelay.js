@@ -3,7 +3,7 @@
 // engine's pipeline, which setSinkId does not control. Mixing all remote tracks
 // into a MediaStreamAudioDestinationNode and playing the mix through a single
 // relay <audio> element moves playback onto the media-element pipeline, where
-// setSinkId works. See https://github.com/livekit/client-sdk-js/pull/1635
+// setSinkId works.
 
 const isIOSDevice =
   typeof navigator !== "undefined" &&
@@ -38,11 +38,13 @@ function ensureRelay() {
   relayElement = document.createElement("audio");
   relayElement.autoplay = true;
   relayElement.playsInline = true;
+  relayElement.style.display = "none";
   relayElement.srcObject = destinationNode.stream;
   document.body.appendChild(relayElement);
 
   // iOS suspends the context until a user gesture and after audio-session
-  // interruptions (e.g. route changes); revive it on any tap.
+  // interruptions (e.g. route changes); revive it on any tap. The relay is a
+  // page-lifetime singleton, so these listeners are intentionally never removed.
   document.addEventListener("touchend", resumeRelay, {
     capture: true,
     passive: true,
@@ -83,6 +85,6 @@ export function setRelaySinkId(deviceId) {
   ensureRelay();
   resumeRelay();
   relayElement.setSinkId(deviceId).catch((err) => {
-    console.log("Setting relay speaker device failed", err);
+    console.error("Setting relay speaker device failed", err);
   });
 }
