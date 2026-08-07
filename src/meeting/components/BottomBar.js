@@ -49,7 +49,12 @@ const pipToastOptions = {
 
 function PipBTN({ isMobile, isTab }) {
   const { pipMode, setPipMode } = useMeetingAppContext();
-  const { localParticipant } = useMeeting();
+  const { localParticipant } = useMeeting({
+    onMeetingLeft: () => {
+      exitSinglePip();
+      exitMultiPip();
+    },
+  });
   const { webcamStream, webcamOn } = useParticipant(
     localParticipant?.id || ""
   );
@@ -57,6 +62,42 @@ function PipBTN({ isMobile, isTab }) {
   const pipVideoRef = useRef(null);
   const clonedTrackRef = useRef(null);
   const pipMultiWindowRef = useRef(null);
+  const pipMultiCleanupRef = useRef(null);
+
+  // Exit single-PiP if active (the helper element itself stays alive).
+  const exitSinglePip = () => {
+    const video = pipVideoRef.current;
+    if (!video) return;
+    try {
+      if (video.webkitPresentationMode === "picture-in-picture") {
+        video.webkitSetPresentationMode("inline");
+      }
+      if (document.pictureInPictureElement === video) {
+        document.exitPictureInPicture().catch(() => {});
+      }
+    } catch (e) {
+      console.log("[PiP] exit failed", e);
+    }
+  };
+
+  // Close multi-PiP and force teardown — needed on meeting-left/unmount
+  // since its video lives on document.body, outside React.
+  const exitMultiPip = () => {
+    const active = pipMultiWindowRef.current;
+    if (!active) return;
+    try {
+      if (active.webkitPresentationMode === "picture-in-picture") {
+        active.webkitSetPresentationMode("inline");
+      }
+      if (document.pictureInPictureElement === active) {
+        document.exitPictureInPicture().catch(() => {});
+      }
+    } catch (e) {
+      console.log("[PiP-Multi] exit failed", e);
+    }
+    // Leave events don't fire if entry was still in flight; cleanup() is idempotent.
+    if (pipMultiCleanupRef.current) pipMultiCleanupRef.current();
+  };
 
   const getRowCount = (length) => (length > 2 ? 2 : length > 0 ? 1 : 0);
   const getColCount = (length) => (length < 2 ? 1 : length < 5 ? 2 : 3);
@@ -86,8 +127,7 @@ function PipBTN({ isMobile, isTab }) {
     video.style.position = "fixed";
     video.style.pointerEvents = "none";
     if (isSafari) {
-      // Safari stops decoding fully off-screen/transparent videos, so
-      // keep a 16:9 near-invisible tile visible in the corner.
+      // Safari stops decoding fully off-screen videos — keep it barely visible.
       video.style.right = "0";
       video.style.bottom = "0";
       video.style.width = "16px";
@@ -124,14 +164,7 @@ function PipBTN({ isMobile, isTab }) {
         "webkitpresentationmodechanged",
         onWebkitModeChange
       );
-      if (document.pictureInPictureElement === video) {
-        document.exitPictureInPicture().catch(() => {});
-      }
-      if (video.webkitPresentationMode === "picture-in-picture") {
-        try {
-          video.webkitSetPresentationMode("inline");
-        } catch (e) {}
-      }
+      exitSinglePip();
       if (clonedTrackRef.current) {
         try {
           clonedTrackRef.current.stop();
@@ -141,13 +174,14 @@ function PipBTN({ isMobile, isTab }) {
       video.srcObject = null;
       video.remove();
       pipVideoRef.current = null;
+      // Also close multi-PiP — it outlives React on document.body.
+      exitMultiPip();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Clone the local webcam track into the hidden video. Cloning keeps
-  // PiP decoding independent from the main render (Safari can't share
-  // a single track across two <video> elements without one going black).
+  // Feed a CLONE of the webcam into the hidden video — Safari can't share
+  // one track across two <video> elements.
   useEffect(() => {
     const video = pipVideoRef.current;
     if (!video) return;
@@ -174,9 +208,8 @@ function PipBTN({ isMobile, isTab }) {
     }
   }, [webcamStream, webcamOn]);
 
-  // SINGLE-PARTICIPANT PiP (local webcam only). Direct-track pipeline —
-  // works on Chrome + Safari and survives backgrounding since no JS paint
-  // loop is required.
+  // SINGLE-PARTICIPANT PiP (local webcam only): direct track, no paint
+  // loop, so it survives backgrounding everywhere.
   const togglePipModeSingle = () => {
     const video = pipVideoRef.current;
     if (!video) {
@@ -221,24 +254,12 @@ function PipBTN({ isMobile, isTab }) {
       .catch((e) => console.log("Failed to enter PiP mode", e));
   };
 
-  // MULTI-PARTICIPANT PiP (grid of all rendered videos). Canvas-composite
-  // pipeline — works on Chrome + Safari. Requires a JS paint loop, so the
-  // grid freezes when the tab is backgrounded (rAF suspends).
-  const togglePipModeMulti = async () => {
-    console.log("[PiP-Multi] toggle clicked. isSafari=", isSafari);
-
+  // MULTI-PARTICIPANT PiP: paint all rendered tiles into a canvas grid,
+  // captureStream() it, and feed that to the PiP video.
+  const togglePipModeMulti = () => {
     // If already active, exit.
     if (pipMultiWindowRef.current) {
-      const active = pipMultiWindowRef.current;
-      try {
-        if (isSafari && active.webkitPresentationMode === "picture-in-picture") {
-          active.webkitSetPresentationMode("inline");
-        } else if (document.pictureInPictureElement === active) {
-          await document.exitPictureInPicture();
-        }
-      } catch (e) {
-        console.log("[PiP-Multi] exit failed", e);
-      }
+      exitMultiPip();
       return;
     }
 
@@ -274,8 +295,7 @@ function PipBTN({ isMobile, isTab }) {
     document.body.appendChild(pipVideo);
     pipMultiWindowRef.current = pipVideo;
 
-    // Paint loop. setInterval (not rAF) so it keeps ticking when Safari
-    // backgrounds the tab — the active PiP window keeps the timer alive.
+    // Paint loop — setInterval, not rAF (rAF suspends on tab switch).
     let drawInterval = null;
     const startDraw = () => {
       if (drawInterval) return;
@@ -287,23 +307,69 @@ function PipBTN({ isMobile, isTab }) {
       drawInterval = null;
     };
 
+    // Backgrounded Safari throttles timers to ~1Hz (freezing the grid);
+    // the audio thread is exempt, so a silent ScriptProcessorNode acts as
+    // a ~23fps paint clock. Must be created inside the click gesture.
+    let audioTicker = null;
+    if (isSafari) {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        const actx = new AC();
+        const node = actx.createScriptProcessor(2048, 1, 1);
+        const silence = actx.createGain();
+        silence.gain.value = 0;
+        node.connect(silence);
+        silence.connect(actx.destination);
+        node.onaudioprocess = () => drawCanvas();
+        actx.resume().catch(() => {});
+        audioTicker = { actx, node };
+      } catch (e) {
+        console.log("[PiP-Multi] audio paint clock unavailable", e);
+      }
+    }
+
     const cleanup = () => {
       stopDraw();
+      if (audioTicker) {
+        try {
+          audioTicker.node.onaudioprocess = null;
+          audioTicker.node.disconnect();
+          audioTicker.actx.close();
+        } catch (e) {}
+        audioTicker = null;
+      }
       setPipMode(false);
       if (pipVideo.srcObject) {
         pipVideo.srcObject.getTracks().forEach((t) => t.stop());
       }
       pipVideo.remove();
       pipMultiWindowRef.current = null;
+      pipMultiCleanupRef.current = null;
     };
+    pipMultiCleanupRef.current = cleanup;
+
+    // iOS pauses on-page videos on backgrounding but allows play() while
+    // hidden — so poll a play() nudge from the paint loop to un-pause
+    // them. (visibilitychange may never fire while PiP is active.)
+    let nudgeTick = 0;
+    function nudgeSources() {
+      nudgeTick = (nudgeTick + 1) % 30; // ~1×/sec at paint cadence
+      if (nudgeTick !== 0) return;
+      document.querySelectorAll("video").forEach((v) => {
+        if (v === pipVideo) return;
+        if (v.srcObject) v.play().catch(() => {});
+      });
+    }
 
     function drawCanvas() {
-      // Dedupe: the same participant may render in multiple <video> nodes
-      // (main tile + thumbnail), so pick one <video> per underlying track.
+      if (isIOS) nudgeSources();
+      // One <video> per track — a participant can render in several nodes.
       const seen = new Set();
       const videos = [];
       document.querySelectorAll("video").forEach((v) => {
         if (v === pipVideo) return;
+        // Skip the single-PiP helper — its CLONE evades the track dedupe.
+        if (v === pipVideoRef.current) return;
         if (!v.videoWidth || !v.videoHeight) return;
         const s = v.srcObject;
         const track = s && s.getVideoTracks && s.getVideoTracks()[0];
@@ -337,19 +403,11 @@ function PipBTN({ isMobile, isTab }) {
     }
 
     pipVideo.addEventListener("enterpictureinpicture", () => {
-      console.log("[PiP-Multi] enterpictureinpicture");
       setPipMode(true);
       startDraw();
     });
-    pipVideo.addEventListener("leavepictureinpicture", () => {
-      console.log("[PiP-Multi] leavepictureinpicture");
-      cleanup();
-    });
+    pipVideo.addEventListener("leavepictureinpicture", cleanup);
     pipVideo.addEventListener("webkitpresentationmodechanged", () => {
-      console.log(
-        "[PiP-Multi] webkitpresentationmodechanged →",
-        pipVideo.webkitPresentationMode
-      );
       if (pipVideo.webkitPresentationMode === "picture-in-picture") {
         setPipMode(true);
         startDraw();
@@ -358,8 +416,7 @@ function PipBTN({ isMobile, isTab }) {
       }
     });
 
-    // Prime the canvas with a few frames BEFORE captureStream so Safari
-    // sees live content and doesn't silently drop the stream.
+    // Prime the canvas before captureStream or Safari drops the stream.
     ctx.fillStyle = "black";
     ctx.fillRect(0, 0, source.width, source.height);
     drawCanvas();
@@ -375,40 +432,28 @@ function PipBTN({ isMobile, isTab }) {
       cleanup();
       return;
     }
-    console.log("[PiP-Multi] captureStream tracks:", stream.getTracks().length);
     pipVideo.srcObject = stream;
 
-    // Kick play() but do NOT await — Safari won't fire loadedmetadata for
-    // a canvas-captured stream, so awaiting anything here just hangs.
+    // Don't await — Safari never fires loadedmetadata for canvas streams.
     pipVideo.play().catch((e) => console.log("[PiP-Multi] play() rejected", e));
 
     if (isSafari) {
-      // Safari's webkitSupportsPresentationMode returns false until the
-      // video has actually played a frame, but webkitSetPresentationMode
-      // will still work once the stream is producing. Poll for readiness.
+      // Safari advertises PiP support only after a frame has played — poll.
       const trySafariPip = (attempt = 0) => {
         if (!pipMultiWindowRef.current) return;
         const canWebkit =
           typeof pipVideo.webkitSupportsPresentationMode === "function" &&
           pipVideo.webkitSupportsPresentationMode("picture-in-picture");
-        console.log(
-          "[PiP-Multi] attempt", attempt,
-          "supports=", canWebkit,
-          "readyState=", pipVideo.readyState,
-          "videoW=", pipVideo.videoWidth
-        );
         if (canWebkit) {
           try {
             pipVideo.webkitSetPresentationMode("picture-in-picture");
-            console.log("[PiP-Multi] webkitSetPresentationMode called");
           } catch (e) {
-            console.log("[PiP-Multi] webkitSetPresentationMode threw", e);
+            console.log("[PiP-Multi] enter failed", e);
             cleanup();
           }
           return;
         }
         if (attempt >= 20) {
-          console.log("[PiP-Multi] gave up — Safari never advertised PiP support");
           toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
           cleanup();
           return;
@@ -422,9 +467,8 @@ function PipBTN({ isMobile, isTab }) {
       const enterChromePip = async () => {
         try {
           await pipVideo.requestPictureInPicture();
-          console.log("[PiP-Multi] requestPictureInPicture resolved");
         } catch (e) {
-          console.log("[PiP-Multi] Chrome PiP failed", e);
+          console.log("[PiP-Multi] enter failed", e);
           cleanup();
         }
       };
