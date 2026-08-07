@@ -56,6 +56,10 @@ function PipBTN({ isMobile, isTab }) {
 
   const pipVideoRef = useRef(null);
   const clonedTrackRef = useRef(null);
+  const pipMultiWindowRef = useRef(null);
+
+  const getRowCount = (length) => (length > 2 ? 2 : length > 0 ? 1 : 0);
+  const getColCount = (length) => (length < 2 ? 1 : length < 5 ? 2 : 3);
 
   // iOS browsers are all WebKit and only expose webkitSetPresentationMode.
   const isIOS =
@@ -170,7 +174,10 @@ function PipBTN({ isMobile, isTab }) {
     }
   }, [webcamStream, webcamOn]);
 
-  const togglePipMode = () => {
+  // SINGLE-PARTICIPANT PiP (local webcam only). Direct-track pipeline —
+  // works on Chrome + Safari and survives backgrounding since no JS paint
+  // loop is required.
+  const togglePipModeSingle = () => {
     const video = pipVideoRef.current;
     if (!video) {
       toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
@@ -214,6 +221,221 @@ function PipBTN({ isMobile, isTab }) {
       .catch((e) => console.log("Failed to enter PiP mode", e));
   };
 
+  // MULTI-PARTICIPANT PiP (grid of all rendered videos). Canvas-composite
+  // pipeline — works on Chrome + Safari. Requires a JS paint loop, so the
+  // grid freezes when the tab is backgrounded (rAF suspends).
+  const togglePipModeMulti = async () => {
+    console.log("[PiP-Multi] toggle clicked. isSafari=", isSafari);
+
+    // If already active, exit.
+    if (pipMultiWindowRef.current) {
+      const active = pipMultiWindowRef.current;
+      try {
+        if (isSafari && active.webkitPresentationMode === "picture-in-picture") {
+          active.webkitSetPresentationMode("inline");
+        } else if (document.pictureInPictureElement === active) {
+          await document.exitPictureInPicture();
+        }
+      } catch (e) {
+        console.log("[PiP-Multi] exit failed", e);
+      }
+      return;
+    }
+
+    const supportsStandardPip = "pictureInPictureEnabled" in document;
+    const supportsWebkitPip =
+      typeof HTMLVideoElement !== "undefined" &&
+      typeof HTMLVideoElement.prototype.webkitSetPresentationMode ===
+        "function";
+    if (!supportsStandardPip && !supportsWebkitPip) {
+      toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
+      return;
+    }
+
+    const source = document.createElement("canvas");
+    source.width = 640;
+    source.height = 360;
+    const ctx = source.getContext("2d");
+
+    const pipVideo = document.createElement("video");
+    pipVideo.autoplay = true;
+    pipVideo.muted = true;
+    pipVideo.playsInline = true;
+    pipVideo.width = source.width;
+    pipVideo.height = source.height;
+    // Safari refuses to enter PiP from a fully off-screen video; keep it barely visible.
+    pipVideo.style.position = "fixed";
+    pipVideo.style.right = "0";
+    pipVideo.style.bottom = "0";
+    pipVideo.style.width = "16px";
+    pipVideo.style.height = "9px";
+    pipVideo.style.opacity = "0.01";
+    pipVideo.style.pointerEvents = "none";
+    document.body.appendChild(pipVideo);
+    pipMultiWindowRef.current = pipVideo;
+
+    // Paint loop. setInterval (not rAF) so it keeps ticking when Safari
+    // backgrounds the tab — the active PiP window keeps the timer alive.
+    let drawInterval = null;
+    const startDraw = () => {
+      if (drawInterval) return;
+      drawInterval = setInterval(drawCanvas, 33);
+    };
+    const stopDraw = () => {
+      if (!drawInterval) return;
+      clearInterval(drawInterval);
+      drawInterval = null;
+    };
+
+    const cleanup = () => {
+      stopDraw();
+      setPipMode(false);
+      if (pipVideo.srcObject) {
+        pipVideo.srcObject.getTracks().forEach((t) => t.stop());
+      }
+      pipVideo.remove();
+      pipMultiWindowRef.current = null;
+    };
+
+    function drawCanvas() {
+      // Dedupe: the same participant may render in multiple <video> nodes
+      // (main tile + thumbnail), so pick one <video> per underlying track.
+      const seen = new Set();
+      const videos = [];
+      document.querySelectorAll("video").forEach((v) => {
+        if (v === pipVideo) return;
+        if (!v.videoWidth || !v.videoHeight) return;
+        const s = v.srcObject;
+        const track = s && s.getVideoTracks && s.getVideoTracks()[0];
+        const key = track ? track.id : v;
+        if (seen.has(key)) return;
+        seen.add(key);
+        videos.push(v);
+      });
+      try {
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, source.width, source.height);
+        const rows = getRowCount(videos.length);
+        const columns = getColCount(videos.length);
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < columns; j++) {
+            const idx = j + i * columns;
+            if (idx < videos.length) {
+              ctx.drawImage(
+                videos[idx],
+                j * (source.width / columns),
+                i * (source.height / rows),
+                source.width / columns,
+                source.height / rows
+              );
+            }
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    pipVideo.addEventListener("enterpictureinpicture", () => {
+      console.log("[PiP-Multi] enterpictureinpicture");
+      setPipMode(true);
+      startDraw();
+    });
+    pipVideo.addEventListener("leavepictureinpicture", () => {
+      console.log("[PiP-Multi] leavepictureinpicture");
+      cleanup();
+    });
+    pipVideo.addEventListener("webkitpresentationmodechanged", () => {
+      console.log(
+        "[PiP-Multi] webkitpresentationmodechanged →",
+        pipVideo.webkitPresentationMode
+      );
+      if (pipVideo.webkitPresentationMode === "picture-in-picture") {
+        setPipMode(true);
+        startDraw();
+      } else {
+        cleanup();
+      }
+    });
+
+    // Prime the canvas with a few frames BEFORE captureStream so Safari
+    // sees live content and doesn't silently drop the stream.
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, source.width, source.height);
+    drawCanvas();
+    drawCanvas();
+    drawCanvas();
+
+    const stream =
+      typeof source.captureStream === "function"
+        ? source.captureStream(30)
+        : null;
+    if (!stream) {
+      toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
+      cleanup();
+      return;
+    }
+    console.log("[PiP-Multi] captureStream tracks:", stream.getTracks().length);
+    pipVideo.srcObject = stream;
+
+    // Kick play() but do NOT await — Safari won't fire loadedmetadata for
+    // a canvas-captured stream, so awaiting anything here just hangs.
+    pipVideo.play().catch((e) => console.log("[PiP-Multi] play() rejected", e));
+
+    if (isSafari) {
+      // Safari's webkitSupportsPresentationMode returns false until the
+      // video has actually played a frame, but webkitSetPresentationMode
+      // will still work once the stream is producing. Poll for readiness.
+      const trySafariPip = (attempt = 0) => {
+        if (!pipMultiWindowRef.current) return;
+        const canWebkit =
+          typeof pipVideo.webkitSupportsPresentationMode === "function" &&
+          pipVideo.webkitSupportsPresentationMode("picture-in-picture");
+        console.log(
+          "[PiP-Multi] attempt", attempt,
+          "supports=", canWebkit,
+          "readyState=", pipVideo.readyState,
+          "videoW=", pipVideo.videoWidth
+        );
+        if (canWebkit) {
+          try {
+            pipVideo.webkitSetPresentationMode("picture-in-picture");
+            console.log("[PiP-Multi] webkitSetPresentationMode called");
+          } catch (e) {
+            console.log("[PiP-Multi] webkitSetPresentationMode threw", e);
+            cleanup();
+          }
+          return;
+        }
+        if (attempt >= 20) {
+          console.log("[PiP-Multi] gave up — Safari never advertised PiP support");
+          toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
+          cleanup();
+          return;
+        }
+        // Keep painting so the stream advances, then re-check.
+        drawCanvas();
+        setTimeout(() => trySafariPip(attempt + 1), 100);
+      };
+      trySafariPip();
+    } else {
+      const enterChromePip = async () => {
+        try {
+          await pipVideo.requestPictureInPicture();
+          console.log("[PiP-Multi] requestPictureInPicture resolved");
+        } catch (e) {
+          console.log("[PiP-Multi] Chrome PiP failed", e);
+          cleanup();
+        }
+      };
+      if (pipVideo.readyState >= 1) {
+        enterChromePip();
+      } else {
+        pipVideo.addEventListener("loadedmetadata", enterChromePip, { once: true });
+      }
+    }
+  };
+
   return isMobile || isTab ? (
     <MobileIconButton
       id="pip-btn"
@@ -222,7 +444,8 @@ function PipBTN({ isMobile, isTab }) {
       isFocused={pipMode}
       Icon={PipIcon}
       onClick={() => {
-        togglePipMode();
+        // togglePipModeSingle();
+        togglePipModeMulti();
       }}
       disabled={false}
     />
@@ -230,7 +453,8 @@ function PipBTN({ isMobile, isTab }) {
     <OutlinedButton
       Icon={PipIcon}
       onClick={() => {
-        togglePipMode();
+        // togglePipModeSingle();
+        togglePipModeMulti();
       }}
       isFocused={pipMode}
       tooltip={pipMode ? "Stop PiP" : "Start Pip"}
