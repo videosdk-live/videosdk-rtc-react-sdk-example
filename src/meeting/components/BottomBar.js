@@ -47,6 +47,18 @@ const pipToastOptions = {
   theme: "light",
 };
 
+// Which PiP pipeline the button uses:
+// "single" — local webcam via a direct track (most robust in background)
+// "multi"  — canvas grid of all participants (custom PiP UI)
+const PIP_STRATEGY = "multi";
+
+const getPipSupport = () => ({
+  standard: "pictureInPictureEnabled" in document,
+  webkit:
+    typeof HTMLVideoElement !== "undefined" &&
+    typeof HTMLVideoElement.prototype.webkitSetPresentationMode === "function",
+});
+
 function PipBTN({ isMobile, isTab }) {
   const { pipMode, setPipMode } = useMeetingAppContext();
   const { localParticipant } = useMeeting({
@@ -113,12 +125,11 @@ function PipBTN({ isMobile, isTab }) {
       isIOS);
 
   useEffect(() => {
-    const supportsStandardPip = "pictureInPictureEnabled" in document;
-    const supportsWebkitPip =
-      typeof HTMLVideoElement !== "undefined" &&
-      typeof HTMLVideoElement.prototype.webkitSetPresentationMode ===
-        "function";
-    if (!supportsStandardPip && !supportsWebkitPip) return;
+    // The helper video (and its webcam clone) only serve single-PiP —
+    // skip the extra decode entirely when running the multi strategy.
+    if (PIP_STRATEGY !== "single") return;
+    const { standard, webkit } = getPipSupport();
+    if (!standard && !webkit) return;
 
     const video = document.createElement("video");
     video.muted = true;
@@ -263,12 +274,8 @@ function PipBTN({ isMobile, isTab }) {
       return;
     }
 
-    const supportsStandardPip = "pictureInPictureEnabled" in document;
-    const supportsWebkitPip =
-      typeof HTMLVideoElement !== "undefined" &&
-      typeof HTMLVideoElement.prototype.webkitSetPresentationMode ===
-        "function";
-    if (!supportsStandardPip && !supportsWebkitPip) {
+    const { standard, webkit } = getPipSupport();
+    if (!standard && !webkit) {
       toast("Picture-in-Picture is not supported by your browser", pipToastOptions);
       return;
     }
@@ -310,6 +317,9 @@ function PipBTN({ isMobile, isTab }) {
     // Backgrounded Safari throttles timers to ~1Hz (freezing the grid);
     // the audio thread is exempt, so a silent ScriptProcessorNode acts as
     // a ~23fps paint clock. Must be created inside the click gesture.
+    // Runs alongside the interval on purpose — each clock is the other's
+    // fallback and paints are cheap. (ScriptProcessorNode is deprecated;
+    // AudioWorklet is the eventual replacement.)
     let audioTicker = null;
     if (isSafari) {
       try {
@@ -353,7 +363,7 @@ function PipBTN({ isMobile, isTab }) {
     // them. (visibilitychange may never fire while PiP is active.)
     let nudgeTick = 0;
     function nudgeSources() {
-      nudgeTick = (nudgeTick + 1) % 30; // ~1×/sec at paint cadence
+      nudgeTick = (nudgeTick + 1) % 30; // roughly 1×/sec; varies with active paint clocks
       if (nudgeTick !== 0) return;
       document.querySelectorAll("video").forEach((v) => {
         if (v === pipVideo) return;
@@ -487,19 +497,17 @@ function PipBTN({ isMobile, isTab }) {
       buttonText={pipMode ? "Stop PiP" : "Start Pip"}
       isFocused={pipMode}
       Icon={PipIcon}
-      onClick={() => {
-        // togglePipModeSingle();
-        togglePipModeMulti();
-      }}
+      onClick={
+        PIP_STRATEGY === "single" ? togglePipModeSingle : togglePipModeMulti
+      }
       disabled={false}
     />
   ) : (
     <OutlinedButton
       Icon={PipIcon}
-      onClick={() => {
-        // togglePipModeSingle();
-        togglePipModeMulti();
-      }}
+      onClick={
+        PIP_STRATEGY === "single" ? togglePipModeSingle : togglePipModeMulti
+      }
       isFocused={pipMode}
       tooltip={pipMode ? "Stop PiP" : "Start Pip"}
       disabled={false}
