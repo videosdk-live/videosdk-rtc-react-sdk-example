@@ -32,7 +32,6 @@ import { sideBarModes } from "../../utils/common";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import { createPopper } from "@popperjs/core";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
-import useMediaStream from "../../hooks/useMediaStream";
 
 function PipBTN({ isMobile, isTab }) {
   const { pipMode, setPipMode } = useMeetingAppContext();
@@ -353,7 +352,6 @@ const WebCamBTN = () => {
   const { getCameras } = useMediaDevice();
   const { localWebcamOn, changeWebcam, toggleWebcam } = useMeeting();
   const [webcams, setWebcams] = useState([]);
-  const { getVideoTrack } = useMediaStream();
 
   const getWebcams = async () => {
     try {
@@ -384,13 +382,7 @@ const WebCamBTN = () => {
         Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
         onClick={async () => {
           try {
-            let track;
-            if (!localWebcamOn) {
-              track = await getVideoTrack({
-                webcamId: selectedWebcam.id,
-              });
-            }
-            await toggleWebcam(track);
+            await toggleWebcam();
           } catch (e) {
             console.log("Error in toggleWebcam", e);
           }
