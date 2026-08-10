@@ -80,7 +80,7 @@ export const MobileIconButton = ({
               }}
             >
               {badge && (
-                <div class="inline-flex absolute -top-2 -right-3 justify-center items-center w-6 h-6 text-xs font-bold text-white bg-black rounded-full">
+                <div className="inline-flex absolute -top-2 -right-3 justify-center items-center w-6 h-6 text-xs font-bold text-white bg-black rounded-full">
                   {badge}
                 </div>
               )}
@@ -105,7 +105,6 @@ export const MobileIconButton = ({
                         preserveAspectRatio:
                           lottieOption.rendererSettings.preserveAspectRatio,
                       }}
-                      isClickToPauseDisabled
                     />
                   </div>
                 </div>

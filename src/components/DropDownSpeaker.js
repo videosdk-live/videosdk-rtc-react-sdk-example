@@ -96,7 +96,7 @@ export default function DropDownSpeaker({ speakers }) {
                             return (
                               item?.kind === "audiooutput" && (
                                 <div
-                                  key={`speaker_${index}`}
+                                  key={`speaker_${item?.deviceId}`}
                                   className={` my-1 pl-4 pr-2 text-white text-left flex `} >
                                   <span className="w-6 mr-2 flex items-center justify-center">
                                     {selectedSpeaker?.label === item?.label && (

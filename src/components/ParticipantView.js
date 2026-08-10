@@ -360,6 +360,7 @@ const CornerDisplayStats = ({ participantId, isPresenting }) => {
                             {qualityStateArray.map((item, index) => {
                               return (
                                 <div
+                                  key={index}
                                   className="flex"
                                   style={{
                                     borderBottom:

@@ -68,7 +68,7 @@ export default function DropDownCam({
                             return (
                               item?.kind === "videoinput" && (
                                 <div
-                                  key={`webcams_${index}`}
+                                  key={`webcams_${item?.deviceId}`}
                                   className={` my-1 pl-4 pr-2 text-white text-left flex`}
                                 >
                                   <span className="w-6 mr-2 flex items-center justify-center">

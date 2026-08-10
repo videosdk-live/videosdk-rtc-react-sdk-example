@@ -266,6 +266,7 @@ const MicBTN = () => {
                               <div className="flex flex-col">
                                 {mics.map(({ deviceId, label }, index) => (
                                   <div
+                                    key={`mics_${deviceId}`}
                                     className={`px-3 py-1 my-1 pl-6 text-white text-left ${deviceId === selectedMic.id &&
                                       "bg-gray-150"
                                       }`}
@@ -274,7 +275,6 @@ const MicBTN = () => {
                                       className={`flex flex-1 w-full text-left ${deviceId === selectedMic.id &&
                                         "bg-gray-150"
                                         }`}
-                                      key={`mics_${deviceId}`}
                                       onClick={async () => {
                                         setSelectedMic({ id: deviceId });
                                         try {
@@ -301,6 +301,7 @@ const MicBTN = () => {
                               <div className="flex flex-col ">
                                 {speakers.map(({ deviceId, label }, index) => (
                                   <div
+                                    key={`speakers_${deviceId}`}
                                     className={`px-3 py-1 my-1 pl-6 text-white ${deviceId === selectedSpeaker.id &&
                                       "bg-gray-150"
                                       }`}
@@ -309,7 +310,6 @@ const MicBTN = () => {
                                       className={`flex flex-1 w-full text-left ${deviceId === selectedSpeaker.id &&
                                         "bg-gray-150"
                                         }`}
-                                      key={`speakers_${deviceId}`}
                                       onClick={() => {
                                         setSelectedSpeaker({ id: deviceId });
                                         close();
@@ -447,6 +447,7 @@ const WebCamBTN = () => {
                               <div className="flex flex-col">
                                 {webcams.map(({ deviceId, label }, index) => (
                                   <div
+                                    key={`output_webcams_${deviceId}`}
                                     className={`px-3 py-1 my-1 pl-6 text-white ${deviceId === selectedWebcam.id &&
                                       "bg-gray-150"
                                       }`}
@@ -455,7 +456,6 @@ const WebCamBTN = () => {
                                       className={`flex flex-1 w-full text-left ${deviceId === selectedWebcam.id &&
                                         "bg-gray-150"
                                         }`}
-                                      key={`output_webcams_${deviceId}`}
                                       onClick={async () => {
                                         setSelectedWebcam({ id: deviceId });
                                         try {
@@ -849,6 +849,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
                       {otherFeatures.map(({ icon }) => {
                         return (
                           <div
+                            key={icon}
                             className={`grid items-center justify-center ${icon === BottomBarButtonTypes.MEETING_ID_COPY
                                 ? "col-span-7 sm:col-span-5 md:col-span-3"
                                 : "col-span-4 sm:col-span-3 md:col-span-2"
