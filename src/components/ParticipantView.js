@@ -440,14 +440,15 @@ const ParticipantAudioPlayer = ({ participantId }) => {
       navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
     if (shouldUseAudioRelay()) {
       setRelaySinkId(selectedSpeaker.id);
-    } else if (micRef.current) {
-      try {
-        if (!isFirefox) {
-          micRef.current.setSinkId(selectedSpeaker.id);
-        }
-      } catch (err) {
+    } else if (
+      micRef.current &&
+      selectedSpeaker.id != null &&
+      !isFirefox &&
+      typeof micRef.current.setSinkId === "function"
+    ) {
+      micRef.current.setSinkId(selectedSpeaker.id).catch((err) => {
         console.error("Setting speaker device failed", err);
-      }
+      });
     }
   }, [selectedSpeaker.id]);
 

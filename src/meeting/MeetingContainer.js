@@ -15,6 +15,7 @@ import { useMeetingAppContext } from "../MeetingAppContextDef";
 import {
   connectTrackToRelay,
   shouldUseAudioRelay,
+  teardownRelay,
 } from "../utils/audioOutputRelay";
 
 const ParticipantMicStream = memo(({ participantId }) => {
@@ -197,6 +198,7 @@ export function MeetingContainer({
   }
 
   function onMeetingLeft() {
+    teardownRelay();
     setSelectedMic({ id: null, label: null })
     setSelectedWebcam({ id: null, label: null })
     setSelectedSpeaker({ id: null, label: null })

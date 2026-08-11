@@ -43,8 +43,8 @@ function ensureRelay() {
   document.body.appendChild(relayElement);
 
   // iOS suspends the context until a user gesture and after audio-session
-  // interruptions (e.g. route changes); revive it on any tap. The relay is a
-  // page-lifetime singleton, so these listeners are intentionally never removed.
+  // interruptions (e.g. route changes); revive it on any tap. The listeners
+  // live until teardownRelay() runs on meeting leave.
   document.addEventListener("touchend", resumeRelay, {
     capture: true,
     passive: true,
@@ -87,4 +87,19 @@ export function setRelaySinkId(deviceId) {
   relayElement.setSinkId(deviceId).catch((err) => {
     console.error("Setting relay speaker device failed", err);
   });
+}
+
+export function teardownRelay() {
+  if (!audioContext) return;
+  document.removeEventListener("touchend", resumeRelay, { capture: true });
+  document.removeEventListener("click", resumeRelay, { capture: true });
+  connectedTracks.forEach(({ sourceNode }) => sourceNode.disconnect());
+  connectedTracks.clear();
+  relayElement.pause();
+  relayElement.srcObject = null;
+  relayElement.remove();
+  relayElement = null;
+  destinationNode = null;
+  audioContext.close().catch(() => {});
+  audioContext = null;
 }
