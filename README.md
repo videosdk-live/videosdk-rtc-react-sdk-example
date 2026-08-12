@@ -1,6 +1,6 @@
 # 🚀 Video SDK for React JS
 
-[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/concept-and-architecture) [![Discord](https://img.shields.io/discord/876774498798551130?label=Join%20on%20Discord)](https://discord.gg/Gpmj6eCq5u) [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE) [![Register](https://img.shields.io/badge/Contact-Know%20More-blue)](https://app.videosdk.live/signup)
+[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/concept-and-architecture) [![Discord](https://img.shields.io/discord/876774498798551130?label=Join%20on%20Discord)](https://discord.gg/Gpmj6eCq5u) [![Register](https://img.shields.io/badge/Contact-Know%20More-blue)](https://app.videosdk.live/signup)
 
 A production-ready video conferencing app built with the VideoSDK React SDK - precall setup, screen share, chat, whiteboard, recording, and RTMP/HLS live streaming, all wired up and ready to clone.
 
@@ -25,7 +25,6 @@ At Video SDK, we’re building tools to help companies create world-class collab
 - [📖 **Examples**](#-examples)
 - [📝 **VideoSDK's Documentation**](#-documentation)
 - [💬 **Join Our Community**](#-join-our-community)
-- [📄 **License**](#-license)
 
 
 ## 🖥️ Demo App
