@@ -103,17 +103,26 @@ const CornerDisplayStats = ({ participantId, isPresenting }) => {
     let stats = [];
     let audioStats = [];
     let videoStats = [];
-    if (isPresenting) {
-      stats = await getShareStats();
-    } else if (webcamStream) {
-      stats = await getVideoStats();
-    } else if (micStream) {
-      stats = await getAudioStats();
-    }
+    try {
+      if (isPresenting) {
+        stats = await getShareStats();
+      } else if (webcamStream) {
+        stats = await getVideoStats();
+      } else if (micStream) {
+        stats = await getAudioStats();
+      }
 
-    if (webcamStream || micStream || isPresenting) {
-      videoStats = isPresenting ? await getShareStats() : await getVideoStats();
-      audioStats = isPresenting ? await getShareAudioStats() : await getAudioStats();
+      if (webcamStream || micStream || isPresenting) {
+        videoStats = isPresenting
+          ? await getShareStats()
+          : await getVideoStats();
+        audioStats = isPresenting
+          ? await getShareAudioStats()
+          : await getAudioStats();
+      }
+    } catch (e) {
+      console.log("Error in fetching participant stats", e);
+      return;
     }
 
     let score = stats
@@ -356,6 +365,7 @@ const CornerDisplayStats = ({ participantId, isPresenting }) => {
                             {qualityStateArray.map((item, index) => {
                               return (
                                 <div
+                                  key={index}
                                   className="flex"
                                   style={{
                                     borderBottom:
@@ -438,17 +448,17 @@ const ParticipantAudioPlayer = ({ participantId }) => {
   useEffect(() => {
     const isFirefox =
       navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-    if (shouldUseAudioRelay()) {
-      setRelaySinkId(selectedSpeaker.id);
-    } else if (
-      micRef.current &&
-      selectedSpeaker.id != null &&
-      !isFirefox &&
-      typeof micRef.current.setSinkId === "function"
-    ) {
-      micRef.current.setSinkId(selectedSpeaker.id).catch((err) => {
-        console.error("Setting speaker device failed", err);
-      });
+    if (micRef.current && !isFirefox && selectedSpeaker?.id) {
+      try {
+        const result = micRef.current.setSinkId(selectedSpeaker.id);
+        if (result && typeof result.catch === "function") {
+          result.catch((err) =>
+            console.log("Setting speaker device failed", err)
+          );
+        }
+      } catch (err) {
+        console.log("Setting speaker device failed", err);
+      }
     }
   }, [selectedSpeaker.id]);
 
@@ -532,7 +542,17 @@ const ParticipantViewContent = ({ participantId }) => {
 };
 
 export function ParticipantView({ participantId }) {
-  const { mode } = useParticipant(participantId);
+  const { mode, isLocal, setQuality } = useParticipant(participantId, {
+    onStreamEnabled: (stream) => {
+      if (!isLocal && stream?.kind === "video") {
+        try {
+          setQuality("high");
+        } catch (e) {
+          console.log("Error in setQuality", e);
+        }
+      }
+    },
+  });
 
   return mode === "SEND_AND_RECV" ? (
     <ParticipantViewContent participantId={participantId} />

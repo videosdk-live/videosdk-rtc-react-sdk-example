@@ -1,26 +1,26 @@
 # 🚀 Video SDK for React JS
 
-[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/concept-and-architecture)
-[![Discord](https://img.shields.io/discord/876774498798551130?label=Join%20on%20Discord)](https://discord.gg/kgAvyxtTxv)
-[![Register](https://img.shields.io/badge/Contact-Know%20More-blue)](https://app.videosdk.live/signup)
+[![Documentation](https://img.shields.io/badge/Read-Documentation-blue)](https://docs.videosdk.live/react/guide/video-and-audio-calling-api-sdk/concept-and-architecture) [![Discord](https://img.shields.io/discord/876774498798551130?label=Join%20on%20Discord)](https://discord.gg/Gpmj6eCq5u) [![Register](https://img.shields.io/badge/Contact-Know%20More-blue)](https://app.videosdk.live/signup)
+
+A production-ready video conferencing app built with the VideoSDK React SDK - precall setup, screen share, chat, whiteboard, recording, and RTMP/HLS live streaming, all wired up and ready to clone.
 
 At Video SDK, we’re building tools to help companies create world-class collaborative products with capabilities for live audio/video, cloud recordings, RTMP/HLS streaming, and interaction APIs.
 
-### 🥳 Get **10,000 minutes free** every month! **[Try it now!](https://app.videosdk.live/signup)**
+### 🥳 Get started with **$20 free credit**. No credit card required. **[Try it now!](https://app.videosdk.live/signup)**
 
 ### ⚡️From Clone to Launch - Get Started with the Example in 5 mins!
 
-[![React](https://cdn.videosdk.live/docs/images/youtube/React.png)](https://www.youtube.com/watch?v=Yho3zNYLVg8 "React")
+[![Watch the VideoSDK React tutorial on YouTube](https://cdn.videosdk.live/docs/images/youtube/React.png)](https://www.youtube.com/watch?v=Yho3zNYLVg8 "React")
 
 ## 📚 **Table of Contents**
 
 - [🖥️ **Demo App**](#%EF%B8%8F-demo-app)
 - [⚡ **Quick Setup**](#-quick-setup)
-- [🔧 **Prerequisites**](#-prerequisites)
+- [🛠 **Prerequisites**](#-prerequisites)
 - [📦 **Running the Sample App**](#-running-the-sample-app)
 - [🔥 **Meeting Features**](#-meeting-features)
 - [🧠 **Key Concepts**](#-key-concepts)
-- [🔑 **Token Generation**](#-token-generation)
+- [🔐 **Token Generation**](#-token-generation)
 - [🧩 **Project OverView**](#-project-overview)
 - [📖 **Examples**](#-examples)
 - [📝 **VideoSDK's Documentation**](#-documentation)
@@ -38,8 +38,8 @@ Curious to see it in action? Check out our [live demo here](https://videosdk.liv
 
 ## 🛠 Prerequisites
 
-- **React** v16 or later
-- **Node** v10 or later
+- **Node** v18 or later (required by `react-scripts` 5)
+- **npm** v9 or later
 - A valid [Video SDK Account](https://app.videosdk.live/signup)
 
 ## 📦 Running the Sample App
@@ -150,7 +150,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[components/RunPrecallTest.js](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/RunPrecallTest.js)** : Runs a pre-call test to measure network quality (uplink/downlink latency, jitter, packet loss, bitrate, frame rate, and resolution) before joining the meeting.
 
 <p align="center">
-<img width="600" height="338" src="public/precall-screen.gif"/>
+<img width="600" height="338" src="public/precall-screen.gif" alt="Precall screen showing device selection and network quality test"/>
 </p>
 
 ### 2. Create or Join Meeting
@@ -162,15 +162,15 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`components/MeetingDetailsScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/MeetingDetailsScreen.js)** : Displays options for creating or joining a meeting.
 
 <p align="center">
-<img width="600" height="338" src="public/create-meeting.gif"/>
+<img width="600" height="338" src="public/create-meeting.gif" alt="Create or join meeting screen"/>
 </p>
 
 ### 3. Waiting Screen
 
-- **[`components/screens/WaitingToJoin.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/WaitingToJoinScreen.js)** : Displays a Lottie animation with messages while waiting to join the meeting. This screen is shown until the `isMeetingJoined` flag is true, which is received from the `meeting` initialized using `useMeeting()` from `@videosdk.live/react-sdk`.
+- **[`components/screens/WaitingToJoinScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/WaitingToJoinScreen.js)** : Displays a Lottie animation with messages while waiting to join the meeting. This screen is shown until the `isMeetingJoined` flag is true, which is received from the `meeting` initialized using `useMeeting()` from `@videosdk.live/react-sdk`.
 
 <p align="center">
-<img width="600" height="338" src="public/waiting-screen.gif"/>
+<img width="600" height="338" src="public/waiting-screen.gif" alt="Waiting-to-join screen with Lottie animation"/>
 </p>
 
 ### 4. Participant View
@@ -182,7 +182,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`meeting/components/ParticipantView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/meeting/components/ParticipantView.js)** : Manage how many participants will be displayed in the participant grid.
 
 <p align="center">
-<img width="600" height="338" src="public/participant_view.png"/>
+<img width="600" height="338" src="public/participant_view.png" alt="Participant grid view"/>
 </p>
 
 ### 5. Meeting Bottom Bar
@@ -195,7 +195,7 @@ The token is used to create and validate a meeting using API and also initialize
   - On a mobile, tablet, or smaller screens, the bottom bar reorders to show the leave button, recording button, mic/webcam buttons, and a `more actions` button. The `more actions` button opens a drawer containing the remaining options.
 
 <p align="center">
-<img width="1363" src="public/bottombar.png"/>
+<img width="1363" src="public/bottombar.png" alt="Meeting bottom bar controls"/>
 </p>
 
 ### 6. Presenter View
@@ -203,7 +203,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`components/PresenterView.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/PresenterView.js)** : Displays the view when a participant shares their screen.
 
 <p align="center">
-<img width="600" height="338" src="public/presenter-view.gif"/>
+<img width="600" height="338" src="public/presenter-view.gif" alt="Presenter view during screen share"/>
 </p>
 
 ### 7. Chat
@@ -211,7 +211,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`sidebar/ChatPanel.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/sidebar/ChatPanel.js)** : Contains the chat side panel, with a chat input field and a list of chat messages.
 
 <p align="center">
-<img width="600" height="338" src="public/chat.gif"/>
+<img width="600" height="338" src="public/chat.gif" alt="In-meeting chat side panel"/>
 </p>
 
 ### 8. Participant List
@@ -219,7 +219,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`sidebar/ParticipantPanel.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/sidebar/ParticipantPanel.js)** : Displays the list of participants present in the meeting.
 
 <p align="center">
-<img width="600" height="338" src="public/participant_list.gif"/>
+<img width="600" height="338" src="public/participant_list.gif" alt="Participant list side panel"/>
 </p>
 
 ### 9. Leave Screen
@@ -227,7 +227,7 @@ The token is used to create and validate a meeting using API and also initialize
 - **[`components/screens/LeaveScreen.js`](https://github.com/videosdk-live/videosdk-rtc-react-sdk-example/blob/main/src/components/screens/LeaveScreen.js)** : Displays the leave screen when participant exit the meeting.
 
 <p align="center">
-<img width="600" src="public/leave-screen.png"/>
+<img width="600" src="public/leave-screen.png" alt="Leave screen shown after exiting the meeting"/>
 </p>
 
 <br/>

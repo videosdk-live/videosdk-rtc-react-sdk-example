@@ -541,11 +541,15 @@ const MicBTN = () => {
   const [speakers, setSpeakers] = useState([]);
 
   const getMics = async () => {
-    const mics = await getMicrophones();
-    const speakers = await getPlaybackDevices();
+    try {
+      const mics = await getMicrophones();
+      const speakers = await getPlaybackDevices();
 
-    mics && mics?.length && setMics(mics);
-    speakers && speakers?.length && setSpeakers(speakers);
+      mics && mics?.length && setMics(mics);
+      speakers && speakers?.length && setSpeakers(speakers);
+    } catch (e) {
+      console.log("Error in getMicrophones/getPlaybackDevices", e);
+    }
   };
 
   const [tooltipShow, setTooltipShow] = useState(false);
@@ -566,8 +570,12 @@ const MicBTN = () => {
     <>
       <OutlinedButton
         Icon={localMicOn ? MicOnIcon : MicOffIcon}
-        onClick={() => {
-          toggleMic();
+        onClick={async () => {
+          try {
+            await toggleMic();
+          } catch (e) {
+            console.log("Error in toggleMic", e);
+          }
         }}
         bgColor={localMicOn ? "bg-gray-750" : "bg-white"}
         borderColor={localMicOn && "#ffffff33"}
@@ -621,6 +629,7 @@ const MicBTN = () => {
                               <div className="flex flex-col">
                                 {mics.map(({ deviceId, label }, index) => (
                                   <div
+                                    key={`mics_${deviceId}`}
                                     className={`px-3 py-1 my-1 pl-6 text-white text-left ${deviceId === selectedMic.id &&
                                       "bg-gray-150"
                                       }`}
@@ -629,10 +638,13 @@ const MicBTN = () => {
                                       className={`flex flex-1 w-full text-left ${deviceId === selectedMic.id &&
                                         "bg-gray-150"
                                         }`}
-                                      key={`mics_${deviceId}`}
-                                      onClick={() => {
+                                      onClick={async () => {
                                         setSelectedMic({ id: deviceId });
-                                        changeMic(deviceId);
+                                        try {
+                                          await changeMic(deviceId);
+                                        } catch (e) {
+                                          console.log("Error in changeMic", e);
+                                        }
                                         close();
                                       }}
                                     >
@@ -652,6 +664,7 @@ const MicBTN = () => {
                               <div className="flex flex-col ">
                                 {speakers.map(({ deviceId, label }, index) => (
                                   <div
+                                    key={`speakers_${deviceId}`}
                                     className={`px-3 py-1 my-1 pl-6 text-white ${deviceId === selectedSpeaker.id &&
                                       "bg-gray-150"
                                       }`}
@@ -660,7 +673,6 @@ const MicBTN = () => {
                                       className={`flex flex-1 w-full text-left ${deviceId === selectedSpeaker.id &&
                                         "bg-gray-150"
                                         }`}
-                                      key={`speakers_${deviceId}`}
                                       onClick={() => {
                                         setSelectedSpeaker({ id: deviceId });
                                         setRelaySinkId(deviceId);
@@ -705,11 +717,14 @@ const WebCamBTN = () => {
   const { getCameras } = useMediaDevice();
   const { localWebcamOn, changeWebcam, toggleWebcam } = useMeeting();
   const [webcams, setWebcams] = useState([]);
-  const { getVideoTrack } = useMediaStream();
 
   const getWebcams = async () => {
-    let webcams = await getCameras();
-    webcams && webcams?.length && setWebcams(webcams);
+    try {
+      let webcams = await getCameras();
+      webcams && webcams?.length && setWebcams(webcams);
+    } catch (e) {
+      console.log("Error in getCameras", e);
+    }
   };
 
   const [tooltipShow, setTooltipShow] = useState(false);
@@ -731,13 +746,11 @@ const WebCamBTN = () => {
       <OutlinedButton
         Icon={localWebcamOn ? WebcamOnIcon : WebcamOffIcon}
         onClick={async () => {
-          let track;
-          if (!localWebcamOn) {
-            track = await getVideoTrack({
-              webcamId: selectedWebcam.id,
-            });
+          try {
+            await toggleWebcam();
+          } catch (e) {
+            console.log("Error in toggleWebcam", e);
           }
-          toggleWebcam(track);
         }}
         bgColor={localWebcamOn ? "bg-gray-750" : "bg-white"}
         borderColor={localWebcamOn && "#ffffff33"}
@@ -791,6 +804,7 @@ const WebCamBTN = () => {
                               <div className="flex flex-col">
                                 {webcams.map(({ deviceId, label }, index) => (
                                   <div
+                                    key={`output_webcams_${deviceId}`}
                                     className={`px-3 py-1 my-1 pl-6 text-white ${deviceId === selectedWebcam.id &&
                                       "bg-gray-150"
                                       }`}
@@ -799,10 +813,13 @@ const WebCamBTN = () => {
                                       className={`flex flex-1 w-full text-left ${deviceId === selectedWebcam.id &&
                                         "bg-gray-150"
                                         }`}
-                                      key={`output_webcams_${deviceId}`}
-                                      onClick={() => {
+                                      onClick={async () => {
                                         setSelectedWebcam({ id: deviceId });
-                                        changeWebcam(deviceId);
+                                        try {
+                                          await changeWebcam(deviceId);
+                                        } catch (e) {
+                                          console.log("Error in changeWebcam", e);
+                                        }
                                         close();
                                       }}
                                     >
@@ -838,12 +855,12 @@ const WebCamBTN = () => {
 };
 
 const RaiseHandBTN = ({ isMobile, isTab }) => {
-  const { publish } = usePubSub("RAISE_HAND");
-  const RaiseHand = () => {
+  const { publish } = usePubSub("RAISE_HAND", {});
+  const RaiseHand = async () => {
     try {
-      publish("Raise Hand");
+      await publish("Raise Hand");
     } catch (e) {
-      console.log("Error in pubsub", e)
+      console.log("Error in pubsub publish (RAISE_HAND)", e);
     }
   };
 
@@ -893,13 +910,20 @@ const RecordingBTN = () => {
     [recordingState]
   );
 
-  const _handleClick = () => {
+  const _handleClick = async () => {
     const isRecording = isRecordingRef.current;
 
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
+    try {
+      if (isRecording) {
+        await stopRecording();
+      } else {
+        await startRecording();
+      }
+    } catch (e) {
+      console.log(
+        `Error in ${isRecording ? "stopRecording" : "startRecording"}`,
+        e
+      );
     }
   };
 
@@ -947,8 +971,12 @@ const ScreenShareBTN = ({ isMobile, isTab }) => {
       }
       isFocused={localScreenShareOn}
       Icon={ScreenShareIcon}
-      onClick={() => {
-        toggleScreenShare();
+      onClick={async () => {
+        try {
+          await toggleScreenShare();
+        } catch (e) {
+          console.log("Error in toggleScreenShare", e);
+        }
       }}
       disabled={
         presenterId
@@ -963,8 +991,12 @@ const ScreenShareBTN = ({ isMobile, isTab }) => {
   ) : (
     <OutlinedButton
       Icon={ScreenShareIcon}
-      onClick={() => {
-        toggleScreenShare();
+      onClick={async () => {
+        try {
+          await toggleScreenShare();
+        } catch (e) {
+          console.log("Error in toggleScreenShare", e);
+        }
       }}
       isFocused={localScreenShareOn}
       tooltip={
@@ -986,8 +1018,12 @@ const LeaveBTN = ({ setIsMeetingLeft }) => {
     <OutlinedButton
       Icon={EndIcon}
       bgColor="bg-red-150"
-      onClick={() => {
-        leave();
+      onClick={async () => {
+        try {
+          await leave();
+        } catch (err) {
+          console.error('leave failed', err);
+        }
         setIsMeetingLeft(true);
       }}
       tooltip="Leave Meeting"
@@ -1170,6 +1206,7 @@ export function BottomBar({ bottomBarHeight, setIsMeetingLeft }) {
                       {otherFeatures.map(({ icon }) => {
                         return (
                           <div
+                            key={icon}
                             className={`grid items-center justify-center ${icon === BottomBarButtonTypes.MEETING_ID_COPY
                                 ? "col-span-7 sm:col-span-5 md:col-span-3"
                                 : "col-span-4 sm:col-span-3 md:col-span-2"

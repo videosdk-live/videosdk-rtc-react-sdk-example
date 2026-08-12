@@ -38,32 +38,36 @@ const ChatMessage = ({ senderId, senderName, text, timestamp, localParticipantId
 
 const ChatInput = ({ inputHeight }) => {
   const [message, setMessage] = useState("");
-  const { publish } = usePubSub("CHAT");
+  const { publish } = usePubSub("CHAT", {});
   const input = useRef();
+
+  const sendMessage = async (messageText) => {
+    try {
+      await publish(messageText, { persist: true, sendOnly: [] }, {});
+      setTimeout(() => {
+        setMessage("");
+      }, 100);
+      input.current?.focus();
+    } catch (e) {
+      console.log("Error in pubsub publish (CHAT)", e);
+    }
+  };
 
   return (
     <div
       className="w-full flex items-center px-2"
       style={{ height: inputHeight }}
     >
-      <div class="relative  w-full">
-        <span class="absolute inset-y-0 right-0 flex mr-2 rotate-90 ">
+      <div className="relative  w-full">
+        <span className="absolute inset-y-0 right-0 flex mr-2 rotate-90 ">
           <button
             disabled={message.length < 2}
             type="submit"
             className="p-1 focus:outline-none focus:shadow-outline"
-            onClick={() => {
+            onClick={async () => {
               const messageText = message.trim();
               if (messageText.length > 0) {
-                try {
-                  publish(messageText, { persist: true });
-                  setTimeout(() => {
-                    setMessage("");
-                  }, 100);
-                  input.current?.focus();
-                } catch (e) {
-                  console.log("Error in pubsub", e)
-                }
+                await sendMessage(messageText);
               }
             }}
           >
@@ -77,27 +81,19 @@ const ChatInput = ({ inputHeight }) => {
           type="text"
           className="py-4 text-base text-white border-gray-400 border bg-gray-750 rounded pr-10 pl-2 focus:outline-none w-full"
           placeholder="Write your message"
-          autocomplete="off"
+          autoComplete="off"
           ref={input}
           value={message}
           onChange={(e) => {
             setMessage(e.target.value);
           }}
-          onKeyPress={(e) => {
+          onKeyPress={async (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
               const messageText = message.trim();
 
               if (messageText.length > 0) {
-                try {
-                  publish(messageText, { persist: true });
-                  setTimeout(() => {
-                    setMessage("");
-                  }, 100);
-                  input.current?.focus();
-                } catch (e) {
-                  console.log("Error in pubsub", e)
-                }
+                await sendMessage(messageText);
               }
             }
           }}
@@ -111,7 +107,10 @@ const ChatMessages = ({ listHeight }) => {
   const listRef = useRef();
   const { localParticipant } = useMeeting();
   const localParticipantId = localParticipant?.id;
-  const { messages } = usePubSub("CHAT");
+  const { messages } = usePubSub(
+    "CHAT",
+    {},
+  );
 
   const scrollToBottom = (data) => {
     if (!data) {
@@ -139,11 +138,11 @@ const ChatMessages = ({ listHeight }) => {
   return messages ? (
     <div ref={listRef} style={{ overflowY: "scroll", height: listHeight }}>
       <div className="p-4">
-        {messages.map((msg, i) => {
+        {messages.map((msg) => {
           const { senderId, senderName, message, timestamp } = msg;
           return (
             <ChatMessage
-              key={`chat_item_${i}`}
+              key={`chat_item_${timestamp}_${senderId}`}
               {...{ senderId, senderName, text: message, timestamp, localParticipantId }}
             />
           );

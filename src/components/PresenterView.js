@@ -69,9 +69,13 @@ const StopPresentingOverlay = ({ presenterId, toggleScreenShare }) => {
         <div className="mt-8">
           <button
             className="bg-purple-550 text-white px-4 py-2 rounded text-sm text-center font-medium"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              toggleScreenShare();
+              try {
+                await toggleScreenShare();
+              } catch (err) {
+                console.error('toggleScreenShare failed', err);
+              }
             }}
           >
             STOP PRESENTING

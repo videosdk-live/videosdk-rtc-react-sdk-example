@@ -162,7 +162,6 @@ export const OutlinedButton = ({
                           preserveAspectRatio:
                             lottieOption.rendererSettings.preserveAspectRatio,
                         }}
-                        isClickToPauseDisabled
                       />
                     </div>
                   </div>
