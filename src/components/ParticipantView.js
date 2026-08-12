@@ -10,6 +10,11 @@ import MicOffSmallIcon from "../icons/MicOffSmallIcon";
 import NetworkIcon from "../icons/NetworkIcon";
 import SpeakerIcon from "../icons/SpeakerIcon";
 import { getQualityScore, nameTructed } from "../utils/common";
+import {
+  connectTrackToRelay,
+  setRelaySinkId,
+  shouldUseAudioRelay,
+} from "../utils/audioOutputRelay";
 import * as ReactDOM from "react-dom";
 import { useMeetingAppContext } from "../MeetingAppContextDef";
 
@@ -433,16 +438,19 @@ const ParticipantAudioPlayer = ({ participantId }) => {
   useEffect(() => {
     const isFirefox =
       navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
-    if (micRef.current) {
-      try {
-        if (!isFirefox) {
-          micRef.current.setSinkId(selectedSpeaker.id);
-        }
-      } catch (err) {
-        console.log("Setting speaker device failed", err);
-      }
+    if (shouldUseAudioRelay()) {
+      setRelaySinkId(selectedSpeaker.id);
+    } else if (
+      micRef.current &&
+      selectedSpeaker.id != null &&
+      !isFirefox &&
+      typeof micRef.current.setSinkId === "function"
+    ) {
+      micRef.current.setSinkId(selectedSpeaker.id).catch((err) => {
+        console.error("Setting speaker device failed", err);
+      });
     }
-  }, [selectedSpeaker]);
+  }, [selectedSpeaker.id]);
 
   useEffect(() => {
     if (micRef.current) {
@@ -455,13 +463,18 @@ const ParticipantAudioPlayer = ({ participantId }) => {
           .catch((error) =>
             console.error("micRef.current.play() failed", error)
           );
+        if (!isLocal) {
+          return connectTrackToRelay(micStream.track);
+        }
       } else {
         micRef.current.srcObject = null;
       }
     }
-  }, [micStream, micOn]);
+  }, [micStream, micOn, isLocal]);
 
-  return <audio ref={micRef} autoPlay muted={isLocal} />;
+  return (
+    <audio ref={micRef} autoPlay muted={isLocal || shouldUseAudioRelay()} />
+  );
 };
 
 const ParticipantVideoSection = ({ participantId }) => {

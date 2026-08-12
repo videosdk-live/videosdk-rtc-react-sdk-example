@@ -30,6 +30,7 @@ import useIsTab from "../../hooks/useIsTab";
 import useIsMobile from "../../hooks/useIsMobile";
 import { MobileIconButton } from "../../components/buttons/MobileIconButton";
 import { sideBarModes } from "../../utils/common";
+import { setRelaySinkId } from "../../utils/audioOutputRelay";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import { createPopper } from "@popperjs/core";
 import { useMeetingAppContext } from "../../MeetingAppContextDef";
@@ -662,6 +663,7 @@ const MicBTN = () => {
                                       key={`speakers_${deviceId}`}
                                       onClick={() => {
                                         setSelectedSpeaker({ id: deviceId });
+                                        setRelaySinkId(deviceId);
                                         close();
                                       }}
                                     >
