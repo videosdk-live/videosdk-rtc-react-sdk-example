@@ -252,7 +252,3 @@ Explore more and start building with our [**Documentation**](https://docs.videos
 
 - **[Discord](https://discord.gg/Gpmj6eCq5u)**: Engage with the Video SDK community, ask questions, and share insights.
 - **[X](https://x.com/video_sdk)**: Stay updated with the latest news, updates, and tips from Video SDK.
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
